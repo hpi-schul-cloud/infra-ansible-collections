@@ -1,0 +1,32 @@
+#!/bin/bash
+
+usage(){
+  echo "Usage:"
+  echo "   duply-status <backup>"
+  echo "Possible backups:"
+  ls -1 ~/.duply/default/sc* | tr '\n' '\0' | xargs -0 -n 1 basename
+}
+
+if [ $# -ne 1 ] || [ $1 == "--help" ] || [ $1 == "-h" ]; then
+  usage
+  exit 1
+fi
+
+get_valid_group(){
+  local gr=""
+  if id -nG "$USER" | grep -qw "devops"; then
+    gr=devops
+  fi
+  if id -nG "$USER" | grep -qw "support"; then
+    gr=support
+  fi
+  echo $gr
+}
+valid_group=$(get_valid_group)
+if [ -n "$valid_group" ]; then
+  export BACKUP_TARGET=$1
+  duply default status 
+else
+  echo "You are not in one of the groups: devops,support"
+  exit 1
+fi

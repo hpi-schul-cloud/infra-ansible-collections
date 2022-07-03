@@ -1,0 +1,5 @@
+TARGET="{{ hostvars[inventory_hostname][sc_item]['backup']['target']['url'] }}/{{backupDb}}-{{item}}"
+
+export AWS_ACCESS_KEY_ID={{ backupS3Key }}
+# secret key
+export AWS_SECRET_ACCESS_KEY={{ backupS3Secret }}

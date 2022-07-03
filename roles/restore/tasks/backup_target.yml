@@ -1,0 +1,47 @@
+---
+  - name: Include sc instance values
+    include_vars:
+      file: "files/values/{{ sc_item }}.yml"
+      name: "{{ sc_item }}"
+    tags: molecule-notest
+
+  - name: create temp duply profile dir
+    tags: [ restore ]
+    file:
+      path: "/data/restore/profiles/default"
+      owner: "root"
+      group: "root"
+      mode: 0700
+      state: directory
+
+  - name: copy backup target config for mongodb
+    tags: [ restore ]
+    template:
+      src: backup-target.j2
+      dest: "/data/restore/profiles/default/{{ sc_item }}-mongodb-{{ item }}"
+      owner: "root"
+      group: "root"
+      mode: 0600
+    loop: "{{ hostvars[inventory_hostname][sc_item]['backup']['mongodb'].keys()|list }}"
+    when:
+      (hostvars[inventory_hostname][sc_item] is defined) and
+      (hostvars[inventory_hostname][sc_item]['backup'] is defined) and
+      (hostvars[inventory_hostname][sc_item]['backup']['mongodb'] is defined)
+    vars:
+      backupDb: mongodb
+
+  - name: copy backup target config for postgres
+    tags: [ restore ]
+    template:
+      src: backup-target.j2
+      dest: "/data/restore/profiles/default/{{ sc_item }}-postgres-{{ item }}"
+      owner: "root"
+      group: "root"
+      mode: 0600
+    loop: "{{ hostvars[inventory_hostname][sc_item]['backup']['postgres'].keys()|list }}"
+    when:
+      (hostvars[inventory_hostname][sc_item] is defined) and
+      (hostvars[inventory_hostname][sc_item]['backup'] is defined) and
+      (hostvars[inventory_hostname][sc_item]['backup']['postgres'] is defined)
+    vars:
+      backupDb: postgres

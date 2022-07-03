@@ -1,0 +1,9 @@
+---
+    - name: set sshd_banner
+      copy:
+        src: sshd_banner.txt
+        dest: /etc/ssh/sshd_banner.txt
+        owner: root
+        group: root
+        mode: 0644
+      notify: restart sshd

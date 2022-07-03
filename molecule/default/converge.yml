@@ -1,0 +1,59 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - debug: var=inventory_hostname
+    - name: "Include role: users"
+      include_role:
+        name: "users"
+    - name: "Include role: basic"
+      include_role: 
+        name: "basic"
+    - name: "Include role: restore"
+      include_role:
+        name: "restore"
+  vars:
+  # vars for role: restore
+    schulcloud:
+      - sc-prod-nbc 
+      - sc-prod-brb 
+
+  # vars for role: user, basic
+    present_groups:
+      - name: devops
+        gid: 1500
+        hosts:
+          - localhost
+            # inventory_hostname needs to be provided - needed by if condition in user role 
+          - instance
+      - name: support
+        gid: 1600
+        hosts:
+          - localhost
+          - instance
+
+    present_users:
+    #User Template
+    #  - name: <username>
+    #    uid: <uid>
+    #    groups:
+    #      - <list of user groups>
+    #    hosts:
+    #      - <list of allow host>
+    #    hosts_absend:
+    #      - <list of host who the user don't have access any more, if we not fully remove the user>
+    #    allhosts: true # short cut for all hosts at the host list
+      # Deployuser
+      - name: technicaluser
+        uid: 2260
+        groups:
+          - devops
+          - support
+        hosts: 
+          - localhost
+          - instance
+        #allhosts: true
+          
+    absent_users:
+      - dummy.user
+

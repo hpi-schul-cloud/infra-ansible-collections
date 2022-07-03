@@ -1,0 +1,10 @@
+---
+# Latest group information are needed 
+  - getent:
+      database: group
+      split: ':'
+    tags: [ restore ]
+  - import_tasks: duply.yml
+    tags: [ restore ]
+
+

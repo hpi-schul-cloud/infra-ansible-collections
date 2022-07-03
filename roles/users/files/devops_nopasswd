@@ -1,0 +1,5 @@
+# Created by Ansible Playbook #infra-ansible-collections 
+
+# User rules for devops
+# allows people in group devops to run all commands
+%devops ALL=(ALL:ALL) NOPASSWD:ALL

@@ -1,0 +1,60 @@
+#!/bin/bash
+
+usage(){
+  echo "Usage:"
+  echo "   duply-restore <backup> <startdate> [<enddate>] <restore path>"
+  echo "Format for startdate/enddate: YYYY-MM-DD"
+  echo "Possible backups:"
+  ls -1 ~/.duply/default/sc* | tr '\n' '\0' | xargs -0 -n 1 basename
+}
+
+get_valid_group(){
+  local gr=""
+  if id -nG "$USER" | grep -qw "devops"; then
+    gr=devops
+  fi
+  if id -nG "$USER" | grep -qw "support"; then
+    gr=support
+  fi
+  echo $gr
+}
+
+if [ $# -lt 2 ] || [ $# -gt 4 ] || [ $1 == "--help" ] || [ $1 == "-h" ]; then
+  usage
+  exit 1
+fi
+
+export BACKUP_TARGET=$1
+if [[ $3 = 20* ]]
+then 
+  enddate=$3
+  targetpath=$4
+else
+  enddate=$2
+  targetpath=$3
+fi
+
+startdate=$2
+
+start=$(date -d "$startdate + 1 day" +%Y%m%d)
+end=$(date -d "$enddate + 1 day" +%Y%m%d)
+if [[ $end < $start ]]; then
+  temp=$start
+  start=$end
+  end=$temp
+fi
+valid_group=$(get_valid_group)
+if [ -n "$valid_group" ]; then
+  while [[ $start -le "$end" ]]; do 
+    restoredate=$(date -d $start +%Y-%m-%d)  
+    pathdate=$(date -d "$restoredate - 1 day" +%Y-%m-%d)
+    duply default restore $targetpath/$pathdate $restoredate
+    start=$(date -d "$start + 1 day" +%Y%m%d)
+    chgrp -R $valid_group $targetpath/$pathdate
+    find $targetpath/$pathdate -type f -exec chmod g+rw {} \;
+    find $targetpath/$pathdate -type d -exec chmod g+rwx {} \;
+  done
+else
+  echo "You are not in one of the groups: devops,support"
+  exit 1
+fi

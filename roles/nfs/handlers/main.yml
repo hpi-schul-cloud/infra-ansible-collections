@@ -1,0 +1,3 @@
+---
+- name: Export directories
+  command: exportfs -ar

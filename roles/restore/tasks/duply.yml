@@ -1,0 +1,50 @@
+---
+  - name: install duply gnupg
+    apt:
+      name: ['duply','gnupg2','expect']
+      update_cache: yes
+      state: latest
+
+  - name: Install boto python package
+    pip:
+      name: boto
+
+  - name: Create backup target configuration files
+    include_tasks: backup_target.yml
+    tags: [ restore ]
+    loop: "{{ schulcloud }}"
+    # loop: "{{ groups.sc }}"
+    loop_control:
+      loop_var: sc_item
+    vars:
+      backupS3Key: "{{ lookup('schulcloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.s3.key') }}"
+      backupS3Secret: "{{ lookup('schulcloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.s3.secret') }}"
+
+# Prepares duply profiles and gpg keys for each user in devops and support group 
+  - name: Create duply profiles
+    include_tasks: duply_configuration.yml
+    when:
+      (user_item.0.name is defined) and
+      ((user_item.0.allhosts is defined and user_item.0.allhosts == True) or (user_item.0.hosts is defined and inventory_hostname in user_item.0.hosts)) and 
+      (user_item.1 in ["devops","support"]) # Only devops and support group member are allowed to use gpg keys for support
+    loop: "{{ present_users | subelements('groups') }}"
+    loop_control:
+      loop_var: user_item
+
+  - name: copy duply-restore script
+    tags: [ restore ]
+    copy:
+      src: duply-restore
+      dest: "/usr/bin/duply-restore"
+      owner: "root"
+      group: "root"
+      mode: 0755
+
+  - name: copy duply-status script
+    tags: [ restore ]
+    copy:
+      src: duply-status
+      dest: "/usr/bin/duply-status"
+      owner: "root"
+      group: "root"
+      mode: 0755

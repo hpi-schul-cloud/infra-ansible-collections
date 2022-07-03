@@ -1,0 +1,101 @@
+---
+  - name: cleanup duply profile dir
+    tags: [ restore ]
+    file:
+      path: "/home/{{user_item.0.name}}/.duply/default"
+      state: absent
+
+  - name: create duply config dir
+    tags: [ restore ]
+    file:
+      path: "/home/{{user_item.0.name}}/.duply/default"
+      # path: "/home/{{user_item.0.name}}/.duply"
+      owner: "{{user_item.0.name}}"
+      group: "{{user_item.0.name}}"
+      mode: 0700
+      state: directory
+
+  - name: create duply restore dir
+    tags: [ restore ]
+    file:
+      path: "/data/restore"
+      owner: "root"
+      group: "root"
+      mode: u+rwx,g+rwxs,o-rwx
+      state: directory
+
+  - name: Copy profile files
+    command:
+      cmd: "cp -r /data/restore/profiles/default /home/{{user_item.0.name}}/.duply"
+      # creates: "/home/{{user_item.0.name}}/.duply/default"
+
+  - name: Set right owner of profile files
+    tags: [ restore ]
+    file:
+      path: "/home/{{user_item.0.name}}/.duply"
+      owner: "{{user_item.0.name}}"
+      group: "{{user_item.0.name}}"
+      mode: u+rwx,g+rwxs,o-rwx
+      recurse: yes 
+
+  - name: create duply restore group dir
+    tags: [ restore ]
+    file:
+      path: "/data/restore/{{user_item.1}}"
+      owner: "root"
+      group: "{{user_item.1}}"
+      mode: u+rwx,g+rwxs,o-rwx
+      state: directory
+
+  - name: create duply cache dir
+    tags: [ restore ]
+    file:
+      path: "/data/restore/{{user_item.1}}/.cache/{{user_item.0.name}}"
+      owner: "root"
+      group: "{{user_item.1}}"
+      mode: 0770
+      state: directory
+
+  - name: copy duply config
+    tags: [ restore ]
+    template:
+      src: duply.conf.j2
+      dest: "/home/{{user_item.0.name}}/.duply/default/conf"
+      owner: "{{user_item.0.name}}"
+      group: "{{user_item.0.name}}"
+      mode: 0600
+
+  - name: import public keys
+    tags: [ restore ]
+    shell: >
+      echo "{{ lookup('schulcloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.gpg.keys.' + user_item.1 + '.public') }}" | gpg2 --import && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.pub.lock"
+    args:
+      creates: "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.pub.lock"
+    become: true
+    become_user: "{{user_item.0.name}}"
+
+  - name: import ownertrusts
+    tags: [ restore ]
+    shell: >
+      gpg2 --list-keys --fingerprint --with-colons | sed -E -n -e 's/^fpr:::::::::([0-9A-F]+):$/\1:6:/p' | gpg2 --import-ownertrust && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.trust.lock"
+    args:
+      creates: "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.trust.lock"
+    become: true
+    become_user: "{{user_item.0.name}}"
+    register: ownertrusts_status
+
+  - name: import private keys
+    tags: [ restore ]
+    shell: >
+      echo '{{ lookup('schulcloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.gpg.keys.' + user_item.1 + '.secret') }}' | gpg2 --allow-secret-key-import --batch --import && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.sec.lock"
+    args:
+      creates: "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.sec.lock"
+    become: true
+    become_user: "{{user_item.0.name}}"
+
+  - name: update trustdb
+    tags: [ restore ]
+    command: gpg2 --update-trustdb
+    become: true
+    become_user: "{{user_item.0.name}}"
+    when: ownertrusts_status.changed

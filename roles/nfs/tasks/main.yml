@@ -1,0 +1,18 @@
+---
+- name: Install nfs-server
+  apt:
+    name: nfs-server
+    update_cache: true
+
+- name: Create exports file
+  copy:
+    dest: /etc/exports
+    content: "{{ nfs_exports }}"
+    mode: 0644
+  notify: Export directories
+
+- name: Enable nfs-server
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: true

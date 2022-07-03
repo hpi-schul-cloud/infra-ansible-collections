@@ -1,0 +1,21 @@
+---
+  - name: Prepare molecule
+    hosts: all
+    pre_tasks:
+    # create ssh dir, since in docker image dir is not automatically set up and we need it to test the copying of files
+    - name: Creates ssh directory
+      file:
+        path: /etc/ssh
+        state: directory
+    # if you want to test ssh login permissions, install and start the ssh server on the conatiner:
+    - name: Install openssh-server
+      apt:
+        name: openssh-server
+        update_cache: yes
+        state: present
+    - name: start ssh server 
+      command: service ssh start
+      become: true
+
+
+
