@@ -1,0 +1,9 @@
+---
+- import_tasks: ingress.yml
+- import_tasks: onepassword.yml
+- import_tasks: otc-cert-manager.yml
+- import_tasks: coredns.yml
+- import_tasks: fluentbit.yml
+- import_tasks: monitoring.yml
+- import_tasks: nfs-provider.yml
+- import_tasks: kubernetes-event-exporter.yml

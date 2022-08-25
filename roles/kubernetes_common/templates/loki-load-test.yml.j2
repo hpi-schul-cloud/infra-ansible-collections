@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: loki-load-test
+  namespace: default
+spec:
+  replicas: {{ loki_load_test.replicas }}
+  selector:
+    matchLabels:
+      app: loki-load-test
+  template:
+    metadata:
+      labels:
+        app: loki-load-test
+    spec:
+      containers:
+      - name: loki-load-test
+        args:
+        - /ocp-logtest.py
+        - --line-length={{ loki_load_test.line_length }}
+        - --rate={{ loki_load_test.rate }}
+        - --text-type=input
+        - --file=/sample.log
+        - --raw
+        command:
+        - python
+        image: quay.io/mffiedler/ocp-logtest:latest
+        volumeMounts:
+        - mountPath: /sample.log
+          subPath: sample.log
+          name: loki-load-test
+        - mountPath: /ocp-logtest.py
+          subPath: ocp-logtest.py
+          name: loki-load-test
+      volumes:
+      - name: loki-load-test
+        configMap:
+          name: loki-load-test
+          items:
+          - key: sample.log
+            path: sample.log
+          - key: ocp-logtest.py
+            path: ocp-logtest.py

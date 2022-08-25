@@ -1,0 +1,18 @@
+---
+# As the ingress in kuberneter needs a hostname for routing the requests we need also hostnames
+# on the client side. Therefore the coredns configuration is extended with victoriametrics hosts
+# and loki hosts
+# See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
+- name: Setup Coredns Configmap with additional hosts
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: coredns-additional-conf
+        namespace: kube-system
+      data:
+        additional.conf: |-
+          {{ coredns_additional_hosts }}

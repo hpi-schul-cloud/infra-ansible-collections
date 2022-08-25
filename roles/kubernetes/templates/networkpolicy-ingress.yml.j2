@@ -1,0 +1,31 @@
+apiVersion: crd.projectcalico.org/v1
+kind: GlobalNetworkPolicy
+metadata:
+  name: allow-internal-ingress-only
+spec:
+  order: 20
+  preDNAT: true
+  applyOnForward: true
+  ingress:
+{% if kubernetes_ingress_whitelist_ips | length %}
+    - action: Allow
+      source:
+        nets: {{ kubernetes_ingress_whitelist_ips }}
+      destination:
+        ports:
+        - 30000:32767
+      protocol: TCP
+{% endif %}
+    - action: Allow
+      protocol: ICMP
+    - action: Deny
+      destination:
+        ports:
+        - 30000:32767
+      protocol: TCP
+    - action: Deny
+      destination:
+        ports:
+        - 30000:32767
+      protocol: UDP
+  selector: role == 'hostendpoint'

@@ -1,0 +1,36 @@
+---
+- name: Add grafana chart repo
+  kubernetes.core.helm_repository:
+    name: grafana
+    repo_url: "https://grafana.github.io/helm-charts"
+
+- name: Install Loki
+  kubernetes.core.helm:
+    name: loki
+    chart_ref: grafana/loki-distributed
+    update_repo_cache: true
+    wait: true
+    wait_timeout: 10m
+    chart_version: "{{ loki_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: monitoring
+    values:
+      "{{ loki_values }}"
+
+# For working secret transfer a 1password secret is needed (See https://docs.hpi-schul-cloud.org/display/PROD/Loki)
+# See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
+- name: Create loki http basic auth secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: "{{ loki_ingres_basic_auth_secret_name }}"
+        namespace: monitoring
+        labels:
+          app: loki
+          release: loki
+      spec:
+        itemPath: "vaults/{{ vault }}/items/loki"
