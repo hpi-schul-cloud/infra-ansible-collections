@@ -1,0 +1,21 @@
+---
+- name: Add nfs-subdir helm repo
+  kubernetes.core.helm_repository:
+    name: nfs-subdir
+    repo_url: "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  when: nfs_server_ip is defined
+  tags: nfs
+
+- name: Install nfs-subdir provider helm chart
+  kubernetes.core.helm:
+    name: nfs-provider
+    chart_ref: "nfs-subdir/nfs-subdir-external-provisioner"
+    wait: true
+    wait_timeout: 10m
+    chart_version: "{{ nfs_provider_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: nfs-provider
+    create_namespace: true
+    values: "{{ nfs_provider_values }}"
+  when: nfs_server_ip is defined
+  tags: nfs

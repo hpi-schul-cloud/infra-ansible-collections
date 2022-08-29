@@ -1,0 +1,49 @@
+---
+- name: Create otcdns secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: otcdns-credentials
+        namespace: cert-manager
+      spec:
+        itemPath: "vaults/{{ vault }}/items/otcdns-credentials"
+  when: otcdns_wildcard_certificates | length > 0
+
+- name: Add otcdns chart repo
+  kubernetes.core.helm_repository:
+    name: otcdns
+    repo_url: "https://hpi-schul-cloud.github.io/infra-otc-cert-manager-webhook/"
+
+- name: Install otcdns webhook plugin
+  kubernetes.core.helm:
+    name: otcdns
+    chart_ref: otcdns/infra-otc-cert-manager-webhook
+    chart_version: "{{ otcdns_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: cert-manager
+    values:
+      "{{ otcdns_values }}"
+  when: otcdns_wildcard_certificates | length > 0
+
+- name: Create wildcard certificates
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: cert-manager.io/v1
+      kind: Certificate
+      metadata:
+        name: "{{ item.name }}"
+        namespace: "{{ item.namespace }}"
+      spec:
+        dnsNames: "{{ item.dnsNames }}"
+        secretName: "{{ item.name }}"
+        issuerRef:
+          kind: "ClusterIssuer"
+          name: "sc-cert-manager-clusterissuer-letsencrypt-otcdns"
+  loop: "{{ otcdns_wildcard_certificates }}"
+  when: otcdns_wildcard_certificates | length > 0

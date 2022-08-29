@@ -1,0 +1,84 @@
+---
+# NGINX Ingress Controller: https://kubernetes.github.io/ingress-nginx/
+#
+# Sources: https://github.com/kubernetes/ingress-nginx
+#
+# Helm Chart:
+# Releases: https://github.com/kubernetes/ingress-nginx/tags
+# Sources: https://github.com/kubernetes/ingress-nginx/tree/master/charts/ingress-nginx
+# Helm Repo: https://kubernetes.github.io/ingress-nginx
+# "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx"
+# Use: "helm show values ingress-nginx/ingress-nginx" to view configuration options.
+#
+# Installation:
+# https://kubernetes.github.io/ingress-nginx/deploy/
+# https://kubernetes.io/docs/concepts/services-networking/ingress/
+- name: Add nginx-ingress-controller Helm repo
+  kubernetes.core.helm_repository:
+    name: ingress-nginx
+    repo_url: https://kubernetes.github.io/ingress-nginx
+# - name: Create ingress-controller namespace
+#   kubernetes.core.k8s:
+#     state: present
+#     kubeconfig: "{{ kubeconfig }}"
+#     api_version: v1
+#     # name: "u"
+#     kind: Namespace
+- name: Install nginx-ingress-controller Helm chart
+  kubernetes.core.helm:
+    name: ingress-nginx
+    chart_ref: ingress-nginx/ingress-nginx
+    chart_version: "{{ ingress_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: ingress-controller
+    create_namespace: true
+    values:
+      "{{ ingress_chart_values }}"
+# The basic cert-manager. This provides the functionality
+# to manage certificates.
+#
+# Sources and release info:
+# https://github.com/jetstack/cert-manager/tags
+# https://github.com/jetstack/cert-manager/releases/tag/v1.0.4
+
+# Helm Chart:
+# Sources: https://github.com/jetstack/cert-manager/tree/master/deploy/charts/cert-manager
+# Helm-Repo: https://artifacthub.io/packages/helm/jetstack/cert-manager
+# The Repo works, but: https://github.com/cert-manager/website/issues/478
+#
+# Installation:
+# https://cert-manager.io/docs/installation/kubernetes/
+#
+# Custom Resource Definitions:
+# For older versions we have maintained the matching crds in charts/sc-cert-manager-addons/crds/cert-manager.crds.yaml.
+# When updating to a new Cert-Manager version, the charts/sc-cert-manager-addons/crds/cert-manager.crds.yaml file potentially must be updated.
+# Newer versions >= 1.1.0 support an installCRDs switch.
+# https://github.com/jetstack/cert-manager/blob/release-1.1/deploy/charts/cert-manager/templates/BUILD.bazel
+#
+# The Cert-Manager itself can live without an ingress to provide self-signed certificates.
+# For Let's encrypt certificates an Ingress will be needed to validate the site ownership.
+- name: Add Jetstack.io Helm repo
+  kubernetes.core.helm_repository:
+    name: jetstack
+    repo_url: https://charts.jetstack.io
+- name: Install cert-manger Helm chart
+  kubernetes.core.helm:
+    name: cert-manager
+    chart_ref: jetstack/cert-manager
+    chart_version: "{{ cert_manager_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: cert-manager
+    create_namespace: true
+    values:
+      "{{ cert_manager_chart_values }}"
+
+# ClusterIssuer setup. See https://artifacthub.io/packages/helm/jetstack/cert-manager
+# "In order to begin issuing certificates, you will need to set up a ClusterIssuer or
+# Issuer resource (for example, by creating a 'letsencrypt-staging' issuer)."
+# https://cert-manager.io/docs/concepts/issuer/
+- name: Install clusterissuer Helm chart
+  kubernetes.core.helm:
+    name: sc-cert-manager-clusterissuer
+    chart_ref: "{{ inventory_dir }}/charts/sc-cert-manager-clusterissuer"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: cert-manager

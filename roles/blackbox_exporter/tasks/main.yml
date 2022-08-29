@@ -1,0 +1,18 @@
+---
+- name: Add prometheus-community chart repo
+  tags: prometheus
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: "https://prometheus-community.github.io/helm-charts"
+
+- name: Install Prometheus Blackbox Exporter
+  kubernetes.core.helm:
+    name: prometheus-blackbox-exporter
+    chart_ref: prometheus-community/prometheus-blackbox-exporter
+    update_repo_cache: true
+    chart_version: "{{ prometheus_blackbox_exporter_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: monitoring
+    wait: true
+    values:
+      "{{ prometheus_blackbox_exporter_values }}"

@@ -1,0 +1,45 @@
+---
+###################### Terraform setup ##########################################################
+# Executes terraform apply on normal ansible-playbook run. When the option --check is given,
+# terraform plan is executed. For all terraform tasks the variable resource_pool must be defined.
+# See https://docs.ansible.com/ansible/latest/collections/community/general/terraform_module.html
+- name: Execute terraform apply
+  environment:
+    IONOS_USERNAME: "{{ ionos_username }}"
+    IONOS_PASSWORD: "{{ ionos_password }}"
+    AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
+    AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
+  community.general.terraform:
+    project_path: '{{ inventory_dir }}/terraform/resource-pools/{{ resource_pool }}'
+    state: present
+    # use terraform plan instead of terraform apply for testing
+    # state: planned
+    # plan_file: /tmp/tf-plan
+    workspace: "{{ stage }}"
+    force_init: true
+    provider_upgrade: true
+    # A group of key-values to override template variables or those in variables files.
+    # They have to be put in EVERY single resource pool
+    variables: "{{ terraform_variables }}"
+  register: terraform_run
+
+- name: Terraform executed command
+  debug:
+    msg: "Apply command: {{ terraform_run.command }}"
+  when: terraform_run.command is defined
+
+- name: Terraform run output
+  debug:
+    msg: "{{ terraform_run.stdout }}"
+  when: terraform_run is defined
+
+- name: Terraform run output variables
+  debug:
+    var: terraform_run.outputs
+  when: terraform_run is defined and terraform_run.outputs is defined
+# Retrieves the kubeconfig for the newly created kubernetes cluster and stores it under $HOME/.kube/<cluster_name>.yml
+- name: Create folder .kube
+  ansible.builtin.file:
+    path: "{{ lookup('env','HOME') }}/.kube/"
+    state: directory
+  when: terraform_run is defined and terraform_run.outputs is defined

@@ -1,0 +1,33 @@
+---
+# See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_repository_module.html
+- name: Add fluentbit chart repo
+  kubernetes.core.helm_repository:
+    name: fluent
+    repo_url: "https://fluent.github.io/helm-charts"
+
+# See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html
+- name: Install Fluentbit (Loki)
+  kubernetes.core.helm:
+    name: fluent-bit
+    chart_ref: fluent/fluent-bit
+    update_repo_cache: true
+    wait: true
+    chart_version: "{{ fluentbit_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: kube-system
+    values:
+      "{{ fluentbit_values }}"
+
+- name: Install Fluentbit (syslog VM)
+  kubernetes.core.helm:
+    name: fluent-bit-syslog
+    chart_ref: fluent/fluent-bit
+    update_repo_cache: true
+    wait: true
+    wait_timeout: 600s
+    chart_version: "{{ fluentbit_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: kube-system
+    values:
+      "{{ fluentbit_syslog_values }}"
+  when: syslog_vm_ip is defined

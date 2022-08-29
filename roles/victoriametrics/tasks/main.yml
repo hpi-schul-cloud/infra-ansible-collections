@@ -1,0 +1,51 @@
+---
+- name: Add Victoriametrics chart repo
+  kubernetes.core.helm_repository:
+    name: vm
+    repo_url: "https://victoriametrics.github.io/helm-charts/"
+
+- name: Create vminsert http basic auth secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: "{{ victoriametrics_vminsert_basic_auth_secret_name }}"
+        namespace: monitoring
+      spec:
+        itemPath: "vaults/{{ vault }}/items/victoriametrics"
+
+- name: Create Victoriametrics PVCs
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: vmstorage-volume-victoriametrics-victoria-metrics-cluster-vmstorage-{{ item }}
+        namespace: monitoring
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: "{{ victoriametrics_vmstorage_persistentVolume.persistentVolume.storageClass }}"
+        resources:
+          requests:
+            storage: "{{ victoriametrics_vmstorage_persistentVolume.persistentVolume.size }}"
+  # End is less than or equal so we have to substract 1
+  with_sequence: start=0 end="{{ victoriametrics_vmstorage_replica_count -1 }}"
+
+- name: Install Victoriametrics
+  kubernetes.core.helm:
+    name: victoriametrics
+    chart_ref: vm/victoria-metrics-cluster
+    update_repo_cache: true
+    wait: true
+    wait_timeout: 600s
+    chart_version: "{{ victoriametrics_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: monitoring
+    values:
+      "{{ victoriametrics_values }}"

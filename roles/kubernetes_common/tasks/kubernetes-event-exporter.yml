@@ -1,0 +1,16 @@
+---
+- name: Add bitnami chart repo
+  kubernetes.core.helm_repository:
+    name: bitnami
+    repo_url: "https://charts.bitnami.com/bitnami"
+  tags: kube-events
+
+- name: Deploy latest version of kubernetes-event-exporter inside monitoring namespace
+  kubernetes.core.helm:
+    name: kube-events
+    chart_ref: bitnami/kubernetes-event-exporter
+    update_repo_cache: true
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: monitoring
+    values: "{{ kube_events_logger_values }}"
+  tags: kube-events
