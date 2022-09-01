@@ -120,3 +120,10 @@ Subsystem sftp  /usr/lib/openssh/sftp-server
 #       PermitTTY no
 #       ForceCommand cvs server
 PasswordAuthentication no
+
+# prevent the tunneluser from being able to open a shell - should only be used for tunneling
+Match User tunneluser
+  AllowTcpForwarding yes
+  X11Forwarding no
+  AllowAgentForwarding no
+  ForceCommand /bin/false
