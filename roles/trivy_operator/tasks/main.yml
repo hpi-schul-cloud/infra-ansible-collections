@@ -1,9 +1,9 @@
 ---
 - name: Add aqua security helm chart repo
-  tags: trivy
   kubernetes.core.helm_repository:
     name: aqua
     repo_url: "https://aquasecurity.github.io/helm-charts/"
+  tags: trivy
 
 - name: Create security namespace for Trivy Operator
   kubernetes.core.k8s:
@@ -12,8 +12,7 @@
     api_version: v1
     name: "{{ trivy_operator_release_namespace }}"
     kind: Namespace
-  tags:
-    - trivy
+  tags: trivy
 
 - name: Install Trivy Operator
   kubernetes.core.helm:
