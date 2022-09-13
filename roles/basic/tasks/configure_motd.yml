@@ -1,8 +1,8 @@
 ---
-    - name: set sshd_banner
+    - name: set motd
       copy:
-        src: sshd_banner.txt
-        dest: /etc/ssh/sshd_banner.txt
+        src: motd
+        dest: /etc/motd
         owner: root
         group: root
         mode: 0644
