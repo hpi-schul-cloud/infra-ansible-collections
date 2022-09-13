@@ -1,0 +1,28 @@
+---
+- name: Add aqua security helm chart repo
+  kubernetes.core.helm_repository:
+    name: aqua
+    repo_url: "https://aquasecurity.github.io/helm-charts/"
+  tags: trivy
+
+- name: Create security namespace for Trivy Operator
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    api_version: v1
+    name: "{{ trivy_operator_release_namespace }}"
+    kind: Namespace
+  tags: trivy
+
+- name: Install Trivy Operator
+  kubernetes.core.helm:
+    name: trivy-operator
+    chart_ref: aqua/trivy-operator
+    update_repo_cache: true
+    chart_version: "{{ trivy_operator_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "{{ trivy_operator_release_namespace }}"
+    wait: true
+    values:
+      "{{ trivy_values }}"
+  tags: trivy
