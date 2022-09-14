@@ -1,7 +1,7 @@
 ---
   - import_tasks: basic_install_ubuntu.yml 
     when: ansible_distribution == "Ubuntu"
-  - import_tasks: configure_sshd.yml
+  - import_tasks: configure_motd.yml
     when: ansible_distribution == "Ubuntu"
   - import_tasks: fail2ban.yml
     when: ansible_distribution == "Ubuntu"
