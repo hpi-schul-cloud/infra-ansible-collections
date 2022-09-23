@@ -1,0 +1,113 @@
+---
+# Full Backup of Bucket is done every day
+  - name: Create instance namespaces for s3-backup
+    kubernetes.core.k8s:
+      state: present
+      kubeconfig: "{{ kubeconfig }}"
+      api_version: v1
+      name: "{{ cronjob_namespace }}"
+      kind: Namespace
+
+  - name: Create source credentials secret
+    kubernetes.core.k8s:
+      state: present
+      kubeconfig: "{{ kubeconfig }}"
+      definition:
+        apiVersion: onepassword.com/v1
+        kind: OnePasswordItem
+        metadata:
+          name: "{{ source_secret }}"
+          namespace: "{{ cronjob_namespace }}"
+        spec:
+          itemPath: "vaults/{{ instance_vault }}/items/{{ source_secret }}"
+
+  - name: Create target credentials secret
+    kubernetes.core.k8s:
+      state: present
+      kubeconfig: "{{ kubeconfig }}"
+      definition:
+        apiVersion: onepassword.com/v1
+        kind: OnePasswordItem
+        metadata:
+          name: "{{ target_secret }}"
+          namespace: "{{ cronjob_namespace }}"
+        spec:
+          itemPath: "vaults/{{ instance_vault }}/items/{{ target_secret }}"
+
+  - name: Apply IONOS S3 Backup script configmap
+    kubernetes.core.k8s:
+      state: present
+      kubeconfig: "{{ kubeconfig }}"
+      definition:
+        apiVersion: v1
+        kind: ConfigMap
+        metadata:
+          name: "{{ instance_name }}-script"
+          namespace: "{{ cronjob_namespace }}"
+        data:
+          script.sh: |-
+            #!/usr/bin/env bash
+            echo "=== prepare backup pod ==="
+            apt update -y
+            apt-get install rclone -y
+            rclone --version
+            apt-get install python3-setuptools -y
+            apt-get install python3-pip -y
+            python3 -m pip --version
+            git clone https://github.com/hpi-schul-cloud/infra-tools.git
+            chmod +x ./infra-tools/s3-backup/s3-backup.py
+            pip3 install -r ./infra-tools/s3-backup/requirements.txt
+            mkdir -p /root/.config/rclone
+            envsubst < /scripts/rclone.conf > /root/.config/rclone/rclone.conf
+            mkdir /infra-tools/s3-backup/logs
+            echo "=== start daily fullbackup ==="
+            /infra-tools/s3-backup/s3-backup.py -c /scripts/s3b.yaml -s -f -va
+          s3b.yaml: |-
+            ---
+            s3_backup_configuration:
+              instances:
+                - instancename: {{ instance_name }}
+                  instancename_short: {{ instance_name }}
+                  s3_source_drives: [ source ]
+                  s3_source_bucket_patterns: ['*']
+                  s3_target_drive: target
+                  s3_target_backup_bucket: {{ s3_target_backup_bucket }}
+                  backup_day_of_month: 1
+              s3drives:
+                - drivename: source
+                  backupdrive: False
+                - drivename: target
+                  backupdrive: True
+              defect_buckets: []
+              defect_files: []
+              mail:
+                receiver_mail_addresses: [ backup@dbildungscloud.de ]
+          rclone.conf: |-
+            [source]
+            type = s3
+            provider = Other
+            env_auth = false
+            access_key_id = $AWS_S3_SOURCE_KEY
+            secret_access_key = $AWS_S3_SOURCE_SECRET
+            endpoint = {{ s3_url }}
+            region = {{ s3_region }}
+
+            [target]
+            type = s3
+            provider = Other
+            env_auth = false
+            access_key_id = $AWS_S3_TARGET_KEY
+            secret_access_key = $AWS_S3_TARGET_SECRET
+            endpoint = {{ s3_backup_url }}
+            region = {{ s3_backup_region }}
+
+  - name: Install IONOS S3 Backup cronjob
+    kubernetes.core.helm:
+      name: "{{ instance_name }}"
+      chart_ref: "{{ inventory_dir }}/charts/cronjob"
+      wait: yes
+      chart_version: "{{ cronjob_s3_backup_chart_version }}"
+      kubeconfig: "{{ kubeconfig }}"
+      release_namespace: "{{ cronjob_namespace }}"
+      values:
+        "{{ cronjob_s3_backup_values }}"
