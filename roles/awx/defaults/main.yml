@@ -1,0 +1,42 @@
+awx_namespace: awx
+awx_admin_email: name@local
+awx_admin_password_secret_name: awx-admin-password
+awx_ingress_tls_secret_name: awx-ingress-cert
+awx_ingress_type: ingress
+awx_ingress_annotations:
+awx_postgres_storage_class:
+awx_postgres_resource_requirements:
+  requests:
+    cpu: 500m
+    memory: 2Gi
+  limits:
+    cpu: 1000m
+    memory: 4Gi
+awx_postgres_storage_access_mode: ReadWriteOnce
+awx_postgres_storage_requirements:
+    requests:
+      storage: 8Gi
+awx_web_resource_requirements:
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+  limits:
+    cpu: 2000m
+    memory: 4Gi
+awx_task_resource_requirements:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+awx_ee_resource_requirements:
+  requests:
+    cpu: 500m
+    memory: 1Gi
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+awx_projects_persistence: true
+awx_projects_storage_access_mode: ReadWriteOnce
+awx_projects_storage_size: 8Gi
