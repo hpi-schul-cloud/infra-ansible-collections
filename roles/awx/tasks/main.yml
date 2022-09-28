@@ -1,0 +1,58 @@
+
+    - name: Install awx-operator
+      kubernetes.core.k8s:
+        state: "present"
+        kubeconfig: "{{ kubeconfig }}"
+        template:  awx-operator.yml
+      tags:
+        - awx
+
+# Normally this PVC is created by the awx-postgres statefulset, but this prevents resizing so we create it beforehand
+# The name must be the name that the statefulset uses to create its PVC
+    - name: Create AWX Postgres PVC
+      kubernetes.core.k8s:
+        state: "present"
+        kubeconfig: "{{ kubeconfig }}"
+        definition:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: postgres-13
+            namespace: "{{ awx_namespace }}"
+          spec:
+            accessModes:
+              - "{{ awx_postgres_storage_access_mode }}"
+            storageClassName: "{{ awx_postgres_storage_class }}"
+            resources: "{{ awx_postgres_storage_requirements }}"
+      tags:
+        - awx
+
+    - name: Install awx
+      kubernetes.core.k8s:
+        state: "present"
+        kubeconfig: "{{ kubeconfig }}"
+        definition:
+          apiVersion: awx.ansible.com/v1beta1
+          kind: AWX
+          metadata:
+            name: awx
+            namespace: "{{ awx_namespace }}"
+          spec:
+            admin_email: "{{ awx_admin_email }}"
+            admin_password_secret: "{{ awx_admin_password_secret_name }}"
+            ingress_type: "{{ awx_ingress_type }}"
+            ingress_annotations: "{{ awx_ingress_annotations }}"
+            ingress_tls_secret: "{{ awx_ingress_tls_secret_name}}"
+            hostname: "{{ awx_hostname }}"
+            postgres_storage_requirements: "{{ awx_postgres_storage_requirements }}"
+            postgres_storage_class: "{{ awx_postgres_storage_class }}"
+            postgres_resource_requirements: "{{ awx_postgres_resource_requirements }}"
+            web_resource_requirements: "{{ awx_web_resource_requirements }}"
+            task_resource_requirements: "{{ awx_task_resource_requirements }}"
+            ee_resource_requirements: "{{ awx_ee_resource_requirements }}"
+            projects_persistence: "{{ awx_projects_persistence }}"
+            projects_storage_access_mode: "{{ awx_projects_storage_access_mode }}"
+            project_storage_size: "{{ awx_projects_storage_size }}"
+            security_context_settings: "{{ awx_security_context_settings }}"
+      tags:
+        - awx
