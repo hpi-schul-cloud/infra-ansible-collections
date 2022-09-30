@@ -25,7 +25,7 @@
       apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: data-cassandra-{{ item }}
+        name: data-cassandra2-{{ item }}
         namespace: monitoring
       spec:
         accessModes:
@@ -38,7 +38,7 @@
 
 - name: Install Cassandra
   kubernetes.core.helm:
-    name: cassandra
+    name: cassandra2
     chart_ref: bitnami/cassandra
     update_repo_cache: true
     wait: true
