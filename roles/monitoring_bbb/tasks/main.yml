@@ -27,7 +27,7 @@
         bbb.yml: |-
           - targets:
           {% for n in range(bbb_server_count) %}
-          {% if bbb_new_exporters %}
+          {% if bbb_ebbba_exporters %}
               - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}'
           {% else %}
               - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}:9100'
@@ -115,10 +115,10 @@
               username:
                 name: bbb-node-exporter-basic-auth
                 key: username
-            path: "{{ '/mon/node/' if bbb_new_exporters else '/metrics' }}"
+            path: "{{ '/mon/node/' if bbb_ebbba_exporters else '/metrics' }}"
             interval: 30s
             honorLabels: true
-            port: "{{ 'https' if bbb_new_exporters else 'node-exporter' }}"
+            port: "{{ 'https' if bbb_ebbba_exporters else 'node-exporter' }}"
             scheme: https
             tlsConfig:
               insecureSkipVerify: true
