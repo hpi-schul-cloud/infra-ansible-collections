@@ -1,0 +1,64 @@
+---
+- name: Create namespace for collabora
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    api_version: v1
+    name: "{{ collabora_namespace }}"
+    kind: Namespace
+
+- name: Create collabora secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: collabora
+        namespace: "{{ collabora_namespace }}"
+      spec:
+        itemPath: "vaults/{{ vault }}/items/{{ collabora_secret }}"
+
+- name: Deploy latest version of collabora
+  kubernetes.core.helm:
+    name: collabora
+    chart_ref: "{{ inventory_dir }}/charts/collabora"
+    update_repo_cache: yes
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "{{ collabora_namespace }}"
+    values: "{{ collabora_values }}"
+
+- name: Install collabora ingress to redirect metrics page so it cant be seen
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: extensions/v1beta1
+      kind: Ingress
+      metadata:
+        name: collabora-ingress-redirect-metrics
+        namespace: "{{ collabora_namespace }}"
+        annotations:
+          cert-manager.io/cluster-issuer: sc-cert-manager-clusterissuer-letsencrypt
+          kubernetes.io/ingress.class: nginx
+          nginx.ingress.kubernetes.io/rewrite-target: /$1
+          nginx.ingress.kubernetes.io/server-snippet: |
+            location ~* "^/cool/" {
+                deny all;
+                return 403;
+              }
+      spec:
+        tls:
+        - hosts:
+          - "{{ collabora_hostname }}"
+          secretName: collabora-tls
+        rules:
+          - host: "{{ collabora_hostname }}"
+            http:
+              paths:
+              - path: /cool(/.*)
+                pathType: Prefix
+                backend:
+                  serviceName: collabora-online
+                  servicePort: 9980
