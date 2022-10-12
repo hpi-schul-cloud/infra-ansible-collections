@@ -66,8 +66,10 @@
           ports:
             - name: node-exporter
               port: 9100
+              protocol: TCP
             - name: https
               port: 443
+              protocol: TCP
 
 - name: Create BBB service for autoscaler
   kubernetes.core.k8s:
@@ -82,12 +84,16 @@
         labels:
           k8s-app: bbb-metrics
       spec:
-        clusterIp: None
+        type: ClusterIP
         ports:
           - name: node-exporter
             port: 9100
+            targetPort: 9100
+            protocol: TCP
           - name: https
             port: 443
+            targetPort: 443
+            protocol: TCP
 
 - name: Create BBB service monitor for autoscaler
   kubernetes.core.k8s:
