@@ -15,14 +15,14 @@
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: collabora
+        name: "{{ collabora_name }}"
         namespace: "{{ collabora_namespace }}"
       spec:
-        itemPath: "vaults/{{ vault }}/items/{{ collabora_secret }}"
+        itemPath: "vaults/{{ vault }}/items/{{ collabora_name }}"
 
 - name: Deploy latest version of collabora
   kubernetes.core.helm:
-    name: collabora
+    name: "{{ collabora_name }}"
     chart_ref: "{{ inventory_dir }}/charts/collabora"
     update_repo_cache: yes
     kubeconfig: "{{ kubeconfig }}"
@@ -37,14 +37,14 @@
       apiVersion: extensions/v1beta1
       kind: Ingress
       metadata:
-        name: collabora-ingress-redirect-metrics
+        name: "{{ collabora_name }}-redirect-metrics"
         namespace: "{{ collabora_namespace }}"
         annotations:
           cert-manager.io/cluster-issuer: sc-cert-manager-clusterissuer-letsencrypt
           kubernetes.io/ingress.class: nginx
           nginx.ingress.kubernetes.io/rewrite-target: /$1
           nginx.ingress.kubernetes.io/server-snippet: |
-            location ~* "^/cool/" {
+            location ~* "^/cool/getMetrics" {
                 deny all;
                 return 403;
               }
@@ -57,7 +57,7 @@
           - host: "{{ collabora_hostname }}"
             http:
               paths:
-              - path: /cool(/.*)
+              - path: /cool/getMetrics(/.*)
                 pathType: Prefix
                 backend:
                   serviceName: collabora-online
