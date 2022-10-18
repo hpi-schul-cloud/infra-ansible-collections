@@ -4,24 +4,21 @@
     name: iptables
     state: present
 
-- name: Set default policy DROP for INPUT
-  iptables:
-    chain: INPUT
-    policy: DROP
-
 - name: Allow SSH in
   iptables:
     chain: INPUT
     protocol: TCP
     destination_port: 22
-    # match: state
     ctstate: NEW,ESTABLISHED
     jump: ACCEPT
 
 - name: Allow related and established connections
   iptables:
     chain: INPUT
-    # protocol: TCP
-    # match: state
     ctstate: ESTABLISHED,RELATED
     jump: ACCEPT
+
+- name: Set default policy DROP for INPUT
+  iptables:
+    chain: INPUT
+    policy: DROP

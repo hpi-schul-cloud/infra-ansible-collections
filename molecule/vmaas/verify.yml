@@ -41,22 +41,22 @@
 
 # Test SRE user SSH connection
     - name: Connect as SRE user
-      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes sre@localhost -p 2222 -i {{ sre_ssh_key_path }} ls
+      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes sre@localhost -p 2222 -i {{ sre_ssh_key_path }} sudo -v
       delegate_to: localhost
 
     - name: Connect as SRE user with tenant key
-      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes sre@localhost -p 2222 -i {{ tenant_ssh_key_path }} ls
+      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes sre@localhost -p 2222 -i {{ tenant_ssh_key_path }} sudo -v
       register: ssh_output
       failed_when: ssh_output.rc == 0
       delegate_to: localhost
 
 # Test tenant user SSH connection
     - name: Connect as tenant user
-      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes {{ tenant_user_name }}@localhost -p 2222 -i {{ tenant_ssh_key_path }} ls
+      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes {{ tenant_user_name }}@localhost -p 2222 -i {{ tenant_ssh_key_path }} sudo -v
       delegate_to: localhost
 
     - name: Connect as tenant user with SRE key
-      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes {{ tenant_user_name }}@localhost -p 2222 -i {{ sre_ssh_key_path }} ls
+      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes {{ tenant_user_name }}@localhost -p 2222 -i {{ sre_ssh_key_path }} sudo -v
       register: ssh_output
       failed_when: ssh_output.rc == 0
       delegate_to: localhost
