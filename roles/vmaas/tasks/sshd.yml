@@ -3,12 +3,14 @@
   user:
     name: root
     password: "{{ root_password | password_hash('sha512') }}"
+
 - name: Disable root login
   lineinfile:
     path: /etc/ssh/sshd_config
     regexp: "^PermitRootLogin"
     line: PermitRootLogin no
   notify: restart sshd
+
 - name: Disable password authentication
   lineinfile:
     path: /etc/ssh/sshd_config

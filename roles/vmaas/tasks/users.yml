@@ -1,34 +1,40 @@
 ---
+# SRE user
 - name: Create SRE technical user
   user:
     name: sre
     uid: "{{ sre_uid }}"
     shell: /bin/bash
     state: present
+
 - name: Add SRE SSH key
   authorized_key:
     user: sre
     state: present
     key: "{{ sre_ssh_key }}"
     exclusive: true
+
 - name: Allow sudo without password for SRE user
   copy:
     content: "%sre ALL=(ALL:ALL) NOPASSWD:ALL"
     dest: /etc/sudoers.d/sre_nopasswd
     mode: 0440
 
+# Tenant user
 - name: Create tenant technical user
   user:
     name: "{{ tenant_user_name }}"
     uid: "{{ tenant_uid }}"
     shell: /bin/bash
     state: present
+
 - name: Add tenant SSH key
   authorized_key:
     user: "{{ tenant_user_name }}"
     state: present
     key: "{{ tenant_ssh_key }}"
     exclusive: true
+
 - name: Allow sudo without password for tenant user
   copy:
     content: "%{{ tenant_user_name }} ALL=(ALL:ALL) NOPASSWD:ALL"

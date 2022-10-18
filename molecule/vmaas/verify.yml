@@ -13,13 +13,16 @@
         name: nginx
         update_cache: true
         state: present
+
     - name: start nginx
       shell: service nginx start
+
     - name: Curl instance on port 80
       shell: curl -m 10 localhost:2280
       ignore_errors: true
       register: curl_output
       delegate_to: localhost
+
     - name: Check that curl failed
       assert:
         that:
@@ -30,6 +33,7 @@
       shell: nmap localhost -p 2222
       register: nmap_output
       delegate_to: localhost
+
     - name: Check that port 22 is open
       assert:
         that:
@@ -40,7 +44,19 @@
       shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes sre@localhost -p 2222 -i {{ sre_ssh_key_path }} ls
       delegate_to: localhost
 
+    - name: Connect as SRE user with tenant key
+      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes sre@localhost -p 2222 -i {{ tenant_ssh_key_path }} ls
+      register: ssh_output
+      failed_when: ssh_output.rc == 0
+      delegate_to: localhost
+
 # Test tenant user SSH connection
     - name: Connect as tenant user
       shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes {{ tenant_user_name }}@localhost -p 2222 -i {{ tenant_ssh_key_path }} ls
+      delegate_to: localhost
+
+    - name: Connect as tenant user with SRE key
+      shell: ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes {{ tenant_user_name }}@localhost -p 2222 -i {{ sre_ssh_key_path }} ls
+      register: ssh_output
+      failed_when: ssh_output.rc == 0
       delegate_to: localhost

@@ -7,7 +7,7 @@
       file:
         path: /etc/ssh
         state: directory
-    # if you want to test ssh login permissions, install and start the ssh server on the conatiner:
+    # if you want to test ssh login permissions, install and start the ssh server on the container:
     - name: Install openssh-server
       apt:
         name: openssh-server

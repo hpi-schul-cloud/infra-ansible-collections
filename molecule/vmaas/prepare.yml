@@ -7,25 +7,21 @@
       file:
         path: /etc/ssh
         state: directory
-    # if you want to test ssh login permissions, install and start the ssh server on the conatiner:
+    # if you want to test ssh login permissions, install and start the ssh server on the container:
     - name: Install openssh-server
       apt:
         name: openssh-server
         update_cache: true
         state: present
+
     - name: start ssh server
       command: service ssh start
       become: true
-    - name: Delete old SSH keypairs
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - "{{ sre_ssh_key_path }}"
-        - "{{ tenant_ssh_key_path }}"
-      delegate_to: localhost
+
     - name: Create SSH keypairs
-      shell: ssh-keygen -b 2048 -t rsa -f {{ item }} -N ""
+      shell:
+        cmd: ssh-keygen -b 2048 -t rsa -f {{ item }} -N ""
+        creates: "{{ item }}"
       loop:
         - "{{ sre_ssh_key_path }}"
         - "{{ tenant_ssh_key_path }}"

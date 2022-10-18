@@ -3,6 +3,7 @@
   package:
     name: iptables
     state: present
+
 - name: Set default policy DROP for INPUT
   iptables:
     chain: INPUT
