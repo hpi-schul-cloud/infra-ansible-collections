@@ -1,2 +1,4 @@
 ---
+# The root user password, used for recovery.
+# Commented out to force people to choose a password.
 # root_password: unencrypted_root_password
