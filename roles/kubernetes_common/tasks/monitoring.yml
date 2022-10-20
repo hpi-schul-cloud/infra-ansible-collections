@@ -28,19 +28,63 @@
   kubernetes.core.helm_repository:
     name: prometheus-community
     repo_url: "https://prometheus-community.github.io/helm-charts"
-
-- name: Create vminsert-credentials secret
+  tags: prometheus
+#  See https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack for the right operator version
+- name: Deploy prometheus operator CRD alertmanagerconfigs
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: onepassword.com/v1
-      kind: OnePasswordItem
-      metadata:
-        name: vminsert-credentials
-        namespace: monitoring
-      spec:
-        itemPath: "vaults/{{ vault }}/items/victoriametrics"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD alertmanagers
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD podmonitors
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD probes
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD prometheuses
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD prometheusrules
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD servicemonitors
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml")
+  tags: prometheus
+
+- name: Deploy prometheus operator CRD thanosrulers
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml")
+  tags: prometheus
 
 - name: Install Prometheus Stack
   kubernetes.core.helm:
@@ -54,6 +98,20 @@
     wait_timeout: 1200s
     values:
       "{{ prometheus_community_values }}"
+  tags: prometheus
+
+- name: Create vminsert-credentials secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: vminsert-credentials
+        namespace: monitoring
+      spec:
+        itemPath: "vaults/{{ vault }}/items/victoriametrics"
 
 - name: Deploy Configmap for Loki load test
   kubernetes.core.k8s:
