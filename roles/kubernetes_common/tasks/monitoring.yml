@@ -34,56 +34,56 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD alertmanagers
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagers.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD podmonitors
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD probes
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_probes.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD prometheuses
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_prometheuses.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD prometheusrules
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_prometheusrules.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD servicemonitors
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml")
   tags: prometheus
 
 - name: Deploy prometheus operator CRD thanosrulers
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_values_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml")
+    definition: lookup('ansible.builtin.uri', "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v{{ prometheus_community_operator_version }}/example/prometheus-operator-crd/monitoring.coreos.com_thanosrulers.yaml")
   tags: prometheus
 
 - name: Install Prometheus Stack
