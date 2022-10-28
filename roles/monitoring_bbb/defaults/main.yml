@@ -1,0 +1,2 @@
+bbb_secret_name: "{{ bbb_instance_name }}"
+bbb_node_exporter_basic_auth_secret_name: "{{ bbb_secret_name }}-node-exporter-basic-auth"

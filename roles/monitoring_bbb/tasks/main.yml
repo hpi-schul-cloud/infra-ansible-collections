@@ -1,4 +1,34 @@
 ---
+- name: Clear local facts
+  set_fact:
+    bbb_servers: []
+    bbb_turn_servers: []
+- name: Generate BBB servers list
+  vars:
+    bbb_server: "{{ 'bbb-' + (n + 1) | string + '.' + bbb_domain_name }}"
+    bbb_server_list_item: "{{ [bbb_server] }}"
+  set_fact:
+    bbb_servers: "{{ bbb_servers + bbb_server_list_item }}"
+  loop: "{{ range(bbb_server_count) }}"
+  loop_control:
+    loop_var: n
+- name: Generate TURN servers list
+  vars:
+    turn_server: "{{ 'turn-' + '%02d' | format(n + 1 | int) + '.' + bbb_domain_name }}"
+  set_fact:
+    bbb_turn_servers: "{{ bbb_turn_servers + [turn_server] }}"
+  loop: "{{ range(bbb_turn_server_count) }}"
+  loop_control:
+    loop_var: n
+# Prometheus Operator can only get additional scrape configs, volumes and volume mounts
+# from one secret or one Helm value each so we have to add entries to the
+# prometheus_additionalScrapeConfigs, prometheus_volumeMounts and prometheus_volumeMounts variable
+- name: Add BBB scrape configs
+  set_fact:
+    prometheus_additionalScrapeConfigs: "{{ prometheus_additionalScrapeConfigs + bbb_prometheus_scrape_config }}"
+    prometheus_volumes: "{{ prometheus_volumes + [bbb_prometheus_volume] }}"
+    prometheus_volumeMounts: "{{ prometheus_volumeMounts + [bbb_prometheus_volume_mount] }}"
+
 - name: Create BBB basic auth credentials secret
   kubernetes.core.k8s:
     state: present
@@ -7,46 +37,10 @@
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: bbb-node-exporter-basic-auth
+        name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
         namespace: monitoring
       spec:
         itemPath: "vaults/{{ vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
-  when: bbb_server_count is defined
-
-- name: Create BBB scrape config configmap
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: bbb-scrape-config
-        namespace: monitoring
-      data:
-        bbb.yml: |-
-          - targets:
-          {% for n in range(bbb_server_count) %}
-          {% if bbb_ebbba_exporters %}
-              - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}'
-          {% else %}
-              - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}:9100'
-              - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}:9688'
-          {% endif %}
-          {% endfor %}
-        bbb-turn-node-exporter.yml: |-
-          - targets:
-          {% for n in range(bbb_turn_server_count) %}
-              - 'turn-{{  '%02d' | format(n+1|int) }}.{{ bbb_domain_name }}:9100'
-          {% endfor %}
-        bbb-turn-coturn-exporter.yml: |-
-          - targets:
-          {% for n in range(bbb_turn_server_count) %}
-          {% if bbb_turn_server_exporter_enabled %}
-              - 'turn-{{  '%02d' | format(n+1|int) }}.{{ bbb_domain_name }}:9642'
-          {% endif %}
-          {% endfor %}
-  when: bbb_server_count is defined
 
 - name: Create BBB endpoint for autoscaler
   kubernetes.core.k8s:
@@ -56,10 +50,10 @@
       apiVersion: v1
       kind: Endpoints
       metadata:
-        name: bbb-autoscaler
+        name: "{{ bbb_instance_name }}-autoscaler"
         namespace: monitoring
         labels:
-          k8s-app: bbb-metrics
+          k8s-app: "{{ bbb_instance_name }}-metrics"
       subsets:
         - addresses: "{{ bbb_ip_addresses[:bbb_server_count] if bbb_ip_addresses is defined \
             and bbb_server_count is defined else [] }}"
@@ -79,10 +73,10 @@
       apiVersion: v1
       kind: Service
       metadata:
-        name: bbb-autoscaler
+        name: "{{ bbb_instance_name }}-autoscaler"
         namespace: monitoring
         labels:
-          k8s-app: bbb-metrics
+          k8s-app: "{{ bbb_instance_name }}-metrics"
       spec:
         type: ClusterIP
         ports:
@@ -103,12 +97,12 @@
       apiVersion: monitoring.coreos.com/v1
       kind: ServiceMonitor
       metadata:
-        name: bbb-service-monitor
+        name: "{{ bbb_instance_name }}-service-monitor"
         namespace: monitoring
       spec:
         selector:
           matchLabels:
-            k8s-app: bbb-metrics
+            k8s-app: "{{ bbb_instance_name }}-metrics"
         namespaceSelector:
           any: false
           matchNames:
@@ -116,10 +110,10 @@
         endpoints:
           - basicAuth:
               password:
-                name: bbb-node-exporter-basic-auth
+                name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
                 key: password
               username:
-                name: bbb-node-exporter-basic-auth
+                name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
                 key: username
             path: "{{ '/mon/node/' if bbb_ebbba_exporters else '/metrics' }}"
             interval: 30s
