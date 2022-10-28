@@ -45,7 +45,7 @@
 
 - name: Create BBB endpoint for autoscaler
   kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses is defined else 'absent' }}"
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
     definition:
       apiVersion: v1
@@ -68,7 +68,7 @@
 
 - name: Create BBB service for autoscaler
   kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses is defined else 'absent' }}"
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
     definition:
       apiVersion: v1
@@ -92,7 +92,7 @@
 
 - name: Create BBB service monitor for autoscaler
   kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses is defined else 'absent' }}"
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
     definition:
       apiVersion: monitoring.coreos.com/v1
