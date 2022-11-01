@@ -2,6 +2,6 @@
 - name: Converge
   hosts: instance
   tasks:
-    - name: "Include VMaaS"
+    - name: "Include VMaaS basic role"
       include_role:
-        name: "vmaas"
+        name: "vmaas_basic"
