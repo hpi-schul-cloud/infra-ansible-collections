@@ -1,0 +1,30 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: instance
+    image: "geerlingguy/docker-ubuntu2004-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    published_ports:
+      - 2222:22/tcp
+      - 2280:80/tcp
+    privileged: true
+    pre_build_image: true
+provisioner:
+  name: ansible
+  inventory:
+    host_vars:
+      instance:
+        root_password: unencrypted_root_password
+        sre_uid: 1000
+        sre_ssh_key_path: /tmp/id_rsa_molecule_sre
+        sre_ssh_key: "{{ lookup('file', '{{ sre_ssh_key_path }}.pub') }}"
+        tenant_user_name: tenant
+        tenant_uid: 2000
+        tenant_ssh_key_path: /tmp/id_rsa_molecule_tenant
+        tenant_ssh_key: "{{ lookup('file', '{{ tenant_ssh_key_path }}.pub') }}"
+verifier:
+  name: ansible
