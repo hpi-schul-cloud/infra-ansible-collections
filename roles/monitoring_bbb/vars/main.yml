@@ -37,7 +37,7 @@ bbb_prometheus_bbb_job:
     - targets: "{{ bbb_servers_bbb_exporter_targets }}"
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ [] if bbb_ebbba_exporters else bbb_prometheus_relabel_configs }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
 bbb_prometheus_bbb_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-node-exporter"
   scheme: https
