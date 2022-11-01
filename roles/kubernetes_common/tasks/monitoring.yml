@@ -28,19 +28,7 @@
   kubernetes.core.helm_repository:
     name: prometheus-community
     repo_url: "https://prometheus-community.github.io/helm-charts"
-
-- name: Create vminsert-credentials secret
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: onepassword.com/v1
-      kind: OnePasswordItem
-      metadata:
-        name: vminsert-credentials
-        namespace: monitoring
-      spec:
-        itemPath: "vaults/{{ vault }}/items/victoriametrics"
+  tags: prometheus
 
 - name: Install Prometheus Stack
   kubernetes.core.helm:
@@ -54,6 +42,20 @@
     wait_timeout: 1200s
     values:
       "{{ prometheus_community_values }}"
+  tags: prometheus
+
+- name: Create vminsert-credentials secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: vminsert-credentials
+        namespace: monitoring
+      spec:
+        itemPath: "vaults/{{ vault }}/items/victoriametrics"
 
 - name: Deploy Configmap for Loki load test
   kubernetes.core.k8s:

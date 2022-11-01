@@ -22,8 +22,8 @@
 
 - name: Deploy latest version of collabora
   kubernetes.core.helm:
-    name: "{{ collabora_name }}"
-    chart_ref: "{{ inventory_dir }}/charts/collabora"
+    name: collabora
+    chart_ref: "{{ playbook_dir }}/../charts/collabora"
     update_repo_cache: yes
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: "{{ collabora_namespace }}"
