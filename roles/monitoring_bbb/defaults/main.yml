@@ -13,10 +13,6 @@ bbb_server_count: 0
 bbb_turn_server_count: 0
 # True if the coturn exporter is enabled on port 9642 /metrics
 bbb_turn_server_exporter_enabled: true
-# List of the IPs of the BBB servers in the same order as the BBB servers,
-# used by the BBB autoscaler
-bbb_ip_addresses: []
-  # - ip: x.x.x.x
 # Name of the Kubernetes secret containing the basic auth credentials for the exporters
 bbb_node_exporter_basic_auth_secret_name: "{{ bbb_instance_name }}-node-exporter-basic-auth"
 # Scalelite API token, used by the liveness probe
