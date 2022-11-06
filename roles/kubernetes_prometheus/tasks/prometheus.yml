@@ -12,4 +12,5 @@
     wait_timeout: 1200s
     values:
       "{{ prometheus_community_values }}"
+  tags: prometheus
 
