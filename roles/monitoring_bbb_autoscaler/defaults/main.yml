@@ -14,3 +14,5 @@ bbb_ip_addresses: []
   # - ip: x.x.x.x
 # Name of the Kubernetes secret containing the basic auth credentials for the exporters
 bbb_node_exporter_basic_auth_secret_name: "{{ bbb_instance_name }}-node-exporter-basic-auth"
+# How often the autoscaler endpoints are scraped
+bbb_scrape_interval: 30s

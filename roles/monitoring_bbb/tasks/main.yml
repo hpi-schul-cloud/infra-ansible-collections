@@ -3,12 +3,13 @@
   set_fact:
     bbb_servers: []
     bbb_turn_servers: []
+# We generate the list of BBB and TURN servers according to our naming convention
+# The easiest way to achieve this is to use set_fact to build the list by successively adding servers to the list
 - name: Generate BBB servers list
   vars:
     bbb_server: "{{ 'bbb-' + (n + 1) | string + '.' + bbb_domain_name }}"
-    bbb_server_list_item: "{{ [bbb_server] }}"
   set_fact:
-    bbb_servers: "{{ bbb_servers + bbb_server_list_item }}"
+    bbb_servers: "{{ bbb_servers + [bbb_server] }}"
   loop: "{{ range(bbb_server_count) }}"
   loop_control:
     loop_var: n
