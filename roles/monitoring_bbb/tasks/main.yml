@@ -1,4 +1,36 @@
 ---
+- name: Clear local facts
+  set_fact:
+    bbb_servers: []
+    bbb_turn_servers: []
+# We generate the list of BBB and TURN servers according to our naming convention.
+# To do this we use set_fact to build the list by successively adding servers to it.
+- name: Generate BBB servers list
+  vars:
+    bbb_server: "{{ 'bbb-' + (n + 1) | string + '.' + bbb_domain_name }}"
+  set_fact:
+    bbb_servers: "{{ bbb_servers + [bbb_server] }}"
+  loop: "{{ range(bbb_server_count) }}"
+  loop_control:
+    loop_var: n
+- name: Generate TURN servers list
+  vars:
+    turn_server: "{{ 'turn-' + '%02d' | format(n + 1 | int) + '.' + bbb_domain_name }}"
+  set_fact:
+    bbb_turn_servers: "{{ bbb_turn_servers + [turn_server] }}"
+  loop: "{{ range(bbb_turn_server_count) }}"
+  loop_control:
+    loop_var: n
+# Prometheus Operator can only get additional scrape configs, volumes and volume mounts
+# from one secret or one Helm value each so we have to add entries to the
+# prometheus_additionalScrapeConfigs, prometheus_volumeMounts and prometheus_volumeMounts variable
+- name: Add BBB scrape configs and liveness probes
+  set_fact:
+    prometheus_additionalScrapeConfigs: "{{ prometheus_additionalScrapeConfigs + bbb_prometheus_scrape_config }}"
+    prometheus_volumes: "{{ prometheus_volumes + [bbb_prometheus_volume] }}"
+    prometheus_volumeMounts: "{{ prometheus_volumeMounts + [bbb_prometheus_volume_mount] }}"
+    prometheus_blackbox_exporter_targets: "{{ prometheus_blackbox_exporter_targets + [bbb_liveness_probe_create, bbb_liveness_probe_end] }}"
+
 - name: Create BBB basic auth credentials secret
   kubernetes.core.k8s:
     state: present
@@ -7,124 +39,7 @@
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: bbb-node-exporter-basic-auth
+        name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
         namespace: monitoring
       spec:
         itemPath: "vaults/{{ vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
-  when: bbb_server_count is defined
-
-- name: Create BBB scrape config configmap
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: v1
-      kind: ConfigMap
-      metadata:
-        name: bbb-scrape-config
-        namespace: monitoring
-      data:
-        bbb.yml: |-
-          - targets:
-          {% for n in range(bbb_server_count) %}
-          {% if bbb_ebbba_exporters %}
-              - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}'
-          {% else %}
-              - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}:9100'
-              - 'bbb-{{ n+1 }}.{{ bbb_domain_name }}:9688'
-          {% endif %}
-          {% endfor %}
-        bbb-turn-node-exporter.yml: |-
-          - targets:
-          {% for n in range(bbb_turn_server_count) %}
-              - 'turn-{{  '%02d' | format(n+1|int) }}.{{ bbb_domain_name }}:9100'
-          {% endfor %}
-        bbb-turn-coturn-exporter.yml: |-
-          - targets:
-          {% for n in range(bbb_turn_server_count) %}
-          {% if bbb_turn_server_exporter_enabled %}
-              - 'turn-{{  '%02d' | format(n+1|int) }}.{{ bbb_domain_name }}:9642'
-          {% endif %}
-          {% endfor %}
-  when: bbb_server_count is defined
-
-- name: Create BBB endpoint for autoscaler
-  kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses is defined else 'absent' }}"
-    kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: v1
-      kind: Endpoints
-      metadata:
-        name: bbb-autoscaler
-        namespace: monitoring
-        labels:
-          k8s-app: bbb-metrics
-      subsets:
-        - addresses: "{{ bbb_ip_addresses[:bbb_server_count] if bbb_ip_addresses is defined \
-            and bbb_server_count is defined else [] }}"
-          ports:
-            - name: node-exporter
-              port: 9100
-              protocol: TCP
-            - name: https
-              port: 443
-              protocol: TCP
-
-- name: Create BBB service for autoscaler
-  kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses is defined else 'absent' }}"
-    kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        name: bbb-autoscaler
-        namespace: monitoring
-        labels:
-          k8s-app: bbb-metrics
-      spec:
-        type: ClusterIP
-        ports:
-          - name: node-exporter
-            port: 9100
-            targetPort: 9100
-            protocol: TCP
-          - name: https
-            port: 443
-            targetPort: 443
-            protocol: TCP
-
-- name: Create BBB service monitor for autoscaler
-  kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses is defined else 'absent' }}"
-    kubeconfig: "{{ kubeconfig }}"
-    definition:
-      apiVersion: monitoring.coreos.com/v1
-      kind: ServiceMonitor
-      metadata:
-        name: bbb-service-monitor
-        namespace: monitoring
-      spec:
-        selector:
-          matchLabels:
-            k8s-app: bbb-metrics
-        namespaceSelector:
-          any: false
-          matchNames:
-            - monitoring
-        endpoints:
-          - basicAuth:
-              password:
-                name: bbb-node-exporter-basic-auth
-                key: password
-              username:
-                name: bbb-node-exporter-basic-auth
-                key: username
-            path: "{{ '/mon/node/' if bbb_ebbba_exporters else '/metrics' }}"
-            interval: 30s
-            honorLabels: true
-            port: "{{ 'https' if bbb_ebbba_exporters else 'node-exporter' }}"
-            scheme: https
-            tlsConfig:
-              insecureSkipVerify: true
