@@ -52,7 +52,7 @@ bbb_prometheus_turn_coturn_exporter_job:
   scheme: https
   metrics_path: /metrics
   static_configs:
-    - targets: "{{ bbb_turn_servers_coturn_exporter_targets }}"
+    - targets: "{{ bbb_turn_servers_coturn_exporter_targets if bbb_turn_server_exporter_enabled else [] }}"
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
@@ -61,7 +61,7 @@ bbb_prometheus_turn_node_exporter_job:
   scheme: https
   metrics_path: /metrics
   static_configs:
-    - targets: "{{ bbb_turn_servers_node_exporter_targets if bbb_turn_server_exporter_enabled else [] }}"
+    - targets: "{{ bbb_turn_servers_node_exporter_targets }}"
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
