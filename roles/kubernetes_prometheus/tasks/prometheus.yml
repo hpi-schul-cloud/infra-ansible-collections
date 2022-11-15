@@ -1,0 +1,16 @@
+---
+
+- name: Install Prometheus Stack
+  kubernetes.core.helm:
+    name: "{{ item.name }}"
+    chart_ref: prometheus-community/kube-prometheus-stack
+    update_repo_cache: true
+    chart_version: "{{ prometheus_community_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "{{ item.namespace }}"
+    wait: true
+    wait_timeout: 1200s
+    values:
+      "{{ prometheus_community_values }}"
+  tags: prometheus
+
