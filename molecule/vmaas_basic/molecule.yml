@@ -26,5 +26,6 @@ provisioner:
         tenant_uid: 2000
         tenant_ssh_key_path: /tmp/id_rsa_molecule_tenant
         tenant_ssh_key: "{{ lookup('file', '{{ tenant_ssh_key_path }}.pub') }}"
+        running_in_molecule: true
 verifier:
   name: ansible
