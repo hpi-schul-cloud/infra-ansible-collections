@@ -5,4 +5,4 @@
     state: restarted
   # The service module doesn't work in docker
   # We can't use the molecule-notest tag because handlers aren't skipped by tags
-  when: lookup('ansible.builtin.env', 'MOLECULE_DEBUG') == ""
+  when: not running_in_molecule|default(false)
