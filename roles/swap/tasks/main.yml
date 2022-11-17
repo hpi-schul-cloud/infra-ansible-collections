@@ -4,13 +4,18 @@
     path: "{{ swapfile_path }}"
   register: stat_swapfile
 
+- name: Disable swap before resize
+  command:
+    cmd: swapoff -a
+  when: not stat_swapfile.stat.exists or (stat_swapfile.stat.size < swapfile_size_mb * 1024 * 1024)
+
 - name: Create swap file
   command:
     cmd: dd if=/dev/zero of={{ swapfile_path }} bs=1024 count={{ swapfile_size_mb }}k
   notify:
     - Make swapfile
     - Activate swapfile
-  when: not stat_swapfile.stat.exists or (stat_swapfile.stat.size < swapfile_size_mb * 1024)
+  when: not stat_swapfile.stat.exists or (stat_swapfile.stat.size < swapfile_size_mb * 1024 * 1024)
 
 - name: Set swappiness
   ansible.posix.sysctl:
