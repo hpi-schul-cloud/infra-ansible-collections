@@ -1,5 +1,25 @@
 ---
 
+- name: Create Grafana PVC
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: "{{ item.name }}-grafana"
+        namespace: monitoring
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: "{{ prometheus_community_values.grafana.persistence.storageClassName }}"
+        resources:
+          requests:
+            storage: "{{ prometheus_community_values.grafana.persistence.size }}"
+  when: item.grafana.enabled
+  tags: prometheus
+
 - name: Install Prometheus Stack
   kubernetes.core.helm:
     name: "{{ item.name }}"
