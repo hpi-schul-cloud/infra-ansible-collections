@@ -34,7 +34,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     definition:
-      apiVersion: extensions/v1beta1
+      apiVersion: networking.k8s.io/v1
       kind: Ingress
       metadata:
         name: "{{ collabora_name }}-redirect-metrics"
@@ -60,5 +60,7 @@
               - path: /cool/getMetrics(/.*)
                 pathType: Prefix
                 backend:
-                  serviceName: collabora-online
-                  servicePort: 9980
+                  service:
+                    name: collabora-online
+                    port:
+                      number: 9980
