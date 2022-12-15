@@ -1,0 +1,102 @@
+bbb_prometheus_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_instance_name }}"
+bbb_prometheus_basic_auth:
+  username: ne_admin
+  password_file: "{{ bbb_prometheus_basic_auth_secret_mount_path }}/password"
+
+bbb_prometheus_relabel_configs:
+  # Rewrite hostname:port to hostname
+  - source_labels: [__address__]
+    target_label: instance
+    regex: "([^:]+)(:[0-9]+)?"
+    replacement: "${1}"
+
+bbb_prometheus_labels:
+  tenant: "{{ bbb_tenant }}"
+
+bbb_servers_bbb_exporter_targets: "{{ bbb_servers if bbb_ebbba_exporters else bbb_servers | product([':9100']) | map('join', '') }}"
+bbb_servers_node_exporter_targets: "{{ bbb_servers if bbb_ebbba_exporters else bbb_servers | product([':9688']) | map('join', '') }}"
+
+bbb_turn_servers_coturn_exporter_targets: "{{ bbb_turn_servers | product([':9642']) | map('join', '') }}"
+bbb_turn_servers_node_exporter_targets: "{{ bbb_turn_servers | product([':9100']) | map('join', '') }}"
+
+bbb_prometheus_scalelite_job:
+  job_name: "{{ bbb_instance_name }}-scalelite"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - "{{ scalelite_host }}:9100"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+bbb_prometheus_bbb_job:
+  job_name: "{{ bbb_instance_name }}"
+  scheme: https
+  metrics_path: "{{ '/mon/bbb' if bbb_ebbba_exporters else '/metrics' }}"
+  static_configs:
+    - targets: "{{ bbb_servers_bbb_exporter_targets }}"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+bbb_prometheus_bbb_node_exporter_job:
+  job_name: "{{ bbb_instance_name }}-node-exporter"
+  scheme: https
+  metrics_path: "{{ '/mon/node' if bbb_ebbba_exporters else '/metrics' }}"
+  static_configs:
+    - targets: "{{ bbb_servers_node_exporter_targets }}"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+bbb_prometheus_turn_coturn_exporter_job:
+  job_name: "{{ bbb_instance_name }}-turn-coturn-exporter"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets: "{{ bbb_turn_servers_coturn_exporter_targets if bbb_turn_server_exporter_enabled else [] }}"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+bbb_prometheus_turn_node_exporter_job:
+  job_name: "{{ bbb_instance_name }}-turn-node-exporter"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets: "{{ bbb_turn_servers_node_exporter_targets }}"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+
+bbb_prometheus_scrape_config:
+  - "{{ bbb_prometheus_scalelite_job }}"
+  - "{{ bbb_prometheus_bbb_job }}"
+  - "{{ bbb_prometheus_bbb_node_exporter_job }}"
+  - "{{ bbb_prometheus_turn_coturn_exporter_job }}"
+  - "{{ bbb_prometheus_turn_node_exporter_job }}"
+
+bbb_prometheus_volume:
+  name: "{{ bbb_instance_name }}"
+  secret:
+    secretName: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+
+bbb_prometheus_volume_mount:
+  name: "{{ bbb_instance_name }}"
+  mountPath: "{{ bbb_prometheus_basic_auth_secret_mount_path }}"
+  readOnly: true
+
+# See https://docs.bigbluebutton.org/dev/api.html#usage for BBB request signing with the API token
+bbb_liveness_probe_parameters: name=Liveness+check+meeting&meetingID=livenesscheck&attendeePW=ap&moderatorPW=mp&meta_bbb-origin-server-name=liveness-probe
+bbb_liveness_probe_create:
+  name: bbb-liveness-probe-create
+  interval: 15s
+  scrapeTimeout: 5s
+  module: liveness_probe_bbb
+  url: "https://{{ scalelite_host }}/bigbluebutton/api/create?{{ bbb_liveness_probe_parameters }}&checksum=\
+    {{ ('create' + bbb_liveness_probe_parameters + scalelite_api_token) | hash('sha1') }}"
+# We periodically end the liveness check meeting so that it gets scheduled to a new BBB server
+bbb_liveness_probe_end:
+  name: bbb-liveness-probe-end
+  interval: 60s
+  scrapeTimeout: 5s
+  module: liveness_probe_bbb
+  url: "https://{{ scalelite_host }}/bigbluebutton/api/end?{{ bbb_liveness_probe_parameters }}&checksum=\
+    {{ ('end' + bbb_liveness_probe_parameters + scalelite_api_token) | hash('sha1') }}"

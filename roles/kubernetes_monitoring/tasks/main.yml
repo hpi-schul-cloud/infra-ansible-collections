@@ -24,11 +24,6 @@
     values:
       "{{ metrics_server_values }}"
 
-- name: Add prometheus-community chart repo
-  kubernetes.core.helm_repository:
-    name: prometheus-community
-    repo_url: "https://prometheus-community.github.io/helm-charts"
-
 - name: Create vminsert-credentials secret
   kubernetes.core.k8s:
     state: present
@@ -41,19 +36,6 @@
         namespace: monitoring
       spec:
         itemPath: "vaults/{{ vault }}/items/victoriametrics"
-
-- name: Install Prometheus Stack
-  kubernetes.core.helm:
-    name: monitoring
-    chart_ref: prometheus-community/kube-prometheus-stack
-    update_repo_cache: true
-    chart_version: "{{ prometheus_community_chart_version }}"
-    kubeconfig: "{{ kubeconfig }}"
-    release_namespace: monitoring
-    wait: true
-    wait_timeout: 1200s
-    values:
-      "{{ prometheus_community_values }}"
 
 - name: Deploy Configmap for Loki load test
   kubernetes.core.k8s:

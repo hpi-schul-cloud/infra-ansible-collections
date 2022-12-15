@@ -10,7 +10,7 @@
     AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
     AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
   community.general.terraform:
-    project_path: '{{ inventory_dir }}/terraform/resource-pools/{{ resource_pool }}'
+    project_path: '{{playbook_dir}}/../terraform/resource-pools/{{ resource_pool }}'
     state: present
     # use terraform plan instead of terraform apply for testing
     # state: planned

@@ -1,0 +1,4 @@
+---
+swapfile_path: /swapfile
+swapfile_size_mb: 1024
+# vm_swappiness: 60

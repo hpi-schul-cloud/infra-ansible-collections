@@ -1,0 +1,94 @@
+---
+- name: Create BBB basic auth credentials secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+        namespace: monitoring
+      spec:
+        itemPath: "vaults/{{ vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
+
+- name: Create BBB endpoint for autoscaler
+  kubernetes.core.k8s:
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: Endpoints
+      metadata:
+        name: "{{ bbb_instance_name }}-autoscaler"
+        namespace: monitoring
+        labels:
+          k8s-app: "{{ bbb_instance_name }}-metrics"
+      subsets:
+        - addresses: "{{ bbb_ip_addresses[:bbb_server_count] if bbb_ip_addresses is defined \
+            and bbb_server_count is defined else [] }}"
+          ports:
+            - name: node-exporter
+              port: 9100
+              protocol: TCP
+            - name: https
+              port: 443
+              protocol: TCP
+
+- name: Create BBB service for autoscaler
+  kubernetes.core.k8s:
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ bbb_instance_name }}-autoscaler"
+        namespace: monitoring
+        labels:
+          k8s-app: "{{ bbb_instance_name }}-metrics"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: node-exporter
+            port: 9100
+            targetPort: 9100
+            protocol: TCP
+          - name: https
+            port: 443
+            targetPort: 443
+            protocol: TCP
+
+- name: Create BBB service monitor for autoscaler
+  kubernetes.core.k8s:
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: ServiceMonitor
+      metadata:
+        name: "{{ bbb_instance_name }}-service-monitor"
+        namespace: monitoring
+      spec:
+        selector:
+          matchLabels:
+            k8s-app: "{{ bbb_instance_name }}-metrics"
+        namespaceSelector:
+          any: false
+          matchNames:
+            - monitoring
+        endpoints:
+          - basicAuth:
+              password:
+                name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+                key: password
+              username:
+                name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+                key: username
+            path: "{{ '/mon/node/' if bbb_ebbba_exporters else '/metrics' }}"
+            interval: "{{ bbb_scrape_interval }}"
+            honorLabels: true
+            port: "{{ 'https' if bbb_ebbba_exporters else 'node-exporter' }}"
+            scheme: https
+            tlsConfig:
+              insecureSkipVerify: true

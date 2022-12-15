@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: instance
+  tasks:
+    - name: "Include swap role"
+      include_role:
+        name: "swap"

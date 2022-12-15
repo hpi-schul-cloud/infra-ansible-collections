@@ -1,0 +1,20 @@
+---
+- name: Create monitoring namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    api_version: v1
+    name: monitoring
+    kind: Namespace
+
+- name: Add prometheus-community chart repo
+  kubernetes.core.helm_repository:
+    name: prometheus-community
+    repo_url: "https://prometheus-community.github.io/helm-charts"
+  tags: prometheus
+
+- include_tasks: prometheus.yml
+  vars:
+    prometheus_community_values: "{{ prometheus_default_values }}"
+  loop: "{{ prometheus_instances }}"
+  tags: prometheus

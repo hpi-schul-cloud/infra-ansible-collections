@@ -1,0 +1,9 @@
+---
+- name: Prepare molecule
+  hosts: all
+  pre_tasks:
+    - name: Create swapfile
+      file:
+        path: "{{ swapfile_path }}"
+        state: touch
+        mode: "0600"

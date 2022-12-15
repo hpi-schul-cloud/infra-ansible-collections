@@ -1,0 +1,6 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  # Swap operations can't be meaningfully verified in Docker
+  tasks: []

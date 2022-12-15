@@ -53,6 +53,5 @@
             projects_persistence: "{{ awx_projects_persistence }}"
             projects_storage_access_mode: "{{ awx_projects_storage_access_mode }}"
             project_storage_size: "{{ awx_projects_storage_size }}"
-            security_context_settings: "{{ awx_security_context_settings }}"
       tags:
         - awx

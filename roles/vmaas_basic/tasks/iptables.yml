@@ -1,0 +1,24 @@
+---
+- name: Install iptables
+  package:
+    name: iptables
+    state: present
+
+- name: Allow SSH in
+  iptables:
+    chain: INPUT
+    protocol: TCP
+    destination_port: 22
+    ctstate: NEW,ESTABLISHED
+    jump: ACCEPT
+
+- name: Allow related and established connections
+  iptables:
+    chain: INPUT
+    ctstate: ESTABLISHED,RELATED
+    jump: ACCEPT
+
+- name: Set default policy DROP for INPUT
+  iptables:
+    chain: INPUT
+    policy: DROP

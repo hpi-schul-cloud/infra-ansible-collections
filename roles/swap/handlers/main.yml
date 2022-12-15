@@ -1,0 +1,9 @@
+---
+- name: Make swapfile
+  command: mkswap {{ swapfile_path }}
+  # Doesn't work in Molecule with Docker
+  # We can't use the molecule-notest tag because handlers aren't skipped by tags
+  when: not running_in_molecule|default(false)
+- name: Activate swapfile
+  command: swapon {{ swapfile_path }}
+  when: not running_in_molecule|default(false)
