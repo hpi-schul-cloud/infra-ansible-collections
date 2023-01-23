@@ -9,6 +9,7 @@
   kubernetes.core.helm:
     name: kube-events
     chart_ref: bitnami/kubernetes-event-exporter
+    chart_version: "{{ kubernetes_event_exporter_chart_version }}"
     update_repo_cache: true
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: monitoring
