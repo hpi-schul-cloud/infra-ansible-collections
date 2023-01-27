@@ -1,0 +1,13 @@
+rules:
+{% for rule in maintenance_target_ingress_state.result.spec.rules %}
+  - host: {{ rule.host }}
+    http:
+      paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ maintenance_instance }}-maintenance-page-nginx
+                port:
+                  number: 80
+{% endfor %}

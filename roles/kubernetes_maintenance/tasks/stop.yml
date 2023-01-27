@@ -1,0 +1,18 @@
+---
+- name: Restore Ingress
+  kubernetes.core.k8s:
+    state: patched
+    kubeconfig: "{{ kubeconfig }}"
+    kind: Ingress
+    name: "{{ maintenance_target_ingress }}"
+    namespace: "{{ maintenance_namespace }}"
+    definition:
+      spec: "{{ lookup('file', '/tmp/{{ maintenance_instance }}-ingress.yml') | from_yaml }}"
+
+- name: Delete maintenance Nginx Helm chart
+  kubernetes.core.helm:
+    name: "{{ maintenance_instance }}-maintenance-page"
+    state: absent
+    wait: true
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "{{ maintenance_namespace }}"
