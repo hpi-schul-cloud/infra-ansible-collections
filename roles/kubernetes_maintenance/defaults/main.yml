@@ -1,1 +1,7 @@
 maintenance_page_nginx_chart_version: 13.2.22
+maintenance_page_title: Wartung
+maintenance_page_panel_heading: Geplante Wartung
+maintenance_page_text: |-
+  Derzeit finden Wartungsarbeiten statt. <strong>In dieser Zeit ist die Schulcloud-Verbund-Software leider nicht
+  erreichbar.</strong> Wir geben unser Bestes, die Wartungsarbeiten schnellstm&ouml;glich abzuschlie&szlig;en und bitten die
+  Unannehmlichkeiten zu entschuldigen.

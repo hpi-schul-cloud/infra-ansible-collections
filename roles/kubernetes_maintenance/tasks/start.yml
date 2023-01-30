@@ -6,7 +6,7 @@
 
 - name: Install maintenance Nginx Helm chart
   kubernetes.core.helm:
-    name: "{{ maintenance_instance }}-maintenance-page"
+    name: "{{ maintenance_page_release_name }}"
     chart_ref: bitnami/nginx
     update_repo_cache: true
     wait: true
@@ -29,45 +29,13 @@
         - apiVersion: v1
           kind: ConfigMap
           metadata:
-            name: "{{ maintenance_instance }}-maintenance-page-nginx-html"
+            name: "{{ maintenance_page_release_name }}-nginx-html"
           data:
-            maintenance.html: |-
-              <html>
-                <head>
-                  <title>Wartung</title>
-                  <style>.timeline{-webkit-tap-highlight-color: transparent;line-height: 1.428571429;-webkit-font-smoothing: antialiased;font-family:
-                  "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-size: 1.4em;font-weight: 400;color: #126dc4;box-sizing: border-box;}
-                  .panel-heading{-webkit-tap-highlight-color: transparent;line-height: 1.428571429;-webkit-font-smoothing: antialiased;font-family:
-                  "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-size: 1.728rem;box-sizing: border-box;font-weight: 700;} .list-group{
-                  -webkit-tap-highlight-color: transparent;line-height: 1.428571429;-webkit-font-smoothing: antialiased;font-family: "Open Sans",
-                  "Helvetica Neue",Helvetica,Arial,sans-serif;font-size: 1.4em;font-weight: 400;box-sizing: border-box;margin-bottom: 0;padding-left: 0;}
-                  .list-group-item{ -webkit-tap-highlight-color: transparent; line-height: 1.428571429; -webkit-font-smoothing: antialiased;font-family:
-                  "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight: 400;box-sizing: border-box;position: relative;display: block;
-                  margin-bottom: 0;border-radius: 0;background-color: #fff;border: 1px solid #e8e8e8;font-size: 1.1em;padding: 15px;border-top-width: 0;
-                  border-bottom: 0;border-bottom-right-radius: 2px;border-bottom-left-radius: 2px;}
-                  </style>
-                </head>
-                <body>
-                  <div class="timeline">
-                    <div class="panel panel-info">
-                      <div class="panel-heading">
-                        <strong>Geplante Wartung</strong>
-                      </div>
-                      <div class="list-group">
-                        <div class="list-group-item">
-                          Derzeit finden bis ca. 20:00 Uhr Wartungsarbeiten statt. <strong>In dieser Zeit ist die Schulcloud-Verbund-Software leider nicht
-                           erreichbar.</strong> Wir geben unser Bestes, die Wartungsarbeiten schnellstm&ouml;glich abzuschlie&szlig;en und bitten die
-                           Unannehmlichkeiten zu entschuldigen.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </body>
-              </html>
+            maintenance.html: "{{ lookup('template', './maintenance.html.j2') }}"
       extraVolumes:
         - name: maintenance-html
           configMap:
-            name: "{{ maintenance_instance }}-maintenance-page-nginx-html"
+            name: "{{ maintenance_page_release_name }}-nginx-html"
       extraVolumeMounts:
         - name: maintenance-html
           mountPath: /opt/bitnami/nginx/html/maintenance.html
@@ -85,7 +53,7 @@
 - name: Store Ingress locally
   copy:
     content: "{{ maintenance_target_ingress_state.result.spec | to_yaml }}"
-    dest: /tmp/{{ maintenance_instance }}-ingress.yml
+    dest: /tmp/{{ maintenance_page_release_name }}-ingress.yml
     mode: 0600
 
 - name: Update Ingress

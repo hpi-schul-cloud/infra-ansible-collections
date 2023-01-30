@@ -7,7 +7,7 @@ rules:
             pathType: Prefix
             backend:
               service:
-                name: {{ maintenance_instance }}-maintenance-page-nginx
+                name: {{ maintenance_page_release_name }}-nginx
                 port:
                   number: 80
 {% endfor %}
