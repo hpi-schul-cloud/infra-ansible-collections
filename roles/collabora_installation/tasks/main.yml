@@ -18,7 +18,7 @@
         name: "{{ collabora_name }}"
         namespace: "{{ collabora_namespace }}"
       spec:
-        itemPath: "vaults/{{ vault }}/items/{{ collabora_name }}"
+        itemPath: "vaults/{{ collabora_vault }}/items/{{ collabora_name }}"
 
 - name: Deploy latest version of collabora
   kubernetes.core.helm:
