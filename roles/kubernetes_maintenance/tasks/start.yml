@@ -59,7 +59,7 @@
     namespace: "{{ maintenance_namespace }}"
     definition:
       spec:
-        ingressClassName: does-not-exist
+        ingressClassName: "{{ maintenance_page_disable_ingress_class }}"
 
 - name: Create maintenance Ingress
   kubernetes.core.k8s:

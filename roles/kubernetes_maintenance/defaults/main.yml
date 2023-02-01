@@ -1,4 +1,6 @@
 maintenance_page_nginx_chart_version: 13.2.22
+maintenance_page_enable_ingress_class: nginx
+maintenance_page_disable_ingress_class: does-not-exist
 maintenance_page_title: Wartung
 maintenance_page_panel_heading: Geplante Wartung
 maintenance_page_text: |-

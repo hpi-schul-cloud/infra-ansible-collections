@@ -16,7 +16,7 @@
     namespace: "{{ maintenance_namespace }}"
     definition:
       spec:
-        ingressClassName: nginx
+        ingressClassName: "{{ maintenance_page_enable_ingress_class }}"
 
 - name: Delete maintenance Nginx Helm chart
   kubernetes.core.helm:
