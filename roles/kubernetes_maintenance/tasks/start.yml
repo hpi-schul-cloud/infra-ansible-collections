@@ -50,18 +50,23 @@
     namespace: "{{ maintenance_namespace }}"
   register: maintenance_target_ingress_state
 
-- name: Store Ingress locally
-  copy:
-    content: "{{ maintenance_target_ingress_state.result.spec | to_yaml }}"
-    dest: /tmp/{{ maintenance_page_release_name }}-ingress.yml
-    mode: 0600
-
 - name: Update Ingress
   kubernetes.core.k8s:
     state: patched
     kubeconfig: "{{ kubeconfig }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}"
+    namespace: "{{ maintenance_namespace }}"
+    definition:
+      spec:
+        ingressClassName: does-not-exist
+
+- name: Create maintenance Ingress
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    kind: Ingress
+    name: "{{ maintenance_target_ingress }}-maintenance"
     namespace: "{{ maintenance_namespace }}"
     definition:
       spec: "{{ lookup('template', './ingress-rules.yml.j2') | from_yaml }}"

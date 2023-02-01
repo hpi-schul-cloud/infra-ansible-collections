@@ -11,3 +11,4 @@ rules:
                 port:
                   number: 80
 {% endfor %}
+{{ {'tls': maintenance_target_ingress_state.result.spec.tls} | to_nice_yaml }}
