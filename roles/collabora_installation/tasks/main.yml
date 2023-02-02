@@ -15,10 +15,10 @@
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: "{{ collabora_name }}"
+        name: "{{ collabora_secret }}"
         namespace: "{{ collabora_namespace }}"
       spec:
-        itemPath: "vaults/{{ collabora_vault }}/items/{{ collabora_name }}"
+        itemPath: "vaults/{{ collabora_vault }}/items/{{ collabora_secret }}"
 
 - name: Deploy latest version of collabora
   kubernetes.core.helm:
@@ -37,7 +37,7 @@
       apiVersion: networking.k8s.io/v1
       kind: Ingress
       metadata:
-        name: "{{ collabora_name }}-redirect-metrics"
+        name: collabora-redirect-metrics # "{{ collabora_name }}-redirect-metrics"
         namespace: "{{ collabora_namespace }}"
         annotations:
           cert-manager.io/cluster-issuer: sc-cert-manager-clusterissuer-letsencrypt
