@@ -37,7 +37,7 @@
       apiVersion: networking.k8s.io/v1
       kind: Ingress
       metadata:
-        name: collabora-redirect-metrics # "{{ collabora_name }}-redirect-metrics"
+        name: collabora-redirect-metrics
         namespace: "{{ collabora_namespace }}"
         annotations:
           cert-manager.io/cluster-issuer: sc-cert-manager-clusterissuer-letsencrypt
