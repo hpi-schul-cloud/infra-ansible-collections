@@ -13,8 +13,8 @@ bbb_prometheus_relabel_configs:
 bbb_prometheus_labels:
   tenant: "{{ bbb_tenant }}"
 
-bbb_servers_bbb_exporter_targets: "{{ bbb_servers if bbb_ebbba_exporters else bbb_servers | product([':9100']) | map('join', '') }}"
-bbb_servers_node_exporter_targets: "{{ bbb_servers if bbb_ebbba_exporters else bbb_servers | product([':9688']) | map('join', '') }}"
+bbb_servers_bbb_exporter_targets: "{{ bbb_servers if bbb_ebbba_exporters else bbb_servers | product([':9688']) | map('join', '') }}"
+bbb_servers_node_exporter_targets: "{{ bbb_servers if bbb_ebbba_exporters else bbb_servers | product([':9100']) | map('join', '') }}"
 
 bbb_turn_servers_coturn_exporter_targets: "{{ bbb_turn_servers | product([':9642']) | map('join', '') }}"
 bbb_turn_servers_node_exporter_targets: "{{ bbb_turn_servers | product([':9100']) | map('join', '') }}"
