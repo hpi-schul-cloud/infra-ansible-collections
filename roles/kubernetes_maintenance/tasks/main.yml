@@ -1,0 +1,7 @@
+---
+- name: Start maintenance
+  import_tasks: start.yml
+  when: maintenance_enabled | bool
+- name: Stop maintenance
+  import_tasks: stop.yml
+  when: not maintenance_enabled | bool
