@@ -1,4 +1,11 @@
 ---
+# Retrieves the kubeconfig for the newly created kubernetes cluster and stores it under $HOME/.kube/<cluster_name>.yml
+- name: Create folder .kube
+  ansible.builtin.file:
+    path: "{{ lookup('env','HOME') }}/.kube/"
+    state: directory
+  when: terraform_run is defined and terraform_run.outputs is defined
+
 - name: Add Helm diff plugin
   kubernetes.core.helm_plugin:
     plugin_path: https://github.com/databus23/helm-diff
@@ -18,9 +25,3 @@
     path: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
     mode: '0600'
   when: terraform_run is defined and terraform_run.outputs is defined
-
-- name: Install global network policy for ingress
-  kubernetes.core.k8s:
-    state: present
-    kubeconfig: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
-    template: 'networkpolicy-ingress.yml.j2'

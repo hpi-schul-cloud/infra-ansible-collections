@@ -1,0 +1,6 @@
+---
+- name: Install global network policy for ingress
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
+    template: 'networkpolicy-ingress.yml.j2'

@@ -11,10 +11,8 @@
     AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
   community.general.terraform:
     project_path: '{{playbook_dir}}/../terraform/resource-pools/{{ resource_pool }}'
-    state: present
-    # use terraform plan instead of terraform apply for testing
-    # state: planned
-    # plan_file: /tmp/tf-plan
+    state: "{{ 'planned' if terraform_plan else 'present' }}"
+    plan_file: "{{ '/tmp/tf-plan' if terraform_plan else omit }}"
     workspace: "{{ stage }}"
     force_init: true
     provider_upgrade: true
@@ -36,10 +34,4 @@
 - name: Terraform run output variables
   debug:
     var: terraform_run.outputs
-  when: terraform_run is defined and terraform_run.outputs is defined
-# Retrieves the kubeconfig for the newly created kubernetes cluster and stores it under $HOME/.kube/<cluster_name>.yml
-- name: Create folder .kube
-  ansible.builtin.file:
-    path: "{{ lookup('env','HOME') }}/.kube/"
-    state: directory
   when: terraform_run is defined and terraform_run.outputs is defined
