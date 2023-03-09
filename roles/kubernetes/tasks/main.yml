@@ -11,6 +11,7 @@
     plugin_path: https://github.com/databus23/helm-diff
     state: present
 # since ionoscloudsdk.ionoscloud version 6, ansible outputs this as changed (in yellow)
+# This gets the Kubeconfig even in check mode so the task is completely disabled when in check mode
 - name: Get k8s config
   ionoscloudsdk.ionoscloud.k8s_config:
     username: "{{ ionos_username }}"
@@ -18,10 +19,10 @@
     k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value }}"
     config_file: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
     state: present
-  when: terraform_run is defined and terraform_run.outputs is defined
+  when: terraform_run is defined and terraform_run.outputs is defined and not ansible_check_mode
 
 - name: Change file permissions of k8s config
   ansible.builtin.file:
     path: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
     mode: '0600'
-  when: terraform_run is defined and terraform_run.outputs is defined
+  when: terraform_run is defined and terraform_run.outputs is defined and not ansible_check_mode
