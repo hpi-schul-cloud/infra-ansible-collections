@@ -28,6 +28,7 @@
         prober:
           url: "{{ bbb_blackbox_exporter_url }}"  # prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
         module: "{{ bbb_blackbox_exporter_module }}"
+        interval: "{{ bbb_scrape_interval }}"
         targets:
           staticConfig:
             static: "{{ bbb_servers }}"
@@ -47,6 +48,7 @@
         prober:
           url: "{{ bbb_blackbox_exporter_url }}"
         module: "{{ bbb_blackbox_exporter_module }}"
+        interval: "{{ bbb_scrape_interval }}"
         targets:
           staticConfig:
             static:
