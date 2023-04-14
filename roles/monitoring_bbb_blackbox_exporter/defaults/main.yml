@@ -1,0 +1,11 @@
+# Short name of the tenant
+bbb_tenant: tenant
+# Short name of the instance
+bbb_instance_name: "bbb-{{ bbb_tenant }}"
+# Domain under which the BBB servers are
+bbb_domain_name: bbb.example.com
+# Address of the scalelite server
+scalelite_host: "{{ bbb_domain_name }}"
+bbb_server_count: 0
+# How often the blackbox exporter scrapes the targets
+bbb_scrape_interval: 30s
