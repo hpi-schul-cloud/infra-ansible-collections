@@ -9,3 +9,4 @@ scalelite_host: "{{ bbb_domain_name }}"
 bbb_server_count: 0
 # How often the blackbox exporter scrapes the targets
 bbb_scrape_interval: 30s
+bbb_blackbox_exporter_module: http_2xx
