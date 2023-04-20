@@ -1,4 +1,24 @@
 ---
+- name: Install ufw
+  apt:
+    name: ufw
+    update_cache: true
+
+- name: Enable ufw (deny all)
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Allow necessary ports
+  ufw:
+    rule: allow
+    port: "{{ item  }}"
+    proto: tcp
+  loop:
+    - 22
+    - 80
+    - "{{ proxy_port }}"
+
 - name: Get certificate from Let's Encrypt
   tags: certbot
   vars:
@@ -12,6 +32,28 @@
       - domains: ["{{ inventory_hostname }}"]
   import_role:
     name: geerlingguy.certbot
+
+- name: Close port 80 after certificate is created
+  ufw:
+    rule: deny
+    port: 80
+    proto: tcp
+
+- name: Create pre hook to open the port before certificate renewal
+  template:
+    src: bash_script.j2
+    dest: /etc/letsencrypt/renewal-hooks/pre/open_port
+    mode: 0700
+  vars:
+    commands: "ufw allow 80/tcp"
+
+- name: Create post hook to close the port after certificate renewal
+  template:
+    src: bash_script.j2
+    dest: /etc/letsencrypt/renewal-hooks/post/close_port
+    mode: 0700
+  vars:
+    commands: "ufw deny 80/tcp"
 
 - name: Generate passwords in 1Password
   dbildungscloud.onepwd.item:
