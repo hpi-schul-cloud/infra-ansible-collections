@@ -17,6 +17,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -33,6 +34,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -50,6 +52,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       kind: ClusterRoleBinding
       apiVersion: rbac.authorization.k8s.io/v1

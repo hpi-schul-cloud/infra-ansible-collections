@@ -3,6 +3,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     api_version: v1
     name: monitoring
     kind: Namespace
@@ -28,6 +29,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
@@ -41,6 +43,7 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       kind: ConfigMap
       apiVersion: v1
@@ -56,5 +59,6 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     template: loki-load-test.yml.j2
   tags: loki-load-test

@@ -3,6 +3,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
@@ -16,6 +17,7 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: v1
       kind: Endpoints
@@ -39,6 +41,7 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: v1
       kind: Service
@@ -63,6 +66,7 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: monitoring.coreos.com/v1
       kind: ServiceMonitor

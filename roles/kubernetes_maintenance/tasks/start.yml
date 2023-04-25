@@ -45,6 +45,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}"
     namespace: "{{ maintenance_namespace }}"
@@ -54,6 +55,7 @@
   kubernetes.core.k8s:
     state: patched
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}"
     namespace: "{{ maintenance_namespace }}"
@@ -65,6 +67,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}-maintenance"
     namespace: "{{ maintenance_namespace }}"
