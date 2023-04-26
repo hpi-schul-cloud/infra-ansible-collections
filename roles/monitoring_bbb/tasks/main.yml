@@ -7,7 +7,7 @@
 # To do this we use set_fact to build the list by successively adding servers to it.
 - name: Generate BBB servers list
   vars:
-    bbb_server: "{{ 'bbb-' + (n + 1) | string + '.' + bbb_domain_name }}"
+    bbb_server: "{{ 'bbb-' + (n + bbb_server_start_index) | string + '.' + bbb_domain_name }}"
   set_fact:
     bbb_servers: "{{ bbb_servers + [bbb_server] }}"
   loop: "{{ range(bbb_server_count) }}"

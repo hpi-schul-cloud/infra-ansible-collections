@@ -10,6 +10,7 @@ scalelite_host: "{{ bbb_domain_name }}"
 # and /mon/bbb otherwise /metrics on port 9100 is used
 bbb_ebbba_exporters: true
 bbb_server_count: 0
+bbb_server_start_index: 1
 bbb_turn_server_count: 0
 # True if the coturn exporter is enabled on port 9642 /metrics
 bbb_turn_server_exporter_enabled: true

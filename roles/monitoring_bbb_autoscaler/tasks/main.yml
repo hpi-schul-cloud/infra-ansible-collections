@@ -25,7 +25,7 @@
         labels:
           k8s-app: "{{ bbb_instance_name }}-metrics"
       subsets:
-        - addresses: "{{ bbb_ip_addresses[:bbb_server_count] if bbb_ip_addresses is defined \
+        - addresses: "{{ bbb_ip_addresses[bbb_server_start_index:bbb_server_count] if bbb_ip_addresses is defined \
             and bbb_server_count is defined else [] }}"
           ports:
             - name: node-exporter
