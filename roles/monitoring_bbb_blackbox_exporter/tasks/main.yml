@@ -17,6 +17,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: monitoring.coreos.com/v1
       kind: Probe
@@ -37,6 +38,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: monitoring.coreos.com/v1
       kind: Probe
