@@ -1,0 +1,17 @@
+# See https://docs.bigbluebutton.org/dev/api.html#usage for BBB request signing with the API token
+bbb_liveness_probe_parameters: name=Liveness+check+meeting&meetingID=livenesscheck&attendeePW=ap&moderatorPW=mp&meta_bbb-origin-server-name=liveness-probe
+bbb_liveness_probe_create:
+  name: "{{ bbb_instance_name }}-liveness-probe-create"
+  # interval: 15s
+  # scrapeTimeout: 5s
+  # module: liveness_probe_bbb
+  url: "https://{{ scalelite_host }}/bigbluebutton/api/create?{{ bbb_liveness_probe_parameters }}&checksum=\
+    {{ ('create' + bbb_liveness_probe_parameters + scalelite_api_token) | hash('sha1') }}"
+# We periodically end the liveness check meeting so that it gets scheduled to a new BBB server
+bbb_liveness_probe_end:
+  name: "{{ bbb_instance_name }}-liveness-probe-end"
+  # interval: 60s
+  # scrapeTimeout: 5s
+  # module: liveness_probe_bbb
+  url: "https://{{ scalelite_host }}/bigbluebutton/api/end?{{ bbb_liveness_probe_parameters }}&checksum=\
+    {{ ('end' + bbb_liveness_probe_parameters + scalelite_api_token) | hash('sha1') }}"
