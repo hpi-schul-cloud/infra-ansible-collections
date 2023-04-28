@@ -53,3 +53,4 @@
           staticConfig:
             static:
               - "https://{{ scalelite_host }}/bigbluebutton"
+  when: not bbb_servers_only
