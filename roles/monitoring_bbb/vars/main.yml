@@ -66,12 +66,19 @@ bbb_prometheus_turn_node_exporter_job:
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
 
-bbb_prometheus_scrape_config:
+
+bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config if bbb_servers_only else bbb_prometheus_full_scrape_config }}"
+
+bbb_prometheus_full_scrape_config:
   - "{{ bbb_prometheus_scalelite_job }}"
   - "{{ bbb_prometheus_bbb_job }}"
   - "{{ bbb_prometheus_bbb_node_exporter_job }}"
   - "{{ bbb_prometheus_turn_coturn_exporter_job }}"
   - "{{ bbb_prometheus_turn_node_exporter_job }}"
+
+bbb_prometheus_servers_only_scrape_config:
+  - "{{ bbb_prometheus_bbb_job }}"
+  - "{{ bbb_prometheus_bbb_node_exporter_job }}"
 
 bbb_prometheus_volume:
   name: "{{ bbb_instance_name }}"
