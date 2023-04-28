@@ -29,3 +29,5 @@ prometheus_volumeMounts: []
 # The role will add the liveness probe blackbox exporter targets to this list, can be used by the
 # prometheus-blackbox-exporter Helm chart by mapping it to serviceMonitor.targets
 prometheus_blackbox_exporter_targets: []
+# Only monitor the BBB servers but not Scalelite or TURN
+bbb_servers_only: false
