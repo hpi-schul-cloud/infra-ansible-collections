@@ -55,15 +55,6 @@
   vars:
     commands: "ufw deny 80/tcp"
 
-- name: Generate passwords in 1Password
-  dbildungscloud.onepwd.item:
-    vault: "{{ proxy_vault }}"
-    name: "{{ item.name }}"
-    generate_password: "letters,digits,32"
-    overwrite: False
-  with_items:
-    - "{{ proxy_users }}"
-
 - name: Install squid
   apt:
     name: squid-openssl
@@ -87,7 +78,7 @@
   htpasswd:
     path: /etc/squid/htpasswd
     name: "{{ item.name }}"
-    password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=item.name, vault=proxy_vault, field='password', session_shorthand='ansible-run') }}"
+    password: "{{ proxy_passwords[item.name] }}"
     state: "{{ 'present' if allowed else 'absent'}}"
   when: item.name is defined
   with_items:
