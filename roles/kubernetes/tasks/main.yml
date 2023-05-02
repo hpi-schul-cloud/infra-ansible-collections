@@ -32,7 +32,6 @@
     old_ca: "{{ old_cluster_config.cluster['certificate-authority-data'] | b64decode }}"
     merged_ca: "{{ ( old_ca ~ lookup('file', 'isrgrootx1.pem') ) | b64encode}}"
     # Build proxy url
-    proxy_pass: "{{ proxy_pass }}"
     proxy_url: "https://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_domain }}:{{ proxy_port }}"
     # Add it to the existing cluster configuration
     new_cluster_config: "{{ old_cluster_config | combine({'cluster': {'certificate-authority-data': merged_ca, 'proxy-url': proxy_url}}, recursive=True) }}"
