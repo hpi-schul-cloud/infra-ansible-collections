@@ -1,0 +1,22 @@
+include /etc/squid/conf.d/*
+
+# Open port and use let's encrypt certificate for https
+https_port {{ proxy_port }} tls-cert=/etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem tls-key=/etc/letsencrypt/live/{{ inventory_hostname }}/privkey.pem
+
+# Use basic authentification with htpasswd file and reload it regualary
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/htpasswd
+auth_param basic realm {{ realm }}
+auth_param basic credentialsttl {{ credential_refresh_interval }}
+
+# Only requests with the CONNECT method to the specified domains and ports from authenticated users are allowed
+acl dest_ports port {{ allowed_dest_ports }}
+acl authenticated proxy_auth REQUIRED
+acl CONNECT method CONNECT
+acl dest_domain dstdomain {{ allowed_dest_domain }}
+http_access allow CONNECT authenticated dest_domain dest_ports
+
+# Block all other requests
+http_access deny all
+
+# Disable caching
+cache deny all

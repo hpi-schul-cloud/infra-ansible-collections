@@ -21,6 +21,26 @@
     state: present
   when: terraform_run is defined and terraform_run.outputs is defined and not ansible_check_mode
 
+- name: Add proxy configuration to kubeconfig
+  vars:
+    kubeconfig_path: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
+    old_kubeconfig: "{{ lookup('file', kubeconfig_path) | from_yaml }}"
+    old_cluster_config: "{{ old_kubeconfig.clusters[0] }}"
+    # Add ISRG Root X1 certificate (Let's Encrypt certificate of proxy is based on it)
+    # If not added only the included CA of the cluster would be accepted (connection to proxy not possible)
+    # Source of certificate: https://letsencrypt.org/de/certificates/
+    old_ca: "{{ old_cluster_config.cluster['certificate-authority-data'] | b64decode }}"
+    merged_ca: "{{ ( old_ca ~ lookup('file', 'isrgrootx1.pem') ) | b64encode}}"
+    # Build proxy url
+    proxy_url: "https://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_domain }}:{{ proxy_port }}"
+    # Add it to the existing cluster configuration
+    new_cluster_config: "{{ old_cluster_config | combine({'cluster': {'certificate-authority-data': merged_ca, 'proxy-url': proxy_url}}, recursive=True) }}"
+  copy:
+    dest: "{{ kubeconfig_path }}"
+    # Insert the cluster configuration
+    content: "{{ old_kubeconfig | combine({'clusters':[new_cluster_config]}) | to_nice_yaml }}"
+  when: terraform_run is defined and terraform_run.outputs is defined and not ansible_check_mode and proxy_domain is defined
+
 - name: Change file permissions of k8s config
   ansible.builtin.file:
     path: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"

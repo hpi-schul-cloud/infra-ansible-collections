@@ -3,6 +3,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     api_version: v1
     name: "{{ collabora_namespace }}"
     kind: Namespace
@@ -11,6 +12,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
@@ -33,6 +35,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: networking.k8s.io/v1
       kind: Ingress

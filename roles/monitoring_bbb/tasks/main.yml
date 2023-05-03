@@ -35,6 +35,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem

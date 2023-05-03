@@ -4,6 +4,7 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url }}"
     definition:
       apiVersion: v1
       kind: PersistentVolumeClaim
