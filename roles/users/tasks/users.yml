@@ -59,7 +59,7 @@
     user: 
       name: technicaluser
       update_password: always
-      password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='technicaluser', vault='Infrastructure', field='password')| string | password_hash('sha512')}}"
+      password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='technicaluser', vault='Infrastructure', session_shorthand='ansible-run', field='password')| string | password_hash('sha512')}}"
 
   - name: remove users ( absent general )
     user:
