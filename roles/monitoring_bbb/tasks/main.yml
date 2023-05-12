@@ -7,7 +7,7 @@
 # To do this we use set_fact to build the list by successively adding servers to it.
 - name: Generate BBB servers list
   vars:
-    bbb_server: "{{ 'bbb-' + (n + 1) | string + '.' + bbb_domain_name }}"
+    bbb_server: "{{ 'bbb-' + (n + bbb_server_start_index | int) | string + '.' + bbb_domain_name }}"
   set_fact:
     bbb_servers: "{{ bbb_servers + [bbb_server] }}"
   loop: "{{ range(bbb_server_count) }}"
@@ -29,7 +29,6 @@
     prometheus_additionalScrapeConfigs: "{{ prometheus_additionalScrapeConfigs + bbb_prometheus_scrape_config }}"
     prometheus_volumes: "{{ prometheus_volumes + [bbb_prometheus_volume] }}"
     prometheus_volumeMounts: "{{ prometheus_volumeMounts + [bbb_prometheus_volume_mount] }}"
-    prometheus_blackbox_exporter_targets: "{{ prometheus_blackbox_exporter_targets + [bbb_liveness_probe_create, bbb_liveness_probe_end] }}"
 
 - name: Create BBB basic auth credentials secret
   kubernetes.core.k8s:

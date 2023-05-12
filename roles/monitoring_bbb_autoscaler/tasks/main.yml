@@ -15,7 +15,7 @@
 
 - name: Create BBB endpoint for autoscaler
   kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 and bbb_server_count > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
     definition:
@@ -27,7 +27,7 @@
         labels:
           k8s-app: "{{ bbb_instance_name }}-metrics"
       subsets:
-        - addresses: "{{ bbb_ip_addresses[:bbb_server_count] if bbb_ip_addresses is defined \
+        - addresses: "{{ bbb_ip_addresses[bbb_server_start_index - 1:bbb_server_start_index + bbb_server_count] if bbb_ip_addresses is defined \
             and bbb_server_count is defined else [] }}"
           ports:
             - name: node-exporter

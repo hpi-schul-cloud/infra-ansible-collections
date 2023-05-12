@@ -1,0 +1,27 @@
+---
+- name: Create Scalelite liveness probes
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: Probe
+      metadata:
+        name: "{{ item.name }}"
+        namespace: monitoring
+      spec:
+        jobName: "{{ item.name }}"
+        prober:
+          url: "{{ bbb_blackbox_exporter_url }}"
+        module: "{{ bbb_blackbox_exporter_module }}"
+        interval: "{{ bbb_scrape_interval }}"
+        scrapeTimeout: 5s
+        targets:
+          staticConfig:
+            static:
+              - "{{ item.url }}"
+  loop:
+    - "{{ bbb_liveness_probe_create }}"
+    - "{{ bbb_liveness_probe_end }}"
+  loop_control:
+    label: "{{ item.name }}"

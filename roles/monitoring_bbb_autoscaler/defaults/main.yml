@@ -8,6 +8,7 @@ bbb_domain_name: bbb.example.com
 # and /mon/bbb otherwise /metrics on port 9100 is used
 bbb_ebbba_exporters: true
 bbb_server_count: 0
+bbb_server_start_index: 1
 # List of the IPs of the BBB servers in the same order as the BBB servers,
 # used by the BBB autoscaler
 bbb_ip_addresses: []
