@@ -16,6 +16,12 @@
   set_fact:
     bbb_server_present: "{{ bbb_server_list | length > 0 }}"
 
+- name: "{{ bbb_server_name }}"
+  debug:
+    msg:
+  when: ansible_check_mode
+  changed_when: (not bbb_server_present and bbb_server_state == 'present') or (bbb_server_present and bbb_server_state == 'absent')
+
 - name: Register server
   community.docker.docker_container_exec:
     container: scalelite-api
@@ -27,7 +33,6 @@
   community.docker.docker_container_exec:
     container: scalelite-api
     command: "./bin/rake servers:enable[{{ (bbb_server_id.stdout_lines[1] | from_yaml).id }}]"
-  ignore_errors: '{{ ansible_check_mode }}'
   register: bbb_server_id
   when: not ansible_check_mode and not bbb_server_present and bbb_server_state == 'present'
 
@@ -35,5 +40,4 @@
   community.docker.docker_container_exec:
     container: scalelite-api
     command: "./bin/rake servers:remove[{{ bbb_server_list[0].key }}]"
-  ignore_errors: '{{ ansible_check_mode }}'
   when: not ansible_check_mode and bbb_server_present and bbb_server_state == 'absent'
