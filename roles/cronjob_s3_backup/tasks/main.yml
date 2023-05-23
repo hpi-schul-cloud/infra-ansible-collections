@@ -82,25 +82,7 @@
                   backupdrive: False
                 - drivename: target
                   backupdrive: True
-              defect_buckets:
-                - drivename: source
-                  bucketname: hpi-sc-backups-brb
-                - drivename: source
-                  bucketname: hpi-sc-backups-hpi
-                - drivename: source
-                  bucketname: hpi-sc-backups-int
-                - drivename: source
-                  bucketname: hpi-sc-backups-nbc
-                - drivename: source
-                  bucketname: hpi-sc-backups-thr
-                - drivename: source
-                  bucketname: sc-prod-admin-backup
-                - drivename: source
-                  bucketname: sc-prod-collaboration-backup
-                - drivename: source
-                  bucketname: sc-prod-nextcloud-backup
-                - drivename: source
-                  bucketname: sc-tf-remote-state-01-logs
+              defect_buckets: []
               defect_files: []
               mail:
                 receiver_mail_addresses: [ backup@dbildungscloud.de ]
