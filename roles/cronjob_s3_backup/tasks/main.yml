@@ -73,7 +73,7 @@
                 - instancename: {{ instance_name }}
                   instancename_short: {{ instance_name }}
                   s3_source_drives: [ source ]
-                  s3_source_bucket_patterns: ['*']
+                  s3_source_bucket_patterns: ['{{ s3_source_bucket_name }}']
                   s3_target_drive: target
                   s3_target_backup_bucket: {{ s3_target_backup_bucket }}
                   backup_day_of_month: 1
