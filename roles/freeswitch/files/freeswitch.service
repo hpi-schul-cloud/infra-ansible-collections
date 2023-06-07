@@ -1,0 +1,49 @@
+; This file in installations built from Master can be found in 
+; /usr/src/freeswitch/debian
+; edit as needed to match your needs
+
+[Unit]
+Description=freeswitch
+Wants=network-online.target
+Requires=network.target local-fs.target
+After=network.target network-online.target local-fs.target
+
+[Service]
+; service
+Type=forking
+PIDFile=/usr/local/freeswitch/run/freeswitch.pid
+; PermissionsStartOnly has been deprecated in favor of the ExecStart= and similar series, see:
+; https://github.com/NixOS/nixpkgs/issues/53852
+; PermissionsStartOnly=true
+; -nonat disables Network Address Translation probing at FreeSWITCH start, which might not be what you want!
+; blank ExecStart= line flushes the list
+ExecStart=/usr/local/freeswitch/bin/freeswitch -u freeswitch -g freeswitch -ncwait -rp
+TimeoutStartSec=45
+TimeoutStopSec=45
+; Restart=always will ALWAYS restart FreeSWITCH even when you wish to stop it to debug and configure it
+Restart=on-failure
+UMask=0007
+
+; exec
+WorkingDirectory=/usr/local/freeswitch/bin
+User=root
+Group=daemon
+LimitCORE=infinity
+LimitNOFILE=100000
+LimitNPROC=60000
+;LimitSTACK=240
+LimitRTPRIO=infinity
+LimitRTTIME=7000000
+IOSchedulingClass=realtime
+IOSchedulingPriority=2
+; See https://man7.org/linux/man-pages/man7/sched.7.html for scheduler settings that vary by O/S distribution
+; the following 2 lines are recommended for bare-metal machines
+CPUSchedulingPolicy=rr
+CPUSchedulingPriority=89
+; the following 3 lines were found by a user to work on a MacOS VM
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=1
+Nice=-19
+
+[Install]
+WantedBy=multi-user.target
