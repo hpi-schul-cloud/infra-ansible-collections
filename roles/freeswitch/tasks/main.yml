@@ -35,7 +35,6 @@
       command:
         chdir: /usr/src/libs/libks
         cmd: cmake . -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBBACKTRACE=1
-        creates: /usr/src/libs/libks
 
     - name: Run make for libks
       make:
