@@ -42,4 +42,4 @@
         name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
         namespace: monitoring
       spec:
-        itemPath: "vaults/{{ vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
+        itemPath: "vaults/{{ bbb_vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
