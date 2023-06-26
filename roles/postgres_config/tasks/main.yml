@@ -4,22 +4,8 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
-    definition:
-      apiVersion: v1
-      kind: Secret
-      metadata:
-        name: "psql-{{ psql_name }}-config"
-        namespace: "{{ psql_namespace }}"
-      type: Opaque
-      data:
-        PGHOST: "{{ psql_host | b64encode }}"
-        PGUSER: "{{ psql_user | b64encode }}"
-        PGPASSWORD: "{{ psql_pass | b64encode }}"
-        DB_NAME: "{{ psql_db_name | b64encode }}"
-        DB_USER: "{{ psql_db_user | b64encode }}"
-        DB_PASS: "{{ psql_db_pass | b64encode }}"
-        DB_CUSTOM_COMMAND: "{{ psql_db_custom_command | b64encode }}"
-        DB_PRIVILEGES: "{{ psql_db_privileges | b64encode }}"
+    template: 'secret.yml.j2'
+      
   notify: Create Config Job
 
 - name: Create configmap for config-script
@@ -34,6 +20,6 @@
         name: "psql-{{ psql_name }}-config-script"
         namespace: "{{ psql_namespace }}"
       data:
-        config-script: "{{ lookup('file', 'config-script.sh') }}"
+        config-script: "{{ lookup('template', 'config-script.sh.j2') }}"
   notify: Create Config Job
 
