@@ -5,7 +5,6 @@
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
     template: 'secret.yml.j2'
-      
   notify: Create Config Job
 
 - name: Create configmap for config-script
