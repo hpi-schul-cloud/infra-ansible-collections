@@ -19,6 +19,7 @@
         DB_USER: "{{ psql_db_user | b64encode }}"
         DB_PASS: "{{ psql_db_pass | b64encode }}"
         DB_CUSTOM_COMMAND: "{{ psql_db_custom_command | b64encode }}"
+        DB_PRIVILEGES: "{{ psql_db_privileges | b64encode }}"
   notify: Create Config Job
 
 - name: Create configmap for config-script

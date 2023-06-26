@@ -3,3 +3,4 @@ psql_db_name: "{{ psql_db_user }}"
 psql_db_custom_command: ""
 psql_user: postgres
 psql_name: "{{ psql_db_name }}"
+psql_db_privileges: "ALL PRIVILEGES"
