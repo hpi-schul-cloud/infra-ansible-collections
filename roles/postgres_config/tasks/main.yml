@@ -4,6 +4,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     template: 'secret.yml.j2'
   notify: Create Config Job
 
@@ -12,6 +13,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     definition:
       apiVersion: v1
       kind: ConfigMap

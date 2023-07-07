@@ -10,6 +10,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     api_version: v1
     name: "{{ trivy_operator_release_namespace }}"
     kind: Namespace

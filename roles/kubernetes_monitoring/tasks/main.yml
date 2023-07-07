@@ -4,6 +4,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     api_version: v1
     name: monitoring
     kind: Namespace
@@ -30,6 +31,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
@@ -44,6 +46,7 @@
     state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     definition:
       kind: ConfigMap
       apiVersion: v1
@@ -60,5 +63,6 @@
     state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     template: loki-load-test.yml.j2
   tags: loki-load-test

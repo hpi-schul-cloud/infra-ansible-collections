@@ -35,6 +35,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem

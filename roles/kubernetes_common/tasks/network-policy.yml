@@ -4,4 +4,5 @@
     state: present
     kubeconfig: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     template: 'networkpolicy-ingress.yml.j2'

@@ -46,6 +46,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}"
     namespace: "{{ maintenance_namespace }}"
@@ -56,6 +57,7 @@
     state: patched
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}"
     namespace: "{{ maintenance_namespace }}"
@@ -68,6 +70,7 @@
     state: present
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     kind: Ingress
     name: "{{ maintenance_target_ingress }}-maintenance"
     namespace: "{{ maintenance_namespace }}"

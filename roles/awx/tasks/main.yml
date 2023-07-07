@@ -4,6 +4,7 @@
         state: "present"
         kubeconfig: "{{ kubeconfig }}"
         proxy: "{{ proxy_url }}"
+        proxy_headers: "{{ proxy_headers }}"
         template:  awx-operator.yml
       tags:
         - awx
@@ -15,6 +16,7 @@
         state: "present"
         kubeconfig: "{{ kubeconfig }}"
         proxy: "{{ proxy_url }}"
+        proxy_headers: "{{ proxy_headers }}"
         definition:
           apiVersion: v1
           kind: PersistentVolumeClaim
@@ -34,6 +36,7 @@
         state: "present"
         kubeconfig: "{{ kubeconfig }}"
         proxy: "{{ proxy_url }}"
+        proxy_headers: "{{ proxy_headers }}"
         definition:
           apiVersion: awx.ansible.com/v1beta1
           kind: AWX

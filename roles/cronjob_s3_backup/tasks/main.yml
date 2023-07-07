@@ -5,6 +5,7 @@
       state: present
       kubeconfig: "{{ kubeconfig }}"
       proxy: "{{ proxy_url }}"
+      proxy_headers: "{{ proxy_headers }}"
       api_version: v1
       name: "{{ cronjob_namespace }}"
       kind: Namespace
@@ -14,6 +15,7 @@
       state: present
       kubeconfig: "{{ kubeconfig }}"
       proxy: "{{ proxy_url }}"
+      proxy_headers: "{{ proxy_headers }}"
       definition:
         apiVersion: onepassword.com/v1
         kind: OnePasswordItem
@@ -28,6 +30,7 @@
       state: present
       kubeconfig: "{{ kubeconfig }}"
       proxy: "{{ proxy_url }}"
+      proxy_headers: "{{ proxy_headers }}"
       definition:
         apiVersion: onepassword.com/v1
         kind: OnePasswordItem
@@ -42,6 +45,7 @@
       state: present
       kubeconfig: "{{ kubeconfig }}"
       proxy: "{{ proxy_url }}"
+      proxy_headers: "{{ proxy_headers }}"
       definition:
         apiVersion: v1
         kind: ConfigMap

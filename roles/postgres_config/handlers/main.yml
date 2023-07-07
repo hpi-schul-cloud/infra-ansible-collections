@@ -4,6 +4,7 @@
     state: "present"
     kubeconfig: "{{ kubeconfig }}"
     proxy: "{{ proxy_url }}"
+    proxy_headers: "{{ proxy_headers }}"
     definition:
       apiVersion: batch/v1
       kind: Job
