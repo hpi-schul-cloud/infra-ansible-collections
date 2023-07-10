@@ -3,6 +3,6 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
-    proxy: "{{ proxy_url }}"
-    proxy_headers: "{{ proxy_headers }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     template: 'networkpolicy-ingress.yml.j2'

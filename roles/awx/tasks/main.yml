@@ -3,8 +3,8 @@
       kubernetes.core.k8s:
         state: "present"
         kubeconfig: "{{ kubeconfig }}"
-        proxy: "{{ proxy_url }}"
-        proxy_headers: "{{ proxy_headers }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
         template:  awx-operator.yml
       tags:
         - awx
@@ -15,8 +15,8 @@
       kubernetes.core.k8s:
         state: "present"
         kubeconfig: "{{ kubeconfig }}"
-        proxy: "{{ proxy_url }}"
-        proxy_headers: "{{ proxy_headers }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
         definition:
           apiVersion: v1
           kind: PersistentVolumeClaim
@@ -35,8 +35,8 @@
       kubernetes.core.k8s:
         state: "present"
         kubeconfig: "{{ kubeconfig }}"
-        proxy: "{{ proxy_url }}"
-        proxy_headers: "{{ proxy_headers }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
         definition:
           apiVersion: awx.ansible.com/v1beta1
           kind: AWX

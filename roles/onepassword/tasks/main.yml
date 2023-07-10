@@ -17,8 +17,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    proxy: "{{ proxy_url }}"
-    proxy_headers: "{{ proxy_headers }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -35,8 +35,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    proxy: "{{ proxy_url }}"
-    proxy_headers: "{{ proxy_headers }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -54,8 +54,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
-    proxy: "{{ proxy_url }}"
-    proxy_headers: "{{ proxy_headers }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       kind: ClusterRoleBinding
       apiVersion: rbac.authorization.k8s.io/v1
