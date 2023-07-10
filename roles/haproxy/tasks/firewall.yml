@@ -1,4 +1,16 @@
 ---
+  - name: Install dependency of firewalld 
+    ansible.builtin.yum:
+      name:
+        - firewalld
+      state: present
+
+    #If that task makes problems - a simple reboot may help
+  - name: make sure that firewalld status is active
+    service:
+      name=firewalld
+      state=started
+  
   - name: Create frontend zone
     ansible.posix.firewalld:
       zone: "frontend"
