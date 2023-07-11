@@ -78,7 +78,7 @@
   htpasswd:
     path: /etc/squid/htpasswd
     name: "{{ item.name }}"
-    password: "{{ proxy_passwords[item.name] }}"
+    password: "{{ proxy_passwords[item.name] if allowed else omit }}"
     state: "{{ 'present' if allowed else 'absent'}}"
   when: item.name is defined
   with_items:
