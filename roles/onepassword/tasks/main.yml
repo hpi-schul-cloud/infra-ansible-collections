@@ -10,6 +10,7 @@
   kubernetes.core.helm_repository:
     name: 1password
     repo_url: "https://1password.github.io/connect-helm-charts"
+  check_mode: false
 
 # The onepassword credentials json file is used by the connector to connect to central 1password service
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html

@@ -13,6 +13,7 @@
   kubernetes.core.helm_repository:
     name: metrics-server
     repo_url: "https://kubernetes-sigs.github.io/metrics-server/"
+  check_mode: false
 
 - name: Install Metrics Server
   kubernetes.core.helm:
