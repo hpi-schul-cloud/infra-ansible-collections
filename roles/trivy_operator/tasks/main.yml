@@ -3,6 +3,7 @@
   kubernetes.core.helm_repository:
     name: aqua
     repo_url: "https://aquasecurity.github.io/helm-charts/"
+  check_mode: false
   tags: trivy
 
 - name: Create security namespace for Trivy Operator

@@ -3,6 +3,7 @@
   kubernetes.core.helm_repository:
     name: nfs-subdir
     repo_url: "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
+  check_mode: false
   when: nfs_server_ip is defined
   tags: nfs
 
