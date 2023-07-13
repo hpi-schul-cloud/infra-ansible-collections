@@ -1,0 +1,30 @@
+---
+- name: Create /data
+  file:
+    path: "{{ lvm_mount_path }}"
+    state: directory
+    mode: "{{ lvm_mount_path_mode }}"
+- name: Create PV
+  lvg:
+    pvs: "{{ lvm_pvs }}"
+    vg: "{{ lvm_vg }}"
+  become: true
+- name: Create LV
+  lvol:
+    lv: "{{ lvm_lv }}"
+    vg: "{{ lvm_vg }}"
+    size: 100%VG
+  become: true
+- name: Make filesystem
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{ lvm_vg }}/{{ lvm_lv }}"
+  become: true
+- name: Mount filesystem
+  mount:
+    state: mounted
+    fstype: ext4
+    src: "/dev/{{ lvm_vg }}/{{ lvm_lv }}"
+    path: "{{ lvm_mount_path }}"
+    backup: true
+  become: true

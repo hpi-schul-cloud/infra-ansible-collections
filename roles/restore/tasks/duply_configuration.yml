@@ -68,7 +68,7 @@
   - name: import public keys
     tags: [ restore ]
     shell: >
-      echo "{{ lookup('schulcloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.gpg.keys.' + user_item.1 + '.public') }}" | gpg2 --import && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.pub.lock"
+      echo "{{ lookup('dbildungscloud.onepwd.onepwd', vault='sc-prod', session_shorthand='ansible-run', secret_name='backup.gpg.keys.' + user_item.1 + '.public') }}" | gpg2 --import && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.pub.lock"
     args:
       creates: "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.pub.lock"
     become: true
@@ -87,7 +87,7 @@
   - name: import private keys
     tags: [ restore ]
     shell: >
-      echo '{{ lookup('schulcloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.gpg.keys.' + user_item.1 + '.secret') }}' | gpg2 --allow-secret-key-import --batch --import && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.sec.lock"
+      echo '{{ lookup('dbildungscloud.onepwd.onepwd', vault='sc-prod', session_shorthand='ansible-run', secret_name='backup.gpg.keys.' + user_item.1 + '.secret') }}' | gpg2 --allow-secret-key-import --batch --import && touch "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.sec.lock"
     args:
       creates: "/home/{{user_item.0.name}}/.duply/{{ user_item.1 }}.sec.lock"
     become: true

@@ -3,6 +3,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     api_version: v1
     name: monitoring
     kind: Namespace
@@ -11,6 +13,7 @@
   kubernetes.core.helm_repository:
     name: metrics-server
     repo_url: "https://kubernetes-sigs.github.io/metrics-server/"
+  check_mode: false
 
 - name: Install Metrics Server
   kubernetes.core.helm:
@@ -28,6 +31,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
@@ -41,6 +46,8 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       kind: ConfigMap
       apiVersion: v1
@@ -56,5 +63,7 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     template: loki-load-test.yml.j2
   tags: loki-load-test

@@ -1,0 +1,85 @@
+---
+- name: Install ufw
+  apt:
+    name: ufw
+    update_cache: true
+
+- name: Enable ufw (deny all)
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Allow necessary ports
+  ufw:
+    rule: allow
+    port: "{{ item  }}"
+    proto: tcp
+  loop:
+    - 22
+    - 80
+    - "{{ proxy_port }}"
+
+- name: Get certificate from Let's Encrypt
+  tags: certbot
+  vars:
+    certbot_create_if_missing: True
+    certbot_create_method: standalone
+    certbot_admin_email: "{{ lets_encrypt_email }}"
+    certbot_auto_renew_hour: "4"
+    certbot_auto_renew_user: "root"
+    certbot_create_standalone_stop_services: False
+    certbot_certs:
+      - domains: ["{{ inventory_hostname }}"]
+  import_role:
+    name: geerlingguy.certbot
+
+- name: Close port 80 after certificate is created
+  ufw:
+    rule: deny
+    port: 80
+    proto: tcp
+
+- name: Create pre hook to open the port before certificate renewal
+  template:
+    src: bash_script.j2
+    dest: /etc/letsencrypt/renewal-hooks/pre/open_port
+    mode: 0700
+  vars:
+    commands: "ufw allow 80/tcp"
+
+- name: Create post hook to close the port after certificate renewal
+  template:
+    src: bash_script.j2
+    dest: /etc/letsencrypt/renewal-hooks/post/close_port
+    mode: 0700
+  vars:
+    commands: "ufw deny 80/tcp"
+
+- name: Install squid
+  apt:
+    name: squid-openssl
+    update_cache: true
+  notify: Reload squid
+
+- name: Set configuration
+  template:
+    src: "templates/squid.conf.j2"
+    dest: "/etc/squid/squid.conf"
+  notify: Reload squid
+
+- name: Install passlib (required for htpasswd module)
+  pip: 
+    name: passlib
+
+- name: Set/remove allowed users for proxy
+  vars:
+    project_stage: "{{ project }}-{{ stage }}"
+    allowed: "{{ (item.everywhere is defined and item.everywhere == True) or (item.project_stage is defined and project_stage in item.project_stage) }}"
+  htpasswd:
+    path: /etc/squid/htpasswd
+    name: "{{ item.name }}"
+    password: "{{ proxy_passwords[item.name] if allowed else omit }}"
+    state: "{{ 'present' if allowed else 'absent'}}"
+  when: item.name is defined
+  with_items:
+    - "{{ proxy_users }}"

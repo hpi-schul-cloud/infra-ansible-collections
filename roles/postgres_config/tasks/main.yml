@@ -1,0 +1,26 @@
+---
+- name: Create Secret for Postgres configuration
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    template: 'secret.yml.j2'
+  notify: Create Config Job
+
+- name: Create configmap for config-script
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: "psql-{{ psql_name }}-config-script"
+        namespace: "{{ psql_namespace }}"
+      data:
+        config-script: "{{ lookup('template', 'config-script.sh.j2') }}"
+  notify: Create Config Job
+

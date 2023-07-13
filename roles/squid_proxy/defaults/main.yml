@@ -1,0 +1,3 @@
+---
+lets_encrypt_email: devops@dbildungscloud.de
+credential_refresh_interval: "1 minutes"

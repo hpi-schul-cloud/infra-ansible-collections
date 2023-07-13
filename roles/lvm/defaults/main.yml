@@ -1,0 +1,6 @@
+---
+lvm_mount_path: /data
+lvm_mount_path_mode: 0755
+lvm_pvs: /dev/vdb
+lvm_vg: data_vg
+lvm_lv: data_lv

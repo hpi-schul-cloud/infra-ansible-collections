@@ -1,0 +1,60 @@
+---
+- name: Clear local facts
+  set_fact:
+    bbb_servers: []
+# We generate the list of BBB servers according to our naming convention.
+# To do this we use set_fact to build the list by successively adding servers to it.
+- name: Generate BBB servers list
+  vars:
+    bbb_server: "{{ 'https://bbb-' + (n + bbb_server_start_index | int) | string + '.' + bbb_domain_name + '/bigbluebutton' }}"
+  set_fact:
+    bbb_servers: "{{ bbb_servers + [bbb_server] }}"
+  loop: "{{ range(bbb_server_count) }}"
+  loop_control:
+    loop_var: n
+
+- name: Create BBB Server Probe
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: Probe
+      metadata:
+        name: "{{ bbb_instance_name }}-blackbox-exporter"
+        namespace: monitoring
+      spec:
+        jobName: "{{ bbb_instance_name }}-blackbox-exporter"
+        prober:
+          url: "{{ bbb_blackbox_exporter_url }}"  # prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+        module: "{{ bbb_blackbox_exporter_module }}"
+        interval: "{{ bbb_scrape_interval }}"
+        targets:
+          staticConfig:
+            static: "{{ bbb_servers }}"
+
+- name: Create Scalelite Server Probe
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: Probe
+      metadata:
+        name: "{{ bbb_instance_name }}-scalelite-blackbox-exporter"
+        namespace: monitoring
+      spec:
+        jobName: "{{ bbb_instance_name }}-scalelite-blackbox-exporter"
+        prober:
+          url: "{{ bbb_blackbox_exporter_url }}"
+        module: "{{ bbb_blackbox_exporter_module }}"
+        interval: "{{ bbb_scrape_interval }}"
+        targets:
+          staticConfig:
+            static:
+              - "https://{{ scalelite_host }}/bigbluebutton"
+  when: not bbb_servers_only

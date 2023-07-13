@@ -10,6 +10,7 @@
   kubernetes.core.helm_repository:
     name: 1password
     repo_url: "https://1password.github.io/connect-helm-charts"
+  check_mode: false
 
 # The onepassword credentials json file is used by the connector to connect to central 1password service
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
@@ -17,6 +18,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -33,6 +36,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: v1
       kind: Secret
@@ -50,6 +55,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       kind: ClusterRoleBinding
       apiVersion: rbac.authorization.k8s.io/v1

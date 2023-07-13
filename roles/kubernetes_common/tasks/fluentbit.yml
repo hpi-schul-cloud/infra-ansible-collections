@@ -4,6 +4,7 @@
   kubernetes.core.helm_repository:
     name: fluent
     repo_url: "https://fluent.github.io/helm-charts"
+  check_mode: false
 
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html
 - name: Install Fluentbit (Loki)

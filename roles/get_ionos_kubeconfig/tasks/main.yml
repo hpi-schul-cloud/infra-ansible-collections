@@ -1,0 +1,48 @@
+---
+# Retrieves the kubeconfig for the newly created kubernetes cluster and stores it under $HOME/.kube/<cluster_name>.yml
+- name: Create folder .kube
+  ansible.builtin.file:
+    path: "{{ lookup('env','HOME') }}/.kube/"
+    state: directory
+  when: terraform_run is defined and terraform_run.outputs is defined
+
+- name: Add Helm diff plugin
+  kubernetes.core.helm_plugin:
+    plugin_path: https://github.com/databus23/helm-diff
+    state: present
+# since ionoscloudsdk.ionoscloud version 6, ansible outputs this as changed (in yellow)
+# This gets the Kubeconfig even in check mode
+- name: Get k8s config
+  ionoscloudsdk.ionoscloud.k8s_config:
+    username: "{{ ionos_username }}"
+    password: "{{ ionos_password }}"
+    k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value }}"
+    config_file: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
+    state: present
+  when: terraform_run is defined and terraform_run.outputs is defined
+
+- name: Add proxy configuration to kubeconfig
+  vars:
+    kubeconfig_path: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
+    old_kubeconfig: "{{ lookup('file', kubeconfig_path) | from_yaml }}"
+    old_cluster_config: "{{ old_kubeconfig.clusters[0] }}"
+    # Add ISRG Root X1 certificate (Let's Encrypt certificate of proxy is based on it)
+    # If not added only the included CA of the cluster would be accepted (connection to proxy not possible)
+    # Source of certificate: https://letsencrypt.org/de/certificates/
+    old_ca: "{{ old_cluster_config.cluster['certificate-authority-data'] | b64decode }}"
+    merged_ca: "{{ ( old_ca ~ lookup('file', 'isrgrootx1.pem') ) | b64encode}}"
+    # Build proxy url
+    proxy_url: "https://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_domain }}:{{ proxy_port }}"
+    # Add it to the existing cluster configuration
+    new_cluster_config: "{{ old_cluster_config | combine({'cluster': {'certificate-authority-data': merged_ca, 'proxy-url': proxy_url}}, recursive=True) }}"
+  copy:
+    dest: "{{ kubeconfig_path }}"
+    # Insert the cluster configuration
+    content: "{{ old_kubeconfig | combine({'clusters':[new_cluster_config]}) | to_nice_yaml }}"
+  when: terraform_run is defined and terraform_run.outputs is defined and proxy_domain is defined
+
+- name: Change file permissions of k8s config
+  ansible.builtin.file:
+    path: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
+    mode: '0600'
+  when: terraform_run is defined and terraform_run.outputs is defined

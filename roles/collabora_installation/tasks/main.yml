@@ -3,6 +3,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     api_version: v1
     name: "{{ collabora_namespace }}"
     kind: Namespace
@@ -11,14 +13,16 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: "{{ collabora_name }}"
+        name: "{{ collabora_secret }}"
         namespace: "{{ collabora_namespace }}"
       spec:
-        itemPath: "vaults/{{ vault }}/items/{{ collabora_name }}"
+        itemPath: "vaults/{{ collabora_vault }}/items/{{ collabora_secret }}"
 
 - name: Deploy latest version of collabora
   kubernetes.core.helm:
@@ -33,11 +37,13 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: networking.k8s.io/v1
       kind: Ingress
       metadata:
-        name: "{{ collabora_name }}-redirect-metrics"
+        name: collabora-redirect-metrics
         namespace: "{{ collabora_namespace }}"
         annotations:
           cert-manager.io/cluster-issuer: sc-cert-manager-clusterissuer-letsencrypt

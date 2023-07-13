@@ -3,6 +3,7 @@
   kubernetes.core.helm_repository:
     name: grafana
     repo_url: "https://grafana.github.io/helm-charts"
+  check_mode: false
 
 - name: Install Loki
   kubernetes.core.helm:
@@ -23,6 +24,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem

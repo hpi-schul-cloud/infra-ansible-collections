@@ -3,6 +3,8 @@
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
@@ -10,12 +12,14 @@
         name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
         namespace: monitoring
       spec:
-        itemPath: "vaults/{{ vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
+        itemPath: "vaults/{{ bbb_vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
 
 - name: Create BBB endpoint for autoscaler
   kubernetes.core.k8s:
-    state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
+    state: "{{ 'present' if bbb_ip_addresses | length > 0 and bbb_server_count > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: v1
       kind: Endpoints
@@ -25,7 +29,7 @@
         labels:
           k8s-app: "{{ bbb_instance_name }}-metrics"
       subsets:
-        - addresses: "{{ bbb_ip_addresses[:bbb_server_count] if bbb_ip_addresses is defined \
+        - addresses: "{{ bbb_ip_addresses[bbb_server_start_index - 1:bbb_server_start_index - 1 + bbb_server_count] if bbb_ip_addresses is defined \
             and bbb_server_count is defined else [] }}"
           ports:
             - name: node-exporter
@@ -39,6 +43,8 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: v1
       kind: Service
@@ -63,6 +69,8 @@
   kubernetes.core.k8s:
     state: "{{ 'present' if bbb_ip_addresses | length > 0 else 'absent' }}"
     kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
       apiVersion: monitoring.coreos.com/v1
       kind: ServiceMonitor
