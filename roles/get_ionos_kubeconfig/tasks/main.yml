@@ -4,12 +4,14 @@
   ansible.builtin.file:
     path: "{{ lookup('env','HOME') }}/.kube/"
     state: directory
+  run_once: true
   when: terraform_run is defined and terraform_run.outputs is defined
 
 - name: Add Helm diff plugin
   kubernetes.core.helm_plugin:
     plugin_path: https://github.com/databus23/helm-diff
     state: present
+  run_once: true
 # since ionoscloudsdk.ionoscloud version 6, ansible outputs this as changed (in yellow)
 # This gets the Kubeconfig even in check mode
 - name: Get k8s config

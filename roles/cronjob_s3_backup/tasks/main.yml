@@ -112,7 +112,7 @@
   - name: Install IONOS S3 Backup cronjob
     kubernetes.core.helm:
       name: "{{ instance_name }}"
-      chart_ref: "{{ inventory_dir }}/charts/cronjob"
+      chart_ref: "{{ playbook_dir }}/../charts/cronjob"
       wait: yes
       chart_version: "{{ cronjob_s3_backup_chart_version }}"
       kubeconfig: "{{ kubeconfig }}"
