@@ -30,7 +30,7 @@
       apiVersion: v1
       kind: PersistentVolumeClaim
       metadata:
-        name: data-cassandra-{{ item }}
+        name: data-{{ cassandra_values.fullnameOverride | default('cassandra') }}-{{ item }}
         namespace: monitoring
       spec:
         accessModes:
