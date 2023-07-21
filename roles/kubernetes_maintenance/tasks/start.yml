@@ -4,6 +4,7 @@
     name: bitnami
     repo_url: "https://charts.bitnami.com/bitnami"
   check_mode: false
+  changed_when: false
 
 - name: Install maintenance Nginx Helm chart
   kubernetes.core.helm:
