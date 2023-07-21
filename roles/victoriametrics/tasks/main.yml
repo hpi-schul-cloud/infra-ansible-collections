@@ -4,6 +4,7 @@
     name: vm
     repo_url: "https://victoriametrics.github.io/helm-charts/"
   check_mode: false
+  changed_when: false
 
 - name: Create vminsert http basic auth secret
   kubernetes.core.k8s:

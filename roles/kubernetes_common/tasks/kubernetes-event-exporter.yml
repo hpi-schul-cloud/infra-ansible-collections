@@ -4,6 +4,7 @@
     name: bitnami
     repo_url: "https://charts.bitnami.com/bitnami"
   check_mode: false
+  changed_when: false
   tags: kube-events
 
 - name: Deploy latest version of kubernetes-event-exporter inside monitoring namespace

@@ -20,6 +20,7 @@
     name: otcdns
     repo_url: "https://hpi-schul-cloud.github.io/infra-otc-cert-manager-webhook/"
   check_mode: false
+  changed_when: false
 
 - name: Install otcdns webhook plugin
   kubernetes.core.helm:

@@ -4,6 +4,7 @@
     name: nfs-subdir
     repo_url: "https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner"
   check_mode: false
+  changed_when: false
   when: nfs_server_ip is defined
   tags: nfs
 

@@ -4,6 +4,7 @@
     name: grafana
     repo_url: "https://grafana.github.io/helm-charts"
   check_mode: false
+  changed_when: false
 
 - name: Install Loki
   kubernetes.core.helm:
