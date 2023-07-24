@@ -32,7 +32,7 @@
     # If not added only the included CA of the cluster would be accepted (connection to proxy not possible)
     # Source of certificate: https://letsencrypt.org/de/certificates/
     old_ca: "{{ old_cluster_config.cluster['certificate-authority-data'] | b64decode }}"
-    merged_ca: "{{ ( old_ca ~ lookup('file', 'isrgrootx1.pem') ) | b64encode}}"
+    merged_ca: "{{ ( old_ca ~ '\n' ~ lookup('file', 'isrgrootx1.pem') ) | b64encode}}"
     # Build proxy url
     proxy_url: "https://{{ proxy_user }}:{{ proxy_pass }}@{{ proxy_domain }}:{{ proxy_port }}"
     # Add it to the existing cluster configuration
