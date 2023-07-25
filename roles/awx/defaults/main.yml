@@ -1,9 +1,11 @@
 awx_namespace: awx
 awx_admin_email: name@local
 awx_admin_password_secret_name: awx-admin-password
+awx_secret_key_secret:
 awx_ingress_tls_secret_name: awx-ingress-cert
 awx_ingress_type: ingress
 awx_ingress_annotations:
+awx_postgres_configuration_secret:
 awx_postgres_storage_class:
 awx_postgres_resource_requirements:
   requests:
