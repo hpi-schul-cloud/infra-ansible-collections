@@ -46,10 +46,12 @@
           spec:
             admin_email: "{{ awx_admin_email }}"
             admin_password_secret: "{{ awx_admin_password_secret_name }}"
+            secret_key_secret: "{{ awx_secret_key_secret | default(omit, true) }}"
             ingress_type: "{{ awx_ingress_type }}"
             ingress_annotations: "{{ awx_ingress_annotations }}"
             ingress_tls_secret: "{{ awx_ingress_tls_secret_name}}"
             hostname: "{{ awx_hostname }}"
+            postgres_configuration_secret: "{{ awx_postgres_configuration_secret | default(omit, true) }}"
             postgres_storage_requirements: "{{ awx_postgres_storage_requirements }}"
             postgres_storage_class: "{{ awx_postgres_storage_class }}"
             postgres_resource_requirements: "{{ awx_postgres_resource_requirements }}"
@@ -58,6 +60,6 @@
             ee_resource_requirements: "{{ awx_ee_resource_requirements }}"
             projects_persistence: "{{ awx_projects_persistence }}"
             projects_storage_access_mode: "{{ awx_projects_storage_access_mode }}"
-            project_storage_size: "{{ awx_projects_storage_size }}"
+            projects_storage_size: "{{ awx_projects_storage_size }}"
       tags:
         - awx
