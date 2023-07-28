@@ -4,3 +4,8 @@
     name: squid
     enabled: true
     state: reloaded
+- name: Reload fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    enabled: true
+    state: reloaded
