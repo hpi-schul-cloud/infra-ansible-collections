@@ -1,9 +1,12 @@
 ---
-- name: Install ufw
+- name: Install ufw and fail2ban
   apt:
-    name: ufw
+    name: 
+      - ufw
+      - fail2ban
     update_cache: true
 
+# ufw and certificate creation
 - name: Enable ufw (deny all)
   ufw:
     state: enabled
@@ -55,6 +58,7 @@
   vars:
     commands: "ufw deny 80/tcp"
 
+# Squid
 - name: Install squid
   apt:
     name: squid-openssl
@@ -71,6 +75,7 @@
   pip: 
     name: passlib
 
+# Update proxy users
 - name: Set/remove allowed users for proxy
   vars:
     project_stage: "{{ project }}-{{ stage }}"
@@ -83,3 +88,28 @@
   when: item.name is defined
   with_items:
     - "{{ proxy_users }}"
+
+# configure fail2ban for squid
+- name: Enable fail2ban
+  service:
+    name: fail2ban
+    enabled: true
+    state: started
+
+- name: Copy custom squid filter for fail2ban
+  copy:
+    src: custom_squid.conf
+    dest: /etc/fail2ban/filter.d/custom_squid.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload fail2ban
+
+- name: Copy squid-jail for fail2ban
+  template:
+    src: custom_squid.local.j2
+    dest: /etc/fail2ban/jail.d/custom_squid.local
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload fail2ban
