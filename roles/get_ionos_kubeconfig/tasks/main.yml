@@ -41,7 +41,7 @@
     dest: "{{ kubeconfig_path }}"
     # Insert the cluster configuration
     content: "{{ old_kubeconfig | combine({'clusters':[new_cluster_config]}) | to_nice_yaml }}"
-  when: terraform_run is defined and terraform_run.outputs is defined and proxy_domain is defined
+  when: terraform_run is defined and terraform_run.outputs is defined and proxy_domain and not ignore_proxy
 
 - name: Change file permissions of k8s config
   ansible.builtin.file:
