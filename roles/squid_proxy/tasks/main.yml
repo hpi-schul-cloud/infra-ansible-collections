@@ -43,20 +43,21 @@
     proto: tcp
 
 - name: Create pre hook to open the port before certificate renewal
-  template:
-    src: bash_script.j2
+  copy:
     dest: /etc/letsencrypt/renewal-hooks/pre/open_port
     mode: 0700
-  vars:
-    commands: "ufw allow 80/tcp"
+    content: |
+      #!/bin/bash
+      ufw allow 80/tcp
 
 - name: Create post hook to close the port after certificate renewal
-  template:
-    src: bash_script.j2
+  copy:
     dest: /etc/letsencrypt/renewal-hooks/post/close_port
     mode: 0700
-  vars:
-    commands: "ufw deny 80/tcp"
+    content: |
+      #!/bin/bash
+      ufw deny 80/tcp
+      service squid reload
 
 # Squid
 - name: Install squid
