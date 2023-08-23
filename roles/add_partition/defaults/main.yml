@@ -1,0 +1,5 @@
+---
+mount_path: /data
+mount_path_mode: 0755
+block_device: /dev/vdb
+partition_name: /dev/vdb1

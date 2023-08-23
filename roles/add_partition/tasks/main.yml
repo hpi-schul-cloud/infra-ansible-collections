@@ -1,0 +1,32 @@
+---
+- name: Create /data
+  file:
+    path: "{{ mount_path }}"
+    state: directory
+    mode: "{{ mount_path_mode }}"
+
+- name: Create Partition
+  parted:
+    device: "{{ block_device }}"
+    number: 1
+    part_type: primary
+    state: present
+    label: gpt
+    part_start: 0%
+    part_end: 100%
+
+- name: Make filesystem
+  filesystem:
+    fstype: ext4
+    dev: "{{ partition_name }}"
+  become: true
+
+- name: Mount filesystem
+  mount:
+    state: mounted
+    fstype: ext4
+    src: "{{ partition_name }}"
+    path: "{{ mount_path }}"
+    backup: true
+  become: true
+  
