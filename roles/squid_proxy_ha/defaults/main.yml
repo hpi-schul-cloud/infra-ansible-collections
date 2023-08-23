@@ -1,0 +1,12 @@
+---
+lets_encrypt_email: devops@dbildungscloud.de
+# Squid refresh interval for basic auth credentials
+credential_refresh_interval: "1 minutes"
+cluster_name: "proxy_ha"
+certificate_sync_user: certificate-sync
+# Default in IONOS private LAN is 23
+private_network_cidr: 23
+# Path for the certificates on the backup nodes
+certificate_sync_target_directory: "/synced_certificates"
+# Exporter version, see https://github.com/ClusterLabs/ha_cluster_exporter
+ha_cluster_exporter_version: 1.3.3
