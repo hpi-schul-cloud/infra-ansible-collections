@@ -1,4 +1,14 @@
 ---
+- name: Create namespace for psql config
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    api_version: v1
+    name: "{{ psql_namespace }}"
+    kind: Namespace
+
 - name: Create Secret for Postgres configuration
   kubernetes.core.k8s:
     state: present
