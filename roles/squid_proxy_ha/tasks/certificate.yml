@@ -1,0 +1,120 @@
+---
+# Generating and Renewal of the certificate for the main domain only happens on the main node
+# The certificate is then copied to all other nodes via SSH
+
+- name: Generate SSH key for certificate sync
+  openssh_keypair:
+    path: /certificate_sync_key
+  when: is_main_node
+
+- name: Get public key 
+  ansible.builtin.fetch:
+    src: /certificate_sync_key.pub
+    dest: "/tmp/certificate_sync_key_{{ unique_ha_group }}.pub"
+    flat: true
+  when: is_main_node
+
+- name: Create user for certificate sync
+  user:
+    name: "{{ certificate_sync_user }}"
+  when: not is_main_node
+
+- name: Set up authorized key for certificate sync
+  authorized_key:
+    user: "{{ certificate_sync_user }}"
+    key: "{{ lookup('file', '/tmp/certificate_sync_key_' ~ unique_ha_group ~ '.pub') }}"
+    comment: "{{ certificate_sync_user }}"
+    exclusive: False
+  when: not is_main_node
+
+- name: Create directory for synced certificates
+  file:
+    path: "{{ certificate_sync_target_directory }}"
+    state: directory
+    mode: '0700'
+    owner: "{{ certificate_sync_user }}"
+  when: not is_main_node
+
+- name: Ensure nodes are present in known_hosts file
+  known_hosts:
+    name: "{{ hostvars[item]['ansible_hostname'] }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan ' ~ hostvars[item]['inventory_hostname']) }}"
+    hash_host: true
+  when: is_main_node
+  loop: "{{ groups[unique_ha_group] }}" 
+
+- name: Temporarily allow port 80 for letsencrypt
+  ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+
+- name: Get main and node specific certificate from Let's Encrypt
+  tags: certbot
+  vars:
+    certbot_create_if_missing: True
+    certbot_create_method: standalone
+    certbot_admin_email: "{{ lets_encrypt_email }}"
+    certbot_auto_renew_hour: "4"
+    certbot_auto_renew_user: "root"
+    certbot_create_standalone_stop_services: False
+    certbot_certs: 
+      - domains: ["{{ main_domain }}"]
+      - domains: ["{{ inventory_hostname }}"]
+  import_role:
+    name: geerlingguy.certbot
+  when: is_main_node
+
+- name: Get node specific certificate from Let's Encrypt
+  tags: certbot
+  vars:
+    certbot_create_if_missing: True
+    certbot_create_method: standalone
+    certbot_admin_email: "{{ lets_encrypt_email }}"
+    certbot_auto_renew_hour: "4"
+    certbot_auto_renew_user: "root"
+    certbot_create_standalone_stop_services: False
+    certbot_certs: 
+      - domains: ["{{ inventory_hostname }}"]
+  import_role:
+    name: geerlingguy.certbot
+  when: not is_main_node
+
+- name: Create pre hook to open the port before certificate renewal
+  copy:
+    dest: /etc/letsencrypt/renewal-hooks/pre/open_port
+    mode: 0700
+    content: |
+      #!/bin/bash
+      ufw allow 80/tcp
+
+- name: Create post hook to close the port and sync them
+  copy:
+    dest: /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
+    mode: 0700
+    content: |
+      #!/bin/bash
+      ufw deny 80/tcp
+      service ha-cluster-exporter reload
+      {% if is_main_node %}
+      {% for item in groups[unique_ha_group] %}
+      {% if not hostvars[item]['is_main_node'] %}
+      scp -prq -i /certificate_sync_key /etc/letsencrypt/live/ {{ certificate_sync_user }}@{{ hostvars[item]['ansible_hostname'] }}:{{ certificate_sync_target_directory }}
+      {% endif %}
+      {% endfor %}
+      {% endif %}
+
+- name: Create post hook to reload the certificates
+  copy:
+    dest: /etc/letsencrypt/renewal-hooks/post/reload_certificates
+    mode: 0700
+    content: |
+      #!/bin/bash
+      service ha-cluster-exporter reload
+      {% if is_main_node %}
+      service squid reload
+      {% endif %}
+
+- name: Execute the post hook to close port and sync the certificate for the first time
+  command: bash /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
+  when: is_main_node

@@ -1,0 +1,6 @@
+---
+- import_tasks: prepare.yml
+- import_tasks: hacluster.yml
+- import_tasks: certificate.yml
+- import_tasks: proxy.yml
+- import_tasks: monitoring.yml

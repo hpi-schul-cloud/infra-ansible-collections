@@ -1,0 +1,18 @@
+---
+# Only neccessary on the main node because squid is started on demand (main node down) on the other nodes
+# Not using the service module because "state: reloaded" would start the service if it isn't running
+- name: Reload squid
+  ansible.builtin.command: service squid reload
+  when: is_main_node
+
+- name: Reload fail2ban
+  ansible.builtin.service:
+    name: fail2ban
+    enabled: true
+    state: reloaded
+
+- name: Reload ha-cluster-exporter
+  ansible.builtin.service:
+    name: ha-cluster-exporter
+    enabled: true
+    state: reloaded
