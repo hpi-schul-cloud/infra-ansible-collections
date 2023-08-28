@@ -50,6 +50,7 @@ notes:
     node 2 doesn't mean that node 2 is authenticated agains node 1!
   - Tested on CentOS 6.8, 7.3
   - Tested on Red Hat Enterprise Linux 7.3, 7.4, 7.6
+  - Tested on Ubuntu 22.04
   - Experimental support for Red Hat Enterprise Linux 8.0 Beta and pcs 0.10
 '''
 

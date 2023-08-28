@@ -84,6 +84,7 @@ options:
     elements: str
 notes:
    - tested on CentOS 6.8, 7.3
+   - Tested on Ubuntu 22.04
    - module can create and delete clones, groups and master resources indirectly -
      resource can specify --clone, --group, --master option which will cause them to create
      or become part of clone/group/master

@@ -53,6 +53,7 @@ options:
 notes:
    - Tested on CentOS 7.6, Fedora 28, 29
    - Tested on Red Hat Enterprise Linux 7.6
+   - Tested on Ubuntu 22.04
    - node property values with spaces are not idempotent
 '''
 
