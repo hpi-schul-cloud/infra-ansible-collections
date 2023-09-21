@@ -1,0 +1,11 @@
+---
+- name: Install NetworkManager
+  ansible.builtin.yum:
+    name: NetworkManager
+    state: present
+
+- name: Start NetworkManager
+  service:
+    name: NetworkManager
+    enabled: true
+    state: started

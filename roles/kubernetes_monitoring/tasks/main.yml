@@ -59,6 +59,7 @@
         sample.log: "{{ lookup('file', 'loki-load-test-sample.log') }}"
         ocp-logtest.py: "{{ lookup('file', 'ocp-logtest.py') }}"
   tags: loki-load-test
+  when: loki_load_tests_enabled
 
 - name: Deploy Loki load test
   kubernetes.core.k8s:
@@ -68,3 +69,4 @@
     proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     template: loki-load-test.yml.j2
   tags: loki-load-test
+  when: loki_load_tests_enabled

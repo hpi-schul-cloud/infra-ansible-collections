@@ -86,3 +86,4 @@
     chart_ref: "{{ playbook_dir }}/../charts/sc-cert-manager-clusterissuer"
     kubeconfig: "{{ kubeconfig }}"
     release_namespace: cert-manager
+  when: sc_cert_manager_clusterissuer_enabled is true
