@@ -1,0 +1,76 @@
+---
+- name: Allow proxy port
+  ufw:
+    rule: allow
+    port: "{{ proxy_port  }}"
+    proto: tcp
+
+- name: Disable squid service (managed by pacemaker)
+  ansible.builtin.service:
+    name: squid
+    enabled: false
+  register: squid_service
+
+# This is necesarry because with Ubuntu 22.04 (needrestart after apt upgrade) some daemons are 
+# restarted when installing packages, including systemd. This causes all enabled services to be started.
+# Because the squid service is enabled by default, it would be already running at this point,
+# but pacemaker expects it to be disabled and not running on both nodes.
+- name: If squid service was enabled, make sure it is not running
+  ansible.builtin.service:
+    name: squid
+    state: stopped
+  when: squid_service.changed
+
+- name: Set squid configuration
+  vars:
+    certificate_path: "{{ '/etc/letsencrypt' if is_main_node else certificate_sync_target_directory }}/live/{{ main_domain }}"
+  template:
+    src: "templates/squid.conf.j2"
+    dest: "/etc/squid/squid.conf"
+  notify: Reload squid
+
+- name: Set/remove allowed users for proxy
+  tags: kubernetes-users
+  vars:
+    project_stage: "{{ project }}-{{ stage }}"
+    allowed: "{{ (item.everywhere is defined and item.everywhere == True) or (item.project_stage is defined and project_stage in item.project_stage) }}"
+  htpasswd:
+    path: /etc/squid/htpasswd
+    name: "{{ item.name }}"
+    password: "{{ proxy_passwords[item.name] if allowed else omit }}"
+    state: "{{ 'present' if allowed else 'absent'}}"
+  when: item.name is defined
+  with_items:
+    - "{{ proxy_users }}"
+
+- name: Add squid resource
+  pcs_resource:
+    name: "squid"
+    resource_type: 'systemd:squid'
+    options: "--group {{ cluster_name }}_group meta multiple-active=stop_unexpected"
+  when: is_main_node
+
+# configure fail2ban for squid
+- name: Enable fail2ban
+  service:
+    name: fail2ban
+    enabled: true
+    state: started
+
+- name: Copy custom squid filter for fail2ban
+  copy:
+    src: custom_squid.conf
+    dest: /etc/fail2ban/filter.d/custom_squid.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload fail2ban
+
+- name: Copy squid-jail for fail2ban
+  template:
+    src: custom_squid.local.j2
+    dest: /etc/fail2ban/jail.d/custom_squid.local
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload fail2ban
