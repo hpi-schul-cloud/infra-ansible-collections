@@ -1,4 +1,5 @@
 ---
+  - import_tasks: install-network-manager.yml
   - import_tasks: install-haproxy.yml
   - import_tasks: install-haproxy-exporter.yml
   - import_tasks: firewall.yml

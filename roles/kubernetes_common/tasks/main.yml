@@ -2,6 +2,7 @@
 - import_tasks: network-policy.yml
 - import_tasks: ingress.yml
 - import_tasks: otc-cert-manager.yml
+  when: sc_cert_manager_clusterissuer_enabled is true
 - import_tasks: coredns.yml
 - import_tasks: fluentbit.yml
 - import_tasks: nfs-provider.yml
