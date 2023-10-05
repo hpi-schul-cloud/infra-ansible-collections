@@ -34,3 +34,5 @@
         config-script: "{{ lookup('template', 'config-script.sh.j2') }}"
   notify: Create Config Job
 
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
