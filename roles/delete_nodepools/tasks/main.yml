@@ -31,4 +31,5 @@
   loop: "{{ nodepool_zone1_id + nodepool_zone2_id }}"
   loop_control:
     loop_var: pool_id
+  when: not ansible_check_mode
 
