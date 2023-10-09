@@ -2,6 +2,7 @@
 ###################### Destroy Nodepools ##########################################################
 #Using the Ansible module ionoscloudsdk.ionoscloud.k8s_nodepool to destroy a node pool, it's important
 #to note that the module will perform the deletion whether you run it with or without the -C flag.
+#To avoid accidental node pool deletions during an Ansible run in check mode, make use of when: not ansible_check_mode.
 # See https://docs.ionos.com/ansible/api/managed-kubernetes/k8s_nodepool
 
 - name: Run Terraform
