@@ -14,11 +14,21 @@
       nodepool_zone1_id: "{{ terraform_run.outputs.nodepool_zone1_id.value }}"
       nodepool_zone2_id: "{{ terraform_run.outputs.nodepool_zone2_id.value }}"
 
+- name: Debug node pool IDs
+  debug:
+      var: pool_id
+  loop: "{{ nodepool_zone1_id + nodepool_zone2_id }}"
+  loop_control:
+      loop_var: pool_id
+      
 - name: Delete k8s cluster nodepool
   ionoscloudsdk.ionoscloud.k8s_nodepool:
       k8s_cluster_id: "{{ k8s_cluster_id }}"
-      nodepool_id: "{{ item }}"
+      nodepool_id: "{{ pool_id }}"
       username: "{{ ionos_username }}"
       password: "{{ ionos_password }}"
       state: absent
   loop: "{{ nodepool_zone1_id + nodepool_zone2_id }}"
+  loop_control:
+    loop_var: pool_id
+
