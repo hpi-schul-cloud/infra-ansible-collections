@@ -1,0 +1,24 @@
+---
+###################### Destroy Nodepools ##########################################################
+#Using the Ansible module ionoscloudsdk.ionoscloud.k8s_nodepool to destroy a node pool, it's important
+#to note that the module will perform the deletion whether you run it with or without the -C flag.
+# See https://docs.ionos.com/ansible/api/managed-kubernetes/k8s_nodepool
+
+- name: Run Terraform
+  import_role:
+    name: dbildungscloud.infra.resource_pool
+
+- name: Use Terraform output in variables
+  ansible.builtin.set_fact:
+      k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value }}"
+      nodepool_zone1_id: "{{ terraform_run.outputs.nodepool_zone1_id.value }}"
+      nodepool_zone2_id: "{{ terraform_run.outputs.nodepool_zone2_id.value }}"
+
+- name: Delete k8s cluster nodepool
+  ionoscloudsdk.ionoscloud.k8s_nodepool:
+      k8s_cluster_id: "{{ k8s_cluster_id }}"
+      nodepool_id: "{{ item }}"
+      username: "{{ ionos_username }}"
+      password: "{{ ionos_password }}"
+      state: absent
+  loop: "{{ nodepool_zone1_id + nodepool_zone2_id }}"
