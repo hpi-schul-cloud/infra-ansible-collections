@@ -1,0 +1,20 @@
+---
+name: Trigger AWX on push to master
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - plugins/**
+      - roles/**
+
+permissions: {}
+
+jobs:
+  trigger_awx:
+    uses: hpi-schul-cloud/infra-tools/.github/workflows/trigger-awx.yaml@master
+    with:
+      job_id: 33
+    secrets:
+      AWX_TOKEN: ${{ secrets.AWX_TOKEN }}
