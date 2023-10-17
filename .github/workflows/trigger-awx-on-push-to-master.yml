@@ -11,6 +11,9 @@ on:
 
 permissions: {}
 
+concurrency:
+  group: infra-schulcloud-master
+
 jobs:
   trigger_awx:
     uses: hpi-schul-cloud/infra-tools/.github/workflows/trigger-awx.yaml@master
