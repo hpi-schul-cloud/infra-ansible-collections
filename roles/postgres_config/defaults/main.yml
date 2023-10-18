@@ -9,7 +9,7 @@ psql_db_owner: "{{ psql_db_users[0].name }}"  # Owner of the created DB (name of
 # psql_host: Host of DB
 # psql_pass: Password for Initial/Admin user
 # psql_db_name: Name of the DB
-# psql_db_users: List of users to create
+psql_db_users: []                             # List of users to create
 #   - name: Name of User
 #     password: Password of User
 #     privileges: Privileges for user (e.g. "CONNECT" or "ALL PRIVILEGES")

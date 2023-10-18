@@ -23,3 +23,6 @@
     value: "{{ vm_swappiness }}"
     state: present
   when: vm_swappiness is defined
+
+- name: Run handlers now because they might not run if Ansible gets an error later
+  ansible.builtin.meta: flush_handlers
