@@ -6,27 +6,9 @@
 # See https://docs.ionos.com/ansible/api/managed-kubernetes/k8s_nodepool
 
 ---
-###################### Destroy Nodepools ##########################################################
-#Using the Ansible module ionoscloudsdk.ionoscloud.k8s_nodepool to destroy a node pool, it's important
-#to note that the module will perform the deletion whether you run it with or without the -C flag.
-#To avoid accidental node pool deletions during an Ansible run in check mode, make use of when: not ansible_check_mode.
-# See https://docs.ionos.com/ansible/api/managed-kubernetes/k8s_nodepool
-
 - name: Run Terraform
   import_role:
     name: dbildungscloud.infra.resource_pool
-
-- name: Debug node pool IDs
-  debug:
-      msg: "pool_id: {{ item }}"
-  loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit), terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
-  loop_control:
-      loop_var: item
-
-- name: Debug k8s_cluster_id
-  debug:
-      msg: "k8s_cluster_id: {{ terraform_run.outputs.cluster_id.value }}"
-  when: terraform_run.outputs.cluster_id.value is defined
 
 - name: Debug node pool IDs
   debug:
@@ -34,6 +16,7 @@
   loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit) + terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
   loop_control:
       loop_var: pool_id
+
 
 
 #- name: Delete k8s cluster nodepool
@@ -58,4 +41,4 @@
   loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default() + terraform_run.outputs.nodepool_zone2_id.value | default()] }}"
   loop_control:
     loop_var: pool_id
-  when: not ansible_check_mode
+    when: not ansible_check_mode and k8s_cluster_id is defined and pool_id is defined
