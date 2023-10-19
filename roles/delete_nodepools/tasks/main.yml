@@ -21,14 +21,21 @@
       msg: "k8s_cluster_id: {{ terraform_run.outputs.cluster_id.value }}"
   when: terraform_run.outputs.cluster_id.value is defined
 
+- name: Debug node pool IDs
+  debug:
+      var: pool_id
+  loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit) + terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
+  loop_control:
+      loop_var: pool_id
+
 - name: Delete k8s cluster nodepool
   ionoscloudsdk.ionoscloud.k8s_nodepool:
       k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value | default(omit) }}"
-      nodepool_id: "{{ item }}"
+      nodepool_id: "{{ pool_id }}"
       username: "{{ ionos_username }}"
       password: "{{ ionos_password }}"
       state: absent
   loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit) + terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
   loop_control:
-    loop_var: item
-  when: not ansible_check_mode and terraform_run.outputs.cluster_id.value is defined and item is defined
+    loop_var: pool_id
+  when: not ansible_check_mode and k8s_cluster_id is defined 
