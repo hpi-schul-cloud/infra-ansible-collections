@@ -5,40 +5,30 @@
 #To avoid accidental node pool deletions during an Ansible run in check mode, make use of when: not ansible_check_mode.
 # See https://docs.ionos.com/ansible/api/managed-kubernetes/k8s_nodepool
 
----
 - name: Run Terraform
   import_role:
     name: dbildungscloud.infra.resource_pool
 
 - name: Debug node pool IDs
   debug:
-      var: pool_id
+      msg: "pool_id: {{ item }}"
   loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit) + terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
   loop_control:
-      loop_var: pool_id
+      loop_var: item
 
-
-
-#- name: Delete k8s cluster nodepool
-#  ionoscloudsdk.ionoscloud.k8s_nodepool:
-#      k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value | default(omit) }}"
-#      nodepool_id: "{{ pool_id }}"
-#      username: "{{ ionos_username }}"
-#      password: "{{ ionos_password }}"
-#      state: absent
-#  loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit) + terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
-#  loop_control:
-#    loop_var: pool_id
-#  when: not ansible_check_mode # and terraform_run.outputs.cluster_id.value is defined and item is defined
+- name: Debug k8s_cluster_id
+  debug:
+      msg: "k8s_cluster_id: {{ terraform_run.outputs.cluster_id.value }}"
+  when: terraform_run.outputs.cluster_id.value is defined
 
 - name: Delete k8s cluster nodepool
   ionoscloudsdk.ionoscloud.k8s_nodepool:
-      k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value | default() }}"
-      nodepool_id: "{{ pool_id }}"
+      k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value | default(omit) }}"
+      nodepool_id: "{{ item }}"
       username: "{{ ionos_username }}"
       password: "{{ ionos_password }}"
       state: absent
-  loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default() + terraform_run.outputs.nodepool_zone2_id.value | default()] }}"
+  loop: "{{ [terraform_run.outputs.nodepool_zone1_id.value | default(omit) + terraform_run.outputs.nodepool_zone2_id.value | default(omit)] }}"
   loop_control:
-    loop_var: pool_id
-    when: not ansible_check_mode and k8s_cluster_id is defined and pool_id is defined
+    loop_var: item
+  when: not ansible_check_mode and terraform_run.outputs.cluster_id.value is defined and item is defined
