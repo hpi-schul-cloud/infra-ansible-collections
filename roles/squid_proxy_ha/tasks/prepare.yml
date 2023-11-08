@@ -28,7 +28,7 @@
 
 - name: Determine if the host is a main node (first in group)
   set_fact:
-    is_main_node: "{{ (groups[unique_ha_group] | first) == inventory_hostname }}"
+    is_main_node: "{{ (groups[unique_ha_group] | sort | first) == inventory_hostname }}"
 
 - name: Determine internal IP
   set_fact:
@@ -48,7 +48,7 @@
 - name: Check HA clusters are valid (There should be at least 2 nodes in a cluster)
   run_once: True
   debug:
-    msg: "Cluster group: {{ item.key }}\nHosts: {{ item.value }}"
+    msg: "Cluster group: {{ item.key }}\nHosts: {{ item.value | sort }}"
   failed_when: item.value | length < 2
   loop: "{{ groups | dict2items | selectattr('key', 'match', cluster_name ~ '_.*')}}"
 
