@@ -1,0 +1,37 @@
+---
+- name: Allow port for metrics
+  ufw:
+    rule: allow
+    port: 9664
+    proto: tcp
+
+- name: Install ha-cluster-exporter (always changed)
+  ansible.builtin.command:
+    cmd: "go install github.com/ClusterLabs/ha_cluster_exporter@{{ ha_cluster_exporter_version }}"
+  tags: monitoring
+
+- name: Copy service file
+  copy:
+    src: ha-cluster-exporter.service
+    dest: /etc/systemd/system/ha-cluster-exporter.service
+    owner: root
+    group: root
+    mode: 0644
+  tags: monitoring
+
+- name: Set basic auth and TLS config
+  template:
+    src: "templates/ha_cluster_exporter.web.yaml.j2"
+    dest: /etc/ha_cluster_exporter.web.yaml
+    owner: root
+    group: root
+    mode: 0644
+  tags: monitoring
+  notify: Reload ha-cluster-exporter
+
+- name: Start ha-cluster-exporter service
+  service:
+    name: ha-cluster-exporter
+    enabled: true
+    state: started
+  tags: monitoring

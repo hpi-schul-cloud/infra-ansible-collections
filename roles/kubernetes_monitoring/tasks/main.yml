@@ -42,29 +42,3 @@
         namespace: monitoring
       spec:
         itemPath: "vaults/{{ vault }}/items/victoriametrics"
-
-- name: Deploy Configmap for Loki load test
-  kubernetes.core.k8s:
-    state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
-    kubeconfig: "{{ kubeconfig }}"
-    proxy: "{{ proxy_url | default(omit, true) }}"
-    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
-    definition:
-      kind: ConfigMap
-      apiVersion: v1
-      metadata:
-        name: loki-load-test
-        namespace: default
-      data:
-        sample.log: "{{ lookup('file', 'loki-load-test-sample.log') }}"
-        ocp-logtest.py: "{{ lookup('file', 'ocp-logtest.py') }}"
-  tags: loki-load-test
-
-- name: Deploy Loki load test
-  kubernetes.core.k8s:
-    state: "{{ 'present' if loki_load_test.enabled else 'absent' }}"
-    kubeconfig: "{{ kubeconfig }}"
-    proxy: "{{ proxy_url | default(omit, true) }}"
-    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
-    template: loki-load-test.yml.j2
-  tags: loki-load-test

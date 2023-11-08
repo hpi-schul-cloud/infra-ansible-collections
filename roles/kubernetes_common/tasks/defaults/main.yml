@@ -1,1 +1,2 @@
 kubernetes_event_exporter_chart_version: 2.1.2
+sc_cert_manager_clusterissuer_enabled: false
