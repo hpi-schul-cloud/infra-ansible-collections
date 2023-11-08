@@ -1,0 +1,64 @@
+---
+# Install packages, define variables and groups, basic ufw configuration and run checks
+
+- name: Install packages
+  apt:
+    name: 
+      - pcs
+      - pacemaker
+      - python3-distutils
+      - libxml2-utils
+      - ufw
+      - fail2ban
+      - squid-openssl
+      - golang
+
+- name: Install passlib (required for htpasswd module)
+  pip:
+    name: passlib
+
+- name: Set unique name of ha cluster (used for grouping)
+  set_fact:
+    unique_ha_group: "{{cluster_name }}_{{ project }}_{{ stage }}"
+
+- name: Create ansible groups for the proxy clusters
+  changed_when: false
+  group_by:
+    key: "{{ unique_ha_group }}"
+
+- name: Determine if the host is a main node (first in group)
+  set_fact:
+    is_main_node: "{{ (groups[unique_ha_group] | sort | first) == inventory_hostname }}"
+
+- name: Determine internal IP
+  set_fact:
+    internal_ip: "{{ ansible_all_ipv4_addresses | select('match', '10\\..*') | first }}"
+
+# This requires that the domain of the nodes start with <name>-<index>. and the main domain with <name>.
+# Alternative: Get IP from terraform output of a defined resource pool
+- name: Determine main domain of the cluster
+  set_fact:
+    main_domain: "{{ inventory_hostname | regex_replace('^(?P<start>.+?)-\\d+\\.(?P<end>.+)$', '\\g<start>.\\g<end>') }}"
+
+- name: Determine floating IP of the cluster via DNS
+  set_fact:
+    floating_ip: "{{ lookup('community.general.dig', main_domain )}}"
+  when: is_main_node
+
+- name: Check HA clusters are valid (There should be at least 2 nodes in a cluster)
+  run_once: True
+  debug:
+    msg: "Cluster group: {{ item.key }}\nHosts: {{ item.value | sort }}"
+  failed_when: item.value | length < 2
+  loop: "{{ groups | dict2items | selectattr('key', 'match', cluster_name ~ '_.*')}}"
+
+- name: Enable ufw (deny all)
+  ufw:
+    state: enabled
+    policy: deny
+  
+- name: Allow SSH port
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
