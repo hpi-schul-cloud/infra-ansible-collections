@@ -26,7 +26,10 @@
       uid: "{{ item.uid }}"
       shell: /bin/bash
       state: present
-    when: item.name is defined and ((item.allhosts is defined and item.allhosts == True) or (item.hosts is defined and inventory_hostname in item.hosts))
+    vars:
+      vm_permissions: "{{ item.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.name is defined and allowed
     with_items:
       - "{{ present_users }}"
 
@@ -40,10 +43,13 @@
       groups: "{{ item.1 }}"
       append: yes
       state: present
-    when: item.0.name is defined and ((item.0.allhosts is defined and item.0.allhosts == True) or (item.0.hosts is defined and inventory_hostname in item.0.hosts)) and item.1 in ansible_facts.getent_group
+    vars:
+      vm_permissions: "{{ item.0.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.0.name is defined and allowed and item.1 in ansible_facts.getent_group
     with_subelements:
       - "{{ present_users }}"
-      - groups
+      - permissions.vms.groups
 
   - name: Set up authorized keys for users
     authorized_key:
@@ -51,7 +57,10 @@
       state: present
       key: "{{ lookup('file', 'sshkeys/{{ item.name }}.pub') }}"
       exclusive: False
-    when: item.name is defined and ((item.allhosts is defined and item.allhosts == True) or (item.hosts is defined and inventory_hostname in item.hosts))
+    vars:
+      vm_permissions: "{{ item.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.name is defined and allowed
     with_items:
       - "{{ present_users }}"
 
@@ -63,7 +72,7 @@
 
   - name: remove users ( absent general )
     user:
-      name: "{{ item }}"
+      name: "{{ item.name }}"
       shell: /bin/false
       state: absent
       remove: yes
@@ -76,7 +85,10 @@
       shell: /bin/false
       state: absent
       remove: yes
-    when: item.name is defined and (item.hosts_absent is defined and inventory_hostname in item.hosts_absent)
+    vars:
+      vm_permissions: "{{ item.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.name is defined and not allowed
     with_items:
       - "{{ present_users }}"
 
@@ -84,7 +96,7 @@
     #  This task asumes that the home directory of an already deleted user is stored with the name of the user below /home
     #  and will use absent_users as base for the operation
     ansible.builtin.file:
-        path: /home/{{ item }}
+        path: /home/{{ item.name }}
         state: absent
     with_items:
       - "{{ absent_users }}" 

@@ -36,24 +36,26 @@
     #User Template
     #  - name: <username>
     #    uid: <uid>
-    #    groups:
-    #      - <list of user groups>
-    #    hosts:
-    #      - <list of allow host>
-    #    hosts_absend:
-    #      - <list of host who the user don't have access any more, if we not fully remove the user>
-    #    allhosts: true # short cut for all hosts at the host list
+    #    permissions:
+    #      vms:
+    #      groups:
+    #        - <list of user groups>
+    #      hosts:
+    #        - <list of allow host>
+    #      allhosts: true # short cut for all hosts at the host list
       # Deployuser
       - name: technicaluser
         uid: 2260
-        groups:
-          - devops
-          - support
-        hosts: 
-          - localhost
-          - instance
-        #allhosts: true
+        permissions:
+          vms:
+            groups:
+              - devops
+              - support
+            hosts: 
+              - localhost
+              - instance
+            #allhosts: true
           
     absent_users:
-      - dummy.user
+      - name: dummy.user
 
