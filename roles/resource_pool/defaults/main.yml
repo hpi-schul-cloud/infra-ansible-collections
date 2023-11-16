@@ -1,5 +1,3 @@
 ---
 terraform_plan: false
 terraform_workspace: "{{ stage }}"
-# Disabled by default to work with community.general < 5.7.0
-terraform_complex_vars: false
