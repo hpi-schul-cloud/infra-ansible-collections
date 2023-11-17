@@ -16,6 +16,8 @@
     workspace: "{{ terraform_workspace }}"
     force_init: true
     provider_upgrade: true
+    # Variable is unset by default to still work with community.general < 5.7.0
+    complex_vars: "{{ terraform_complex_vars | default(omit) }}"
     # A group of key-values to override template variables or those in variables files.
     # They have to be put in EVERY single resource pool
     variables: "{{ terraform_variables }}"
