@@ -30,8 +30,9 @@
       vm_permissions: "{{ item.permissions.vms | default({}) }}"
       allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
     when: item.name is defined and allowed
-    with_items:
-      - "{{ present_users }}"
+    loop: "{{ present_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - getent:
       database: group
@@ -47,9 +48,9 @@
       vm_permissions: "{{ item.0.permissions.vms | default({}) }}"
       allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
     when: item.0.name is defined and allowed and item.1 in ansible_facts.getent_group
-    with_subelements:
-      - "{{ present_users }}"
-      - permissions.vms.groups
+    loop: "{{ present_users | subelements('permissions.vms.groups', skip_missing=True)}}"
+    loop_control:
+      label: "{{ item.0.name }}-{{ item.1 }}"
 
   - name: Set up authorized keys for users
     authorized_key:
@@ -61,8 +62,9 @@
       vm_permissions: "{{ item.permissions.vms | default({}) }}"
       allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
     when: item.name is defined and allowed
-    with_items:
-      - "{{ present_users }}"
+    loop: "{{ present_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - name: set password for technicaluser 
     user: 
@@ -76,8 +78,9 @@
       shell: /bin/false
       state: absent
       remove: yes
-    with_items:
-      - "{{ absent_users }}"
+    loop: "{{ absent_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - name: remove users ( absent host )
     user:
@@ -89,8 +92,9 @@
       vm_permissions: "{{ item.permissions.vms | default({}) }}"
       allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
     when: item.name is defined and not allowed
-    with_items:
-      - "{{ present_users }}"
+    loop: "{{ present_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - name: Remove orphaned home directories
     #  This task asumes that the home directory of an already deleted user is stored with the name of the user below /home
@@ -98,8 +102,9 @@
     ansible.builtin.file:
         path: /home/{{ item.name }}
         state: absent
-    with_items:
-      - "{{ absent_users }}" 
+    loop: "{{ absent_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   # make it possible for devops group to sudo 
   - name: Make sudo without password for devops group possible
