@@ -86,8 +86,9 @@
     password: "{{ proxy_passwords[item.name] if allowed else omit }}"
     state: "{{ 'present' if allowed else 'absent'}}"
   when: item.name is defined
-  with_items:
-    - "{{ all_users }}"
+  loop: "{{ all_users }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 # configure fail2ban for squid
 - name: Enable fail2ban
