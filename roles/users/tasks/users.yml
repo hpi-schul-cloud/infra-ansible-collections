@@ -62,6 +62,7 @@
       vm_permissions: "{{ item.permissions.vms | default({}) }}"
       allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
     when: item.name is defined and allowed
+    ignore_errors: "{{ ansible_check_mode }}" # Fails because new users were not created
     loop: "{{ present_users }}"
     loop_control:
       label: "{{ item.name }}"
