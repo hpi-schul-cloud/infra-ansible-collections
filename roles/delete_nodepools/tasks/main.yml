@@ -9,11 +9,17 @@
   import_role:
     name: dbildungscloud.infra.resource_pool
 
+- name: Build nodepool list
+  set_fact:
+    nodepools_to_delete: "{{ terraform_run.outputs.nodepool_zone1_id.value | default([]) + terraform_run.outputs.nodepool_zone2_id.value | default([]) }}"
+
 - name: Debug node pool IDs
   debug:
-    var: terraform_run.outputs.nodepool_zone1_id.value + terraform_run.outputs.nodepool_zone2_id.value
-  # Check that Terraform output has all 3 keys
-  when: terraform_run.outputs.keys() | difference(['cluster_id', 'nodepool_zone1_id', 'nodepool_zone2_id'])
+    var: pool_id
+  loop: "{{ nodepools_to_delete }}"
+  loop_control:
+    loop_var: pool_id
+  when: terraform_run.outputs.cluster_id.value is defined
 
 - name: Delete k8s cluster nodepool
   ionoscloudsdk.ionoscloud.k8s_nodepool:
@@ -22,7 +28,7 @@
     username: "{{ ionos_username }}"
     password: "{{ ionos_password }}"
     state: absent
-  loop: "{{ terraform_run.outputs.nodepool_zone1_id.value + terraform_run.outputs.nodepool_zone2_id.value }}"
+  loop: "{{ nodepools_to_delete }}"
   loop_control:
     loop_var: pool_id
-  when: not ansible_check_mode and terraform_run.outputs.keys() | difference(['cluster_id', 'nodepool_zone1_id', 'nodepool_zone2_id'])
+  when: not ansible_check_mode and terraform_run.outputs.cluster_id.value is defined
