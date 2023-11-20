@@ -38,11 +38,11 @@
     #    uid: <uid>
     #    permissions:
     #      vms:
-    #      groups:
-    #        - <list of user groups>
-    #      hosts:
-    #        - <list of allow host>
-    #      allhosts: true # short cut for all hosts at the host list
+    #        groups:
+    #          - <list of user groups>
+    #        hosts:
+    #          - <list of allow host>
+    #        allhosts: true # short cut for all hosts at the host list
       # Deployuser
       - name: technicaluser
         uid: 2260
