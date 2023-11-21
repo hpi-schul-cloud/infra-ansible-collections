@@ -32,16 +32,16 @@
 - name: Set/remove allowed users for proxy
   tags: kubernetes-users
   vars:
-    project_stage: "{{ project }}-{{ stage }}"
-    allowed: "{{ (item.everywhere is defined and item.everywhere == True) or (item.project_stage is defined and project_stage in item.project_stage) }}"
+    allowed: "{{ item.name in allowed_users }}"
   htpasswd:
     path: /etc/squid/htpasswd
     name: "{{ item.name }}"
     password: "{{ proxy_passwords[item.name] if allowed else omit }}"
     state: "{{ 'present' if allowed else 'absent'}}"
   when: item.name is defined
-  with_items:
-    - "{{ proxy_users }}"
+  loop: "{{ all_users }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: Add squid resource
   pcs_resource:

@@ -23,11 +23,13 @@
 # Prepares duply profiles and gpg keys for each user in devops and support group 
   - name: Create duply profiles
     include_tasks: duply_configuration.yml
+    vars:
+      vm_permissions: "{{ user_item.0.permissions.vms | default({}) }}"
     when:
       (user_item.0.name is defined) and
-      ((user_item.0.allhosts is defined and user_item.0.allhosts == True) or (user_item.0.hosts is defined and inventory_hostname in user_item.0.hosts)) and 
+      ((vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([])))) and 
       (user_item.1 in ["devops","support"]) # Only devops and support group member are allowed to use gpg keys for support
-    loop: "{{ present_users | subelements('groups') }}"
+    loop: "{{ present_users | subelements('permissions.vms.groups', skip_missing=True) }}"
     loop_control:
       loop_var: user_item
 
