@@ -36,7 +36,7 @@
 
     - name: Deploy latest version of SSHD chart to update user keys on Cluster
       kubernetes.core.helm:
-        name: spsh-sshd
+        name: sshd
         chart_ref: "{{ playbook_dir }}/../charts/sshd"
         kubeconfig: "{{ kubeconfig }}"
         create_namespace: true
