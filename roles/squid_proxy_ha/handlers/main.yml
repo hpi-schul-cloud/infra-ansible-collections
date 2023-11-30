@@ -16,3 +16,9 @@
     name: ha-cluster-exporter
     enabled: true
     state: reloaded
+
+- name: Reload apparmor
+  ansible.builtin.service:
+    name: apparmor
+    enabled: true
+    state: reloaded
