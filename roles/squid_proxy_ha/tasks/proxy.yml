@@ -74,3 +74,12 @@
     group: root
     mode: 0644
   notify: Reload fail2ban
+
+- name: Copy apparmor profile for squid
+  template:
+    src: usr.sbin.squid.j2
+    dest: /etc/apparmor.d/usr.sbin.squid
+    owner: root
+    group: root
+    mode: 0644
+  notify: Reload apparmor
