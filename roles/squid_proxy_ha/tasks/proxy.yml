@@ -22,8 +22,6 @@
   when: squid_service.changed
 
 - name: Set squid configuration
-  vars:
-    certificate_path: "{{ '/etc/letsencrypt' if is_main_node else certificate_sync_target_directory }}/live/{{ main_domain }}"
   template:
     src: "templates/squid.conf.j2"
     dest: "/etc/squid/squid.conf"
