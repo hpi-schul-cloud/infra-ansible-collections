@@ -12,7 +12,6 @@
       - fail2ban
       - squid-openssl
       - golang
-      - apparmor-utils
 
 - name: Install passlib (required for htpasswd module)
   pip:
