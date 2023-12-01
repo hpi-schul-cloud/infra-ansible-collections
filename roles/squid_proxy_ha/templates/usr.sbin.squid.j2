@@ -4,7 +4,7 @@
 # vim:syntax=apparmor
 #include <tunables/global>
 
-/usr/sbin/squid flags=(attach_disconnected, complain) {
+/usr/sbin/squid flags=(attach_disconnected, {{ squid_apparmor_mode }}) {
   #include <abstractions/base>
   #include <abstractions/kerberosclient>
   #include <abstractions/nameservice>

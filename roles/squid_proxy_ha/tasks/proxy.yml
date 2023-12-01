@@ -81,3 +81,9 @@
     group: root
     mode: 0644
   notify: Reload apparmor
+
+- name: Enable apparmor profile for squid (disabled by default)
+  file:
+    path: /etc/apparmor.d/disable/usr.sbin.squid
+    state: absent
+  notify: Reload apparmor
