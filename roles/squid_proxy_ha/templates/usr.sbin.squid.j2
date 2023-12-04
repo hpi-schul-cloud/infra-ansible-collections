@@ -32,6 +32,7 @@
   capability setgid,
   capability sys_chroot,
   capability dac_read_search, # added to default
+  signal send set=usr1 peer=unconfined, # added to default (used for log rotation)
 
   # allow child processes to run execvp(argv[0], [kidname, ...])
   /usr/sbin/squid rix,
