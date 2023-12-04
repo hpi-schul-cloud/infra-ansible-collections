@@ -1,3 +1,4 @@
+{{ ansible_managed | comment }}
 # Author: Simon Deziel
 #         Jamie Strandboge
 # Changed (marked with # added to default)
@@ -14,9 +15,12 @@
   # probably have to uncomment the line below so that squid can read the
   # private key:
   #/etc/ssl/private/ssl-cert-snakeoil.key r,
-  include <abstractions/ssl_certs> # added to default
-  {{certificate_path}}/fullchain.pem r, # added to default
-  {{certificate_path}}/privkey.pem r, # added to default
+  include <abstractions/openssl> # added to default
+  {% if is_main_node %}
+  /etc/letsencrypt/** r, # added to default
+  {% else %}
+  {{ certificate_sync_target_directory }}/** r, # added to default
+  {% endif %}
 
   # For a more generous permission, but also less secure, you could
   # alternatively include the <abstractions/ssl_keys> abstraction, which

@@ -45,10 +45,6 @@
     floating_ip: "{{ lookup('community.general.dig', main_domain )}}"
   when: is_main_node
 
-- name: Set certificate path
-  set_fact:
-    certificate_path: "{{ '/etc/letsencrypt' if is_main_node else certificate_sync_target_directory }}/live/{{ main_domain }}"
-
 - name: Check HA clusters are valid (There should be at least 2 nodes in a cluster)
   run_once: True
   debug:
