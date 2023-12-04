@@ -87,3 +87,11 @@
     path: /etc/apparmor.d/disable/usr.sbin.squid
     state: absent
   notify: Reload apparmor
+
+- name: Set squid log retention
+  template:
+    src: logrotate_squid.j2
+    dest: /etc/logrotate.d/squid
+    owner: root
+    group: root
+    mode: 0644
