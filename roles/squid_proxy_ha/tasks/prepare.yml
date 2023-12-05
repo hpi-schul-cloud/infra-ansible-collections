@@ -12,6 +12,7 @@
       - fail2ban
       - squid-openssl
       - golang
+      - apparmor-utils
 
 - name: Install passlib (required for htpasswd module)
   pip:
@@ -28,7 +29,7 @@
 
 - name: Determine if the host is a main node (first in group)
   set_fact:
-    is_main_node: "{{ (groups[unique_ha_group] | first) == inventory_hostname }}"
+    is_main_node: "{{ (groups[unique_ha_group] | sort | first) == inventory_hostname }}"
 
 - name: Determine internal IP
   set_fact:
@@ -48,7 +49,7 @@
 - name: Check HA clusters are valid (There should be at least 2 nodes in a cluster)
   run_once: True
   debug:
-    msg: "Cluster group: {{ item.key }}\nHosts: {{ item.value }}"
+    msg: "Cluster group: {{ item.key }}\nHosts: {{ item.value | sort }}"
   failed_when: item.value | length < 2
   loop: "{{ groups | dict2items | selectattr('key', 'match', cluster_name ~ '_.*')}}"
 
@@ -62,3 +63,19 @@
     rule: allow
     port: "22"
     proto: tcp
+
+- name: Deactivate postfix (not necessary)
+  service:
+    name: postfix
+    enabled: false
+    state: stopped
+
+# Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
+# In the night to Sunday for main node and night to Thursday for others
+- name: Reboot weekly if necessary
+  cron:
+    name: "Weekly reboot for updates"
+    weekday: "{{ 0 if is_main_node else 4 }}"
+    hour: "0"
+    minute: "21"
+    job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"

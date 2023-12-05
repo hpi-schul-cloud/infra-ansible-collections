@@ -26,9 +26,13 @@
       uid: "{{ item.uid }}"
       shell: /bin/bash
       state: present
-    when: item.name is defined and ((item.allhosts is defined and item.allhosts == True) or (item.hosts is defined and inventory_hostname in item.hosts))
-    with_items:
-      - "{{ present_users }}"
+    vars:
+      vm_permissions: "{{ item.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.name is defined and allowed
+    loop: "{{ present_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - getent:
       database: group
@@ -40,10 +44,13 @@
       groups: "{{ item.1 }}"
       append: yes
       state: present
-    when: item.0.name is defined and ((item.0.allhosts is defined and item.0.allhosts == True) or (item.0.hosts is defined and inventory_hostname in item.0.hosts)) and item.1 in ansible_facts.getent_group
-    with_subelements:
-      - "{{ present_users }}"
-      - groups
+    vars:
+      vm_permissions: "{{ item.0.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.0.name is defined and allowed and item.1 in ansible_facts.getent_group
+    loop: "{{ present_users | subelements('permissions.vms.groups', skip_missing=True)}}"
+    loop_control:
+      label: "{{ item.0.name }}-{{ item.1 }}"
 
   - name: Set up authorized keys for users
     authorized_key:
@@ -51,9 +58,14 @@
       state: present
       key: "{{ lookup('file', 'sshkeys/{{ item.name }}.pub') }}"
       exclusive: False
-    when: item.name is defined and ((item.allhosts is defined and item.allhosts == True) or (item.hosts is defined and inventory_hostname in item.hosts))
-    with_items:
-      - "{{ present_users }}"
+    vars:
+      vm_permissions: "{{ item.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.name is defined and allowed
+    ignore_errors: "{{ ansible_check_mode }}" # Fails because new users were not created
+    loop: "{{ present_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - name: set password for technicaluser 
     user: 
@@ -63,12 +75,13 @@
 
   - name: remove users ( absent general )
     user:
-      name: "{{ item }}"
+      name: "{{ item.name }}"
       shell: /bin/false
       state: absent
       remove: yes
-    with_items:
-      - "{{ absent_users }}"
+    loop: "{{ absent_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - name: remove users ( absent host )
     user:
@@ -76,18 +89,23 @@
       shell: /bin/false
       state: absent
       remove: yes
-    when: item.name is defined and (item.hosts_absent is defined and inventory_hostname in item.hosts_absent)
-    with_items:
-      - "{{ present_users }}"
+    vars:
+      vm_permissions: "{{ item.permissions.vms | default({}) }}"
+      allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"
+    when: item.name is defined and not allowed
+    loop: "{{ present_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   - name: Remove orphaned home directories
     #  This task asumes that the home directory of an already deleted user is stored with the name of the user below /home
     #  and will use absent_users as base for the operation
     ansible.builtin.file:
-        path: /home/{{ item }}
+        path: /home/{{ item.name }}
         state: absent
-    with_items:
-      - "{{ absent_users }}" 
+    loop: "{{ absent_users }}"
+    loop_control:
+      label: "{{ item.name }}"
 
   # make it possible for devops group to sudo 
   - name: Make sudo without password for devops group possible
