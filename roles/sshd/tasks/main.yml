@@ -1,7 +1,7 @@
     - name: Generate SSH public keys list for SSHD Users
       set_fact:
-        sshd_public_keys: "{{ sshd_public_keys | default({}) | combine({item: lookup('file', 'sshkeys/' + item + '.pub')}) }}"
-      loop: "{{ sshd_users }}"
+        sshd_public_keys: "{{ sshd_public_keys | default({}) | combine({item.name: lookup('file', 'sshkeys/' + item.name + '.pub', errors='ignore') }) }}"
+      loop: "{{ present_users }}"
       tags:
         - sshd
 
