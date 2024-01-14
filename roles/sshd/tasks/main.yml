@@ -5,7 +5,7 @@
       tags:
         - sshd
 
-    - name: Create sshd namespace
+    - name: Create {{ sshd_namespace }} namespace
       kubernetes.core.k8s:
         state: present
         kubeconfig: "{{ kubeconfig }}"
@@ -36,8 +36,8 @@
 
     - name: Deploy latest version of SSHD chart to update user keys on Cluster
       kubernetes.core.helm:
-        name: sshd
-        chart_ref: "{{ playbook_dir }}/../charts/sshd"
+        name: {{ sshd_chart }}
+        chart_ref: "{{ playbook_dir }}/../charts/{{ sshd_chart }}"
         kubeconfig: "{{ kubeconfig }}"
         create_namespace: true
         release_namespace: "{{ sshd_namespace }}"
