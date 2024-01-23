@@ -5,7 +5,7 @@
     instance_specific_chart_values:
       ingress:
         hostname: "{{ proxy_subdomain }}.{{ bettermarks_proxy_maindomain }}"
-      serverBlock: "{{ lookup('template', item+'.conf.j2', errors='ignore') | default(lookup('template', 'basic.conf.j2')) }}"
+      serverBlock: "{{ lookup('template', item+'.conf.j2', errors='ignore') | default(lookup('template', 'basic.conf.j2'), true) }}"
   kubernetes.core.helm:
     name: "bettermarks-{{ item }}-proxy"
     chart_ref: bitnami/nginx
