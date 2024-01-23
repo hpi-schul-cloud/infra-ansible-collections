@@ -1,0 +1,19 @@
+- name: Install Proxy instances for bettermarks
+  vars:
+    proxy_subdomain: "{{ bettermarks_proxy_subdomains[item] }}"
+    bettermarks_subdomain: "{{ bettermarks_subdomains[item] }}"
+    instance_specific_chart_values:
+      ingress:
+        hostname: "{{ proxy_subdomain }}.{{ bettermarks_proxy_maindomain }}"
+      serverBlock: "{{ lookup('template', item+'.conf.j2', errors='ignore') | default(lookup('template', 'basic.conf.j2'), true) }}"
+  kubernetes.core.helm:
+    name: "bettermarks-{{ item }}-proxy"
+    chart_ref: bitnami/nginx
+    update_repo_cache: true
+    wait: true
+    chart_version: "{{ bettermarks_proxy_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "{{ bettermarks_namespace }}"
+    values: "{{ instance_specific_chart_values | ansible.builtin.combine(bettermarks_proxy_chart_values, recursive=true) }}"
+  loop: "{{ bettermarks_proxy_enabled_instances }}"
+  tags: bettermarksproxy
