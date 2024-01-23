@@ -1,3 +1,9 @@
+bettermarks_proxy_enabled_instances:
+  - apm
+  - school
+  - translations
+  - apps
+  - events
 bettermarks_subdomains:
   apm: apm
   school: school
