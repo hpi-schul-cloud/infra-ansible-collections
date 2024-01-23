@@ -6,7 +6,7 @@ bbb_prometheus_basic_auth:
 bbb_ionos_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_instance_name }}-ionos"
 bbb_ionos_basic_auth:
   username: "{{ bbb_ionos_username }}"
-  password_file: "{{ bbb_ionos_password }}"
+  password_file: "{{ bbb_ionos_basic_auth_secret_mount_path }}/password"
 
 bbb_prometheus_relabel_configs:
   # Rewrite hostname:port to hostname
