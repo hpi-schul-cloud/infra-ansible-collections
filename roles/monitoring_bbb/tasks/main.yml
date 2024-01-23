@@ -21,16 +21,17 @@
   loop: "{{ range(bbb_turn_server_count) }}"
   loop_control:
     loop_var: n
+
 # Prometheus Operator can only get additional scrape configs, volumes and volume mounts
 # from one secret or one Helm value each so we have to add entries to the
 # prometheus_additionalScrapeConfigs, prometheus_volumeMounts and prometheus_volumeMounts variable
 - name: Add BBB scrape configs and liveness probes
   set_fact:
     prometheus_additionalScrapeConfigs: "{{ prometheus_additionalScrapeConfigs + bbb_prometheus_scrape_config }}"
-    prometheus_volumes: "{{ prometheus_volumes + [bbb_prometheus_volume] }}"
-    prometheus_volumeMounts: "{{ prometheus_volumeMounts + [bbb_prometheus_volume_mount] }}"
+    prometheus_volumes: "{{ prometheus_volumes + bbb_prometheus_volumes }}"
+    prometheus_volumeMounts: "{{ prometheus_volumeMounts + bbb_prometheus_volume_mounts }}"
 
-- name: Create BBB basic auth credentials secret
+- name: Create BBB secrets
   kubernetes.core.k8s:
     state: present
     kubeconfig: "{{ kubeconfig }}"
@@ -40,7 +41,10 @@
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+        name: "{{ item }}"
         namespace: monitoring
       spec:
-        itemPath: "vaults/{{ bbb_vault }}/items/{{ bbb_node_exporter_basic_auth_secret_name }}"
+        itemPath: "vaults/{{ bbb_vault }}/items/{{ item }}"
+    loop:
+      - "{{ bbb_node_exporter_basic_auth_secret_name }}"
+      - "{{ bbb_ionos_basic_auth_secret_name }}"

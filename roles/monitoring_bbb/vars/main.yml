@@ -3,6 +3,11 @@ bbb_prometheus_basic_auth:
   username: ne_admin
   password_file: "{{ bbb_prometheus_basic_auth_secret_mount_path }}/password"
 
+bbb_ionos_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_instance_name }}-ionos"
+bbb_ionos_basic_auth:
+  username: "{{ bbb_ionos_username }}"
+  password_file: "{{ bbb_ionos_password }}"
+
 bbb_prometheus_relabel_configs:
   # Rewrite hostname:port to hostname
   - source_labels: [__address__]
@@ -33,11 +38,14 @@ bbb_prometheus_bbb_job:
   job_name: "{{ bbb_instance_name }}"
   scheme: https
   metrics_path: "{{ '/mon/bbb' if bbb_ebbba_exporters else '/metrics' }}"
-  static_configs:
-    - targets: "{{ bbb_servers_bbb_exporter_targets }}"
-      labels: "{{ bbb_prometheus_labels }}"
+  ionos_sd_config:
+    datacenter_id: "{{ bbb_datacenter_id }}"
+    basic_auth: "{{ bbb_ionos_basic_auth }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  relabel_configs:
+    - source_labels: [__meta_ionos_server_name]
+      regex: "bbb-.*"
+      action: keep
 bbb_prometheus_bbb_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-node-exporter"
   scheme: https
@@ -80,12 +88,18 @@ bbb_prometheus_servers_only_scrape_config:
   - "{{ bbb_prometheus_bbb_job }}"
   - "{{ bbb_prometheus_bbb_node_exporter_job }}"
 
-bbb_prometheus_volume:
-  name: "{{ bbb_instance_name }}"
-  secret:
-    secretName: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+bbb_prometheus_volumes:
+  - name: "{{ bbb_instance_name }}"
+    secret:
+      secretName: "{{ bbb_node_exporter_basic_auth_secret_name }}"
+  - name: "{{ bbb_instance_name }}-ionos"
+    secret:
+      secretName: "{{ bbb_ionos_basic_auth_secret_name }}"
 
-bbb_prometheus_volume_mount:
-  name: "{{ bbb_instance_name }}"
-  mountPath: "{{ bbb_prometheus_basic_auth_secret_mount_path }}"
-  readOnly: true
+bbb_prometheus_volume_mounts:
+  - name: "{{ bbb_instance_name }}"
+    mountPath: "{{ bbb_prometheus_basic_auth_secret_mount_path }}"
+    readOnly: true
+  - name: "{{ bbb_instance_name }}-ionos"
+    mountPath: "{{ bbb_ionos_basic_auth_secret_mount_path }}"
+    readOnly: true

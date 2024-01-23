@@ -16,6 +16,8 @@ bbb_turn_server_count: 0
 bbb_turn_server_exporter_enabled: true
 # Name of the Kubernetes secret containing the basic auth credentials for the exporters
 bbb_node_exporter_basic_auth_secret_name: "{{ bbb_instance_name }}-node-exporter-basic-auth"
+# Name of the Kubernetes secret containing the IONOS credentials
+bbb_ionos_user_credentials_secret_name: "{{ bbb_instance_name }}-ionos"
 # The role will add the BBB scrape configs to this list, can be used by the kube-prometheus-stack
 # Helm chart by mapping it to prometheus.prometheusSpec.additionalScrapeConfigs
 prometheus_additionalScrapeConfigs: []
