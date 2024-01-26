@@ -29,6 +29,20 @@ bbb_prometheus_scalelite_job:
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
+bbb_prometheus_scalelite_autoscaler_job:
+  job_name: "{{ bbb_instance_name }}-scalelite-autoscaler"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - "{{ scalelite_host }}:9200"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 bbb_prometheus_bbb_job:
   job_name: "{{ bbb_instance_name }}"
   scheme: https
@@ -38,6 +52,8 @@ bbb_prometheus_bbb_job:
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 bbb_prometheus_bbb_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-node-exporter"
   scheme: https
@@ -47,6 +63,8 @@ bbb_prometheus_bbb_node_exporter_job:
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 bbb_prometheus_turn_coturn_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-coturn-exporter"
   scheme: https
@@ -56,6 +74,8 @@ bbb_prometheus_turn_coturn_exporter_job:
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 bbb_prometheus_turn_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-node-exporter"
   scheme: https
@@ -65,12 +85,15 @@ bbb_prometheus_turn_node_exporter_job:
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 
 bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config if bbb_servers_only else bbb_prometheus_full_scrape_config }}"
 
 bbb_prometheus_full_scrape_config:
   - "{{ bbb_prometheus_scalelite_job }}"
+  - "{{ bbb_prometheus_scalelite_autoscaler_job }}"
   - "{{ bbb_prometheus_bbb_job }}"
   - "{{ bbb_prometheus_bbb_node_exporter_job }}"
   - "{{ bbb_prometheus_turn_coturn_exporter_job }}"
