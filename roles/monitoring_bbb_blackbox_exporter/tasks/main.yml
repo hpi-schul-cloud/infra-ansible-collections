@@ -28,7 +28,7 @@
       spec:
         jobName: "{{ bbb_instance_name }}-blackbox-exporter"
         prober:
-          url: "{{ bbb_blackbox_exporter_url }}"  # prometheus-blackbox-exporter.monitoring.svc.cluster.local:9115
+          url: "{{ bbb_blackbox_exporter_url }}"
         module: "{{ bbb_blackbox_exporter_module }}"
         interval: "{{ bbb_scrape_interval }}"
         targets:
