@@ -17,7 +17,7 @@ bbb_prometheus_relabel_configs:
     replacement: "{{ tenant }}"
 
 bbb_datacenter_ionos_sd_configs: |
-  {% for id in bbb_datacenter_id %}
+  {% for id in bbb_datacenter_ids %}
   - datacenter_id: "{{ id }}"
     basic_auth: "{{ bbb_ionos_basic_auth }}"
     port: "{{ 443 if bbb_ebbba_exporters else 9688 }}"
