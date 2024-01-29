@@ -4,14 +4,24 @@ bbb_prometheus_relabel_configs:
   - source_labels: [__meta_ionos_server_state]
     regex: "RUNNING"
     action: keep
+  # Use the IONOS server name as address to scrape
+  - source_labels: [__meta_ionos_server_name]
+    target_label: __address__
   # Removes the port from the hostname
   - source_labels: [__address__]
     target_label: instance
     regex: "([^:]+)(:[0-9]+)?"
     replacement: "${1}"
-  # Use the IONOS server name as address to scrape
-  - source_labels: [__meta_ionos_server_name]
-    target_label: __address__
+  # Add the tenant label
+  - target_label: tenant
+    replacement: "{{ tenant }}"
+
+bbb_prometheus_scalelite_relabel_configs:
+  # Rewrite hostname:port to hostname
+  - source_labels: [__address__]
+    target_label: instance
+    regex: "([^:]+)(:[0-9]+)?"
+    replacement: "${1}"
   # Add the tenant label
   - target_label: tenant
     replacement: "{{ tenant }}"
@@ -19,8 +29,9 @@ bbb_prometheus_relabel_configs:
 bbb_datacenter_ionos_sd_configs: |
   {% for id in bbb_datacenter_ids %}
   - datacenter_id: "{{ id }}"
-    basic_auth: "{{ bbb_ionos_basic_auth }}"
-    port: "{{ 443 if bbb_ebbba_exporters else 9688 }}"
+    basic_auth:
+      {{ bbb_ionos_basic_auth | to_nice_yaml | indent(4) }}
+    port: {{ 443 if bbb_ebbba_exporters else 9688 }}
     refresh_interval: 15s
   {% endfor %}
 
@@ -31,14 +42,8 @@ bbb_prometheus_scalelite_node_exporter_job:
   static_configs:
     - targets:
         - "{{ scalelite_host }}:9100"
-      labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs:
-    # Rewrite hostname:port to hostname
-    - source_labels: [__address__]
-      target_label: instance
-      regex: "([^:]+)(:[0-9]+)?"
-      replacement: "${1}"
+  relabel_configs: "{{ bbb_prometheus_scalelite_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
@@ -49,14 +54,8 @@ bbb_prometheus_scalelite_autoscaler_job:
   static_configs:
     - targets:
         - "{{ scalelite_host }}:9200"
-      labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs:
-    # Rewrite hostname:port to hostname
-    - source_labels: [__address__]
-      target_label: instance
-      regex: "([^:]+)(:[0-9]+)?"
-      replacement: "${1}"
+  relabel_configs: "{{ bbb_prometheus_scalelite_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
@@ -66,7 +65,7 @@ bbb_prometheus_bbb_job:
   metrics_path: "{{ '/mon/bbb' if bbb_ebbba_exporters else '/metrics' }}"
   ionos_sd_configs: "{{ bbb_datacenter_ionos_sd_configs | from_yaml }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'bbb-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  relabel_configs: "{{ [{'source_labels': ['__meta_ionos_server_name'], 'regex': 'bbb-.*', 'action': 'keep'}] + bbb_prometheus_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
@@ -76,7 +75,7 @@ bbb_prometheus_bbb_node_exporter_job:
   metrics_path: "{{ '/mon/node' if bbb_ebbba_exporters else '/metrics' }}"
   ionos_sd_configs: "{{ bbb_datacenter_ionos_sd_configs | from_yaml }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'bbb-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  relabel_configs: "{{ [{'source_labels': ['__meta_ionos_server_name'], 'regex': 'bbb-.*', 'action': 'keep'}] + bbb_prometheus_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
@@ -90,7 +89,7 @@ bbb_prometheus_turn_coturn_exporter_job:
       port: 9642
       refresh_interval: 15s
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'turn-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  relabel_configs: "{{ [{'source_labels': ['__meta_ionos_server_name'], 'regex': 'turn-.*', 'action': 'keep'}] + bbb_prometheus_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
@@ -104,7 +103,7 @@ bbb_prometheus_turn_node_exporter_job:
       port: 9100
       refresh_interval: 15s
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'turn-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  relabel_configs: "{{ [{'source_labels': ['__meta_ionos_server_name'], 'regex': 'turn-.*', 'action': 'keep'}] + bbb_prometheus_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
