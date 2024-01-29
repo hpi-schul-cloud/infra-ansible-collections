@@ -16,7 +16,7 @@ bbb_prometheus_relabel_configs:
   - target_label: tenant
     replacement: "{{ tenant }}"
 
-bbb_prometheus_scalelite_job:
+bbb_prometheus_scalelite_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-scalelite"
   scheme: https
   metrics_path: /metrics
@@ -25,14 +25,27 @@ bbb_prometheus_scalelite_job:
         - "{{ scalelite_host }}:9100"
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  scrape_interval: 15s
-  scrape_timeout: 5s
   relabel_configs:
     # Rewrite hostname:port to hostname
     - source_labels: [__address__]
       target_label: instance
       regex: "([^:]+)(:[0-9]+)?"
       replacement: "${1}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
+
+bbb_prometheus_scalelite_autoscaler_job:
+  job_name: "{{ bbb_instance_name }}-scalelite-autoscaler"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - "{{ scalelite_host }}:9200"
+      labels: "{{ bbb_prometheus_labels }}"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 bbb_prometheus_bbb_job:
   job_name: "{{ bbb_instance_name }}"
@@ -44,9 +57,9 @@ bbb_prometheus_bbb_job:
       port: "{{ 443 if bbb_ebbba_exporters else 9688 }}"
       refresh_interval: 15s
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  scrape_interval: 15s
-  scrape_timeout: 5s
   relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'bbb-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 bbb_prometheus_bbb_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-node-exporter"
@@ -58,9 +71,9 @@ bbb_prometheus_bbb_node_exporter_job:
       port: "{{ 443 if bbb_ebbba_exporters else 9100 }}"
       refresh_interval: 15s
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  scrape_interval: 15s
-  scrape_timeout: 5s
   relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'bbb-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 bbb_prometheus_turn_coturn_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-coturn-exporter"
@@ -72,9 +85,9 @@ bbb_prometheus_turn_coturn_exporter_job:
       port: 9642
       refresh_interval: 15s
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  scrape_interval: 15s
-  scrape_timeout: 5s
   relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'turn-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 bbb_prometheus_turn_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-node-exporter"
@@ -86,16 +99,21 @@ bbb_prometheus_turn_node_exporter_job:
       port: 9100
       refresh_interval: 15s
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  scrape_interval: 15s
-  scrape_timeout: 5s
   relabel_configs: "{{ [{source_labels: [__meta_ionos_server_name], regex: 'turn-.*', action: keep}] + bbb_prometheus_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 
-bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + ([bbb_prometheus_scalelite_job, bbb_prometheus_turn_node_exporter_job] if not bbb_servers_only else []) + [bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else [] }}"
+bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) + [bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else [] }}"
 
 bbb_prometheus_servers_only_scrape_config:
   - "{{ bbb_prometheus_bbb_job }}"
   - "{{ bbb_prometheus_bbb_node_exporter_job }}"
+
+bbb_prometheus_scalelite_scrape_config:
+  - "{{ bbb_prometheus_scalelite_node_exporter_job }}"
+  - "{{ bbb_prometheus_scalelite_autoscaler_job }}"
+  - "{{ bbb_prometheus_turn_node_exporter_job }}"
 
 bbb_prometheus_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_instance_name }}"
 bbb_prometheus_basic_auth:
