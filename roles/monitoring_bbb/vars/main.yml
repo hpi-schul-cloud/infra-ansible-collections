@@ -43,7 +43,12 @@ bbb_prometheus_scalelite_autoscaler_job:
         - "{{ scalelite_host }}:9200"
       labels: "{{ bbb_prometheus_labels }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
-  relabel_configs: "{{ bbb_prometheus_relabel_configs }}"
+  relabel_configs:
+    # Rewrite hostname:port to hostname
+    - source_labels: [__address__]
+      target_label: instance
+      regex: "([^:]+)(:[0-9]+)?"
+      replacement: "${1}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
