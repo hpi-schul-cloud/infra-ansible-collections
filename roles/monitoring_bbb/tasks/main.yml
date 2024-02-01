@@ -2,7 +2,7 @@
 # Prometheus Operator can only get additional scrape configs, volumes and volume mounts
 # from one secret or one Helm value each so we have to add entries to the
 # prometheus_additionalScrapeConfigs, prometheus_volumeMounts and prometheus_volumeMounts variable
-- name: Add BBB scrape configs and liveness probes
+- name: Add BBB scrape configs
   set_fact:
     prometheus_additionalScrapeConfigs: "{{ prometheus_additionalScrapeConfigs + bbb_prometheus_scrape_config }}"
     prometheus_volumes: "{{ prometheus_volumes + bbb_prometheus_volumes }}"
