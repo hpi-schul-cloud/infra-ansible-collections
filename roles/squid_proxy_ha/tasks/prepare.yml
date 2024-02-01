@@ -65,7 +65,17 @@
     proto: tcp
 
 - name: Deactivate postfix (not necessary)
-  ansible.builtin.service:
+  service:
     name: postfix
     enabled: false
     state: stopped
+
+# Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
+# In the night to Sunday for main node and night to Thursday for others
+- name: Reboot weekly if necessary
+  cron:
+    name: "Weekly reboot for updates"
+    weekday: "{{ 0 if is_main_node else 4 }}"
+    hour: "0"
+    minute: "21"
+    job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"

@@ -29,3 +29,5 @@ prometheus_volumeMounts: []
 prometheus_blackbox_exporter_targets: []
 # Only monitor the BBB servers but not Scalelite or TURN
 bbb_servers_only: false
+bbb_monitoring_scrape_interval: 10s
+bbb_monitoring_scrape_timeout: 5s

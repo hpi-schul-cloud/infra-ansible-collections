@@ -1,0 +1,47 @@
+    - name: Generate SSH public keys list for SSHD Users
+      set_fact:
+        sshd_public_keys: "{{ sshd_public_keys | default({}) | combine({item: lookup('file', 'sshkeys/' + item + '.pub')}) }}"
+      loop: "{{ sshd_users }}"
+      tags:
+        - sshd
+
+    - name: Create sshd namespace
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        api_version: v1
+        name: "{{ sshd_namespace }}"
+        kind: Namespace
+      tags:
+        - sshd
+
+    - name: Deploy SSHD host keys secret
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        apply: true
+        definition:
+          apiVersion: onepassword.com/v1
+          kind: OnePasswordItem
+          metadata:
+            name: sshd-host-keys
+            namespace: "{{ sshd_namespace }}"
+          spec:
+            itemPath: "vaults/{{ vault }}/items/sshd-host-keys"
+      tags:
+        - sshd
+
+    - name: Deploy latest version of SSHD chart to update user keys on Cluster
+      kubernetes.core.helm:
+        name: sshd
+        chart_ref: "{{ playbook_dir }}/../charts/sshd"
+        kubeconfig: "{{ kubeconfig }}"
+        create_namespace: true
+        release_namespace: "{{ sshd_namespace }}"
+        values: "{{ sshd_values }}"
+        wait: true
+      tags:
+        - sshd
