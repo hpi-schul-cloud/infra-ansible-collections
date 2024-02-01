@@ -4,9 +4,15 @@ bbb_prometheus_relabel_configs:
   - source_labels: [__meta_ionos_server_state]
     regex: "RUNNING"
     action: keep
+  # Extract the port to a temporary label
+  - source_labels: [__address__]
+    target_label: __tmp_metrics_port
+    regex: "([^:]+)(:[0-9]+)?"
+    replacement: "${2}"
   # Use the IONOS server name as address to scrape
-  - source_labels: [__meta_ionos_server_name]
+  - source_labels: [__meta_ionos_server_name, __tmp_metrics_port]
     target_label: __address__
+    separator: ""
   # Removes the port from the hostname
   - source_labels: [__address__]
     target_label: instance
@@ -79,6 +85,35 @@ bbb_prometheus_bbb_node_exporter_job:
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
+bbb_prometheus_bbb_blackbox_exporter_job:
+  job_name: "{{ bbb_instance_name }}-blackbox-exporter"
+  # scheme: http
+  metrics_path: /probe
+  params:
+    module: ["http_2xx"]
+  ionos_sd_configs: "{{ bbb_datacenter_ionos_sd_configs | from_yaml }}"
+  relabel_configs:
+    - source_labels: [__meta_ionos_server_name]
+      regex: "bbb-.*"
+      action: keep
+    # Drop not running servers
+    - source_labels: [__meta_ionos_server_state]
+      regex: "RUNNING"
+      action: keep
+    # Prefix https:// and append /bigbluebutton to the hostname
+    - source_labels: [__meta_ionos_server_name]
+      target_label: __param_target
+      regex: "(.*)"
+      replacement: "https://${1}/bigbluebutton"
+    - source_labels: [__param_target]
+      target_label: instance
+    - target_label: __address__
+      replacement: "{{ bbb_blackbox_exporter_url | default('prometheus-blackbox-exporter:9115') }}"
+    - target_label: tenant
+      replacement: "{{ tenant }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
+
 bbb_prometheus_turn_coturn_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-coturn-exporter"
   scheme: https
@@ -113,6 +148,7 @@ bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (b
 bbb_prometheus_servers_only_scrape_config:
   - "{{ bbb_prometheus_bbb_job }}"
   - "{{ bbb_prometheus_bbb_node_exporter_job }}"
+  - "{{ bbb_prometheus_bbb_blackbox_exporter_job }}"
 
 bbb_prometheus_scalelite_scrape_config:
   - "{{ bbb_prometheus_scalelite_node_exporter_job }}"
