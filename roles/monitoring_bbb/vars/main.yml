@@ -143,7 +143,7 @@ bbb_prometheus_turn_node_exporter_job:
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 
-bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) + [bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else [] }}"
+bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) + ([bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else []) }}"
 
 bbb_prometheus_servers_only_scrape_config:
   - "{{ bbb_prometheus_bbb_job }}"
@@ -164,11 +164,11 @@ bbb_prometheus_volumes:
   - name: "{{ bbb_instance_name }}"
     secret:
       secretName: "{{ bbb_node_exporter_basic_auth_secret_name }}"
-  - name: "{{ bbb_ionos_basic_auth_secret_name }}"
+  - name: "{{ bbb_instance_name }}-ionos"
     secret:
       secretName: "{{ bbb_ionos_basic_auth_secret_name }}"
 
-bbb_ionos_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_ionos_basic_auth_secret_name }}"
+bbb_ionos_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_instance_name }}-ionos"
 bbb_ionos_basic_auth:
   username: "{{ bbb_prometheus_ionos_username }}"
   password_file: "{{ bbb_ionos_basic_auth_secret_mount_path }}/{{ bbb_ionos_basic_auth_secret_key }}"
@@ -177,6 +177,6 @@ bbb_prometheus_volume_mounts:
   - name: "{{ bbb_instance_name }}"
     mountPath: "{{ bbb_prometheus_basic_auth_secret_mount_path }}"
     readOnly: true
-  - name: "{{ bbb_ionos_basic_auth_secret_name }}"
+  - name: "{{ bbb_instance_name }}-ionos"
     mountPath: "{{ bbb_ionos_basic_auth_secret_mount_path }}"
     readOnly: true
