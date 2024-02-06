@@ -17,13 +17,13 @@
   become: true
 - name: Make filesystem
   filesystem:
-    fstype: ext4
+    fstype: "{{ lvm_file_system_type }}"
     dev: "/dev/{{ lvm_vg }}/{{ lvm_lv }}"
   become: true
 - name: Mount filesystem
   mount:
     state: mounted
-    fstype: ext4
+    fstype: "{{ lvm_file_system_type }}"
     src: "/dev/{{ lvm_vg }}/{{ lvm_lv }}"
     path: "{{ lvm_mount_path }}"
     backup: true
