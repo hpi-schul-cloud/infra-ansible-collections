@@ -8,7 +8,7 @@ server{
     {% if allow_cross_origin_credentials -%}
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
-    {% endif %}
+    {% endif -%}
     # Proxy to the origin
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
     proxy_ssl_server_name on;
