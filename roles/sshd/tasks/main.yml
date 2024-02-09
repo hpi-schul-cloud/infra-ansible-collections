@@ -49,9 +49,7 @@
         name: {{ sshd_chart }}
         chart_ref: "dbildungsplattform/{{ sshd_chart }}"
         update_repo_cache: yes
-        chart_version: "{{ ionos_exporter_helm_chart_version }}"
-        create_namespace: true
-        release_namespace: "{{ sshd_namespace }}"
+        chart_version: "{{ infra_sshd_helm_chart_version }}"
         values: "{{ sshd_values }}"
         wait: true
       tags:
