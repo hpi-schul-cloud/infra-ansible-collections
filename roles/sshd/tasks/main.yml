@@ -1,7 +1,7 @@
     - name: Generate SSH public keys list for SSHD Users
       set_fact:
         sshd_public_keys: "{{ sshd_public_keys | default({}) | combine({item.name: lookup('file', 'sshkeys/' + item.name + '.pub')}) }}"
-      when: item.permissions.sshd is defined and  inventory_hostname in (lookup('inventory_hostnames', item.permissions.sshd.hosts) | default('', true)).split(',')
+      when: item.permissions.sshd is defined and inventory_hostname in (lookup('inventory_hostnames', item.permissions.sshd.hosts) | default('', true)).split(',')
       loop: "{{ present_users }}"
       tags:
         - sshd
@@ -34,12 +34,22 @@
             itemPath: "vaults/{{ vault }}/items/sshd-host-keys"
       tags:
         - sshd
-
+    
+    - name: Add dbildungsplattform chart repo
+      kubernetes.core.helm_repository:
+        name: dbildungsplattform
+        repo_url: https://dbildungsplattform.github.io/helm-charts-registry/
+      check_mode: false
+      changed_when: false
+      tags: sshd
+      
     - name: Deploy latest version of SSHD chart to update user keys on Cluster
       kubernetes.core.helm:
-        name: {{ sshd_chart }}
-        chart_ref: "{{ playbook_dir }}/../charts/{{ sshd_chart }}"
         kubeconfig: "{{ kubeconfig }}"
+        name: {{ sshd_chart }}
+        chart_ref: "dbildungsplattform/{{ sshd_chart }}"
+        update_repo_cache: yes
+        chart_version: "{{ ionos_exporter_helm_chart_version }}"
         create_namespace: true
         release_namespace: "{{ sshd_namespace }}"
         values: "{{ sshd_values }}"
