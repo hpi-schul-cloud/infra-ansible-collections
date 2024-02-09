@@ -1,11 +1,12 @@
-- name: Install Proxy instances for bettermarks
+- name: Install Proxy instances for bettermarks ({{ bettermarks_namespace }})
   vars:
     proxy_subdomain: "{{ bettermarks_proxy_subdomains[item] }}"
     bettermarks_subdomain: "{{ bettermarks_subdomains[item] }}"
+    allow_cross_origin_credentials: "{{ item in bettermarks_credentials_allowed }}"
     instance_specific_chart_values:
       ingress:
         hostname: "{{ proxy_subdomain }}.{{ bettermarks_proxy_maindomain }}"
-      serverBlock: "{{ lookup('template', item+'.conf.j2', errors='ignore') | default(lookup('template', 'basic.conf.j2'), true) }}"
+      serverBlock: "{{ lookup('template', 'nginx.conf.j2') }}"
   kubernetes.core.helm:
     name: "bettermarks-{{ item }}-proxy"
     chart_ref: bitnami/nginx

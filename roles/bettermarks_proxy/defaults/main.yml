@@ -16,6 +16,8 @@ bettermarks_proxy_subdomains:
   apps: apps
   events: events
   translations: translations
+bettermarks_credentials_allowed:
+  - school
 bettermarks_domain: bettermarks.com
 bettermarks_proxy_ingress_enabled: false
 bettermarks_proxy_ingress_tls: false
