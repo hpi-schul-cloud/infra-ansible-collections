@@ -49,7 +49,7 @@
         name: {{ sshd_chart }}
         chart_ref: "dbildungsplattform/{{ sshd_chart }}"
         update_repo_cache: yes
-        chart_version: "{{ sshd_helm_chart_version }}"
+        chart_version: "{{ sshd_chart_version }}"
         release_namespace: "{{ sshd_namespace }}"
         values: "{{ sshd_values }}"
         wait: true
