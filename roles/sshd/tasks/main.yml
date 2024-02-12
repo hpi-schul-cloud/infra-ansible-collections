@@ -50,6 +50,7 @@
         chart_ref: "dbildungsplattform/{{ sshd_chart }}"
         update_repo_cache: yes
         chart_version: "{{ infra_sshd_helm_chart_version }}"
+        release_namespace: "{{ sshd_namespace }}"
         values: "{{ sshd_values }}"
         wait: true
       tags:
