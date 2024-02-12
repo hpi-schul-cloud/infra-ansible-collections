@@ -8,6 +8,7 @@ server{
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
     # Proxy to the origin
+    proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
     proxy_ssl_server_name on;
     # Override the cookie domain
@@ -27,6 +28,7 @@ server{
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
     # Proxy to the origin
+    proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
     proxy_ssl_server_name on;
     proxy_intercept_errors off;
@@ -48,6 +50,7 @@ server{
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
     # Proxy to the origin
+    proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
     proxy_ssl_server_name on;
     proxy_intercept_errors off;
