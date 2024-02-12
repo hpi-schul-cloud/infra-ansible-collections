@@ -1,0 +1,51 @@
+---
+# Create Victoriametrics Longterm
+- name: Create Victoriametrics PVCs for longterm storage 
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: vmstorage-volume-victoriametrics-l-victoria-metrics-cluster-vmstorage-{{ item }}
+        namespace: monitoring
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: "{{ victoriametrics_vmstorage_longterm_persistentVolume.persistentVolume.storageClass }}"
+        resources:
+          requests:
+            storage: "{{ victoriametrics_vmstorage_longterm_persistentVolume.persistentVolume.size }}"
+  # End is less than or equal so we have to substract 1
+  with_sequence: start=0 end="{{ victoriametrics_vmstorage_longterm_replica_count -1 }}"
+  when: victoriametrics_longterm_enabled
+  tags: 
+  - victoriametrics-l
+
+- name: Add Victoriametrics chart repo
+  kubernetes.core.helm_repository:
+    name: vm
+    repo_url: "https://victoriametrics.github.io/helm-charts/"
+  check_mode: false
+  changed_when: false
+  tags: 
+  - victoriametrics-l
+
+- name: Install Longterm Victoriametrics
+  kubernetes.core.helm:
+    name: victoriametrics-l
+    chart_ref: vm/victoria-metrics-cluster
+    update_repo_cache: true
+    wait: true
+    wait_timeout: 600s
+    chart_version: "{{ victoriametrics_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: monitoring
+    values:
+      "{{ victoriametrics_longterm_values }}"
+  when: victoriametrics_longterm_enabled
+  tags: 
+  - victoriametrics-l

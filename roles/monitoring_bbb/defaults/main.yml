@@ -9,13 +9,13 @@ scalelite_host: "{{ bbb_domain_name }}"
 # True if using the exporters from the EBBBA BBB role with metrics under /mon/node
 # and /mon/bbb otherwise /metrics on port 9100 is used
 bbb_ebbba_exporters: true
-bbb_server_count: 0
-bbb_server_start_index: 1
-bbb_turn_server_count: 0
 # True if the coturn exporter is enabled on port 9642 /metrics
 bbb_turn_server_exporter_enabled: true
 # Name of the Kubernetes secret containing the basic auth credentials for the exporters
 bbb_node_exporter_basic_auth_secret_name: "{{ bbb_instance_name }}-node-exporter-basic-auth"
+# Name of the Kubernetes secret containing the IONOS credentials
+bbb_ionos_basic_auth_secret_name: "{{ bbb_instance_name }}-ionos"
+bbb_ionos_basic_auth_secret_key: password
 # The role will add the BBB scrape configs to this list, can be used by the kube-prometheus-stack
 # Helm chart by mapping it to prometheus.prometheusSpec.additionalScrapeConfigs
 prometheus_additionalScrapeConfigs: []
@@ -24,8 +24,7 @@ prometheus_additionalScrapeConfigs: []
 # by mapping it to prometheus.prometheusSpec.volumes and prometheus.prometheusSpec.volumeMounts
 prometheus_volumes: []
 prometheus_volumeMounts: []
-# The role will add the liveness probe blackbox exporter targets to this list, can be used by the
-# prometheus-blackbox-exporter Helm chart by mapping it to serviceMonitor.targets
-prometheus_blackbox_exporter_targets: []
 # Only monitor the BBB servers but not Scalelite or TURN
 bbb_servers_only: false
+bbb_monitoring_scrape_interval: 10s
+bbb_monitoring_scrape_timeout: 5s
