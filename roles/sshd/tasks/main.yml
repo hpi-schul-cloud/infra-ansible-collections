@@ -46,7 +46,7 @@
     - name: Deploy latest version of SSHD chart to update user keys on Cluster
       kubernetes.core.helm:
         kubeconfig: "{{ kubeconfig }}"
-        name: {{ sshd_chart }}
+        name: "{{ sshd_chart }}"
         chart_ref: "dbildungsplattform/{{ sshd_chart }}"
         update_repo_cache: yes
         chart_version: "{{ sshd_chart_version }}"
