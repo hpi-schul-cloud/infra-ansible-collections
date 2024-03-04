@@ -17,14 +17,6 @@
     port: "22"
     proto: tcp
 
-- name: Allow HTTP/HTTPS port
-  ufw:
-    rule: allow
-    port: 
-      - "80"
-      - "443"
-    proto: tcp
-
 # Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
 # In the night to Sunday
 - name: Reboot weekly if necessary
