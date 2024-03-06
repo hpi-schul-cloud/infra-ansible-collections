@@ -1,0 +1,28 @@
+---
+
+- name: Install packages
+  apt:
+    name: 
+      - ufw
+      - fail2ban
+
+- name: Enable ufw (deny all)
+  ufw:
+    state: enabled
+    policy: deny
+  
+- name: Allow SSH port
+  ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+# Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
+# In the night to Sunday
+- name: Reboot weekly if necessary
+  cron:
+    name: "Weekly reboot for updates"
+    weekday: "0"
+    hour: "0"
+    minute: "21"
+    job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"

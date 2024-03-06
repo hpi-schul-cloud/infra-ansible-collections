@@ -1,0 +1,3 @@
+---
+- import_tasks: security.yml
+- import_tasks: installation.yml
