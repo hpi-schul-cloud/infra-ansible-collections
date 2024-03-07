@@ -4,11 +4,15 @@ echo "SELECT 'CREATE USER {{ psql_db_owner }}' WHERE NOT EXISTS (SELECT FROM pg_
 echo "GRANT {{ psql_db_owner }} TO $PGUSER" | psql -d postgres -w
 echo "Create database"
 echo "SELECT 'CREATE DATABASE $DB_NAME OWNER {{ psql_db_owner }}' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$DB_NAME')\gexec" | psql -d postgres -w
+{% if psql_private_db %}
+echo "Revoke permissions for public role"
+echo "REVOKE ALL ON DATABASE $DB_NAME FROM PUBLIC;" | psql -d postgres -w
+{% endif %}
 {% for user in psql_db_users %}
 echo "Create and set privileges for user {{ user.name }}"
 echo "SELECT 'CREATE USER {{ user.name }}' WHERE NOT EXISTS (SELECT FROM pg_user WHERE usename = '{{ user.name }}')\gexec" | psql -d postgres -w
 echo "ALTER USER {{ user.name }} WITH ENCRYPTED PASSWORD '$DB_{{ user.name | upper }}_USER_PASS'" | psql -d postgres -w
 echo "GRANT {{ user.privileges | default(psql_default_privileges) }} ON DATABASE $DB_NAME to {{ user.name }}" | psql -d postgres -w
 {% endfor %}
-echo "Executing optional custom command"
-echo "$DB_CUSTOM_COMMAND" | psql -d postgres -w
+echo "Executing optional custom command in the new DB"
+echo "$DB_CUSTOM_COMMAND" | psql -d $DB_NAME -w

@@ -16,7 +16,7 @@
     proxy: "{{ proxy_url | default(omit, true) }}"
     proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     template: 'secret.yml.j2'
-  notify: Create Config Job
+  register: postgres_secret
 
 - name: Create configmap for config-script
   kubernetes.core.k8s:
@@ -32,8 +32,50 @@
         namespace: "{{ psql_namespace }}"
       data:
         config-script: "{{ lookup('template', 'config-script.sh.j2') }}"
-  notify: Create Config Job
+  register: postgres_configscript
 
-# make sure database changes are applied at this point
-- name: Force all notified handlers to run at this point, not waiting for normal sync points
-  ansible.builtin.meta: flush_handlers
+- name: Create Config Job
+  kubernetes.core.k8s:
+    state: "present"
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: "psql-{{ psql_name }}-config-{{ 1000000 | random | hash('md5') }}"
+        namespace: "{{ psql_namespace }}"
+      spec:
+        template:
+          spec:
+            volumes:
+            - name: config-script
+              configMap:
+                name: "psql-{{ psql_name }}-config-script"
+              # 711 in decimal is 457
+                defaultMode: 457
+            containers:
+            - name:  psql-config
+              image: schulcloud/infra-tools:{{ infratools_image_tag }}
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - /scripts/config-script
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 2Gi
+                requests:
+                  cpu: 100m
+                  memory: 1Gi
+              volumeMounts:
+              - name: config-script
+                mountPath: /scripts/
+              envFrom:
+              - secretRef:
+                  name: "psql-{{ psql_name }}-config"
+            restartPolicy: Never
+        backoffLimit: 4
+  when: postgres_secret.changed or postgres_configscript.changed
