@@ -44,7 +44,7 @@
       apiVersion: batch/v1
       kind: Job
       metadata:
-        name: "psql-{{ psql_name }}-config-{{ 1000000 | random | hash('md5') }}"
+        name: "psql-{{ psql_name }}-config-{{ 1000000 | random | hash('md5') [:10]}}"
         namespace: "{{ psql_namespace }}"
       spec:
         template:
