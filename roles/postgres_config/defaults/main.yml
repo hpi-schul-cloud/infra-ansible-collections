@@ -1,7 +1,7 @@
 ---
 psql_db_custom_command: ""                    # Custom DB command executed after configuration of db and users in the new db
 psql_user: postgres                           # Initial/Admin user
-psql_name: "{{ psql_db_name }}"               # Used for naming ConfigMap, Secret and Job for better identification
+psql_name: "{{ psql_db_name | regex_replace('_', '-') }}"               # Used for naming ConfigMap, Secret and Job for better identification
 psql_default_privileges: "ALL PRIVILEGES"     # Privilieges used if not provided for a user
 psql_db_owner: "{{ psql_db_users[0].name }}"  # Owner of the created DB (name of user)
 psql_private_db: false                        # If true: All priviliges for the db are revoked for the public role
