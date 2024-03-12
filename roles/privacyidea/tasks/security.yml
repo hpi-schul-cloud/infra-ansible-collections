@@ -16,6 +16,19 @@
     rule: allow
     port: "22"
     proto: tcp
+#Configuring ufw for Nginx
+#After installing Nginx, we  need to allow traffic on the ports that Nginx will use to serve web content
+- name: Allow HTTP through the firewall
+  ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Allow HTTPS through the firewall
+  ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
 
 # Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
 # In the night to Sunday

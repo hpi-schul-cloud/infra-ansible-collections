@@ -1,1 +1,38 @@
 ---
+- name: Install MariaDB for PrivacyIDEA
+  apt:
+    name: mariadb-server
+    state: present
+
+- name: Configure MariaDB for PrivacyIDEA
+  mysql_db:
+    name: privacyidea_db
+    state: present
+
+- name: Create PrivacyIDEA User in MariaDB
+  mysql_user:
+    name: privacyidea_user
+    priv: 'privacyidea_db.*:ALL'
+    state: present
+
+# Installing privacyIDEA 3.8.1
+#https://privacyidea.readthedocs.io/en/latest/installation/ubuntu.html
+
+- name: Add PrivacyIDEA Repository
+  become: true
+  block:
+    - name: Download the signing key
+      apt_key:
+        url: https://lancelot.netknights.it/NetKnights-Release.asc
+        state: present
+
+    - name: Add repository
+      apt_repository:
+        repo: 'deb http://lancelot.netknights.it/community/focal/stable focal main'
+        state: present
+
+- name: Install PrivacyIDEA
+  apt:
+    name: privacyidea-apache2
+    state: present
+
