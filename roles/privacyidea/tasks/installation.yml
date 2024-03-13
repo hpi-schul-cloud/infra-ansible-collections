@@ -37,6 +37,6 @@
 
 - name: Install PrivacyIDEA with Nginx
   apt:
-    name: privacyidea-nginx
+    name: privacyidea-nginx=3.9.2-1jammy
     state: present
 
