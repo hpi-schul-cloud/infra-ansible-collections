@@ -46,12 +46,6 @@
   ignore_errors: true
   become: true
 
-- name: Reconfigure dpkg if installation fails
-  ansible.builtin.command:
-    cmd: dpkg --configure -a
-  become: true
-  when: installation_result.failed
-
 - name: Fix broken dependencies
   apt:
     fix_broken: yes
