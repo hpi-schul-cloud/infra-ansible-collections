@@ -4,3 +4,4 @@ db_user_password: root
 mariadb_packages:
   - python3-mysqldb
   - mariadb-server
+  - mariadb-client
