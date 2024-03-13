@@ -40,14 +40,5 @@
 
 - name: Install PrivacyIDEA with Nginx
   apt:
-    name: privacyidea-nginx
+    name: privacyidea-nginx=3.9.2-1jammy
     state: present
-  register: installation_result
-  ignore_errors: true
-  become: true
-
-- name: Fix broken dependencies
-  apt:
-    fix_broken: yes
-  become: true
-  when: installation_result.failed
