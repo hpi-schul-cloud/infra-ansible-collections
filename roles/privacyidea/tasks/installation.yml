@@ -35,8 +35,25 @@
         repo: 'deb http://lancelot.netknights.it/community/jammy/stable jammy main' #For Ubuntu 22.04 LTS, use jammy.
         state: present
 
+
+
+
 - name: Install PrivacyIDEA with Nginx
   apt:
     name: privacyidea-nginx
     state: present
+  register: installation_result
+  ignore_errors: true
+  become: true
 
+- name: Reconfigure dpkg if installation fails
+  ansible.builtin.command:
+    cmd: dpkg --configure -a
+  become: true
+  when: installation_result.failed
+
+- name: Fix broken dependencies
+  apt:
+    fix_broken: yes
+  become: true
+  when: installation_result.failed
