@@ -7,16 +7,16 @@
 - name: Configure MariaDB for PrivacyIDEA
   mysql_db:
     name: privacyidea_db
-    #login_user: root
-    #login_password: "{{ mariadb_root_password }}"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
     state: present
 
 - name: Create PrivacyIDEA User in MariaDB
   mysql_user:
     name: privacyidea_user
-    #password: "{{ db_user_password }}"
-    #login_user: root
-    #login_password: "{{ mariadb_root_password }}"
+    password: "{{ db_user_password }}"
+    login_user: root
+    login_password: "{{ mariadb_root_password }}"
     priv: 'privacyidea_db.*:ALL'
     state: present
 
