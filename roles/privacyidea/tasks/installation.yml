@@ -35,8 +35,10 @@
         repo: 'deb http://lancelot.netknights.it/community/jammy/stable jammy main' #For Ubuntu 22.04 LTS, use jammy.
         state: present
 
-
-
+- name: Update APT package
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
 
 - name: Install PrivacyIDEA with Nginx
   apt:
