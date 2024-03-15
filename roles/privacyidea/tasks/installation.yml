@@ -20,8 +20,6 @@
     priv: 'privacyidea_db.*:ALL'
     state: present
 
-#https://privacyidea.readthedocs.io/en/latest/installation/ubuntu.html
-
 - name: Add PrivacyIDEA Repository
   become: true
   block:
@@ -32,7 +30,7 @@
 
     - name: Add repository
       apt_repository:
-        repo: 'deb http://lancelot.netknights.it/community/jammy/stable jammy main' #For Ubuntu 22.04 LTS, use jammy.
+        repo: 'deb http://lancelot.netknights.it/community/jammy/stable jammy main'
         state: present
 
 - name: Update APT package
@@ -42,5 +40,4 @@
 
 - name: Install PrivacyIDEA with Nginx
   apt:
-    name: privacyidea-nginx=3.9.2-1jammy # This command will install PrivacyIDEA and Nginx, along with any necessary dependencies.
-    state: present
+    name: privacyidea-nginx=3.9.2-1jammy
