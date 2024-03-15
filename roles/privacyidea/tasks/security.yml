@@ -17,12 +17,6 @@
     port: "22"
     proto: tcp
 
-- name: Allow HTTP through the firewall
-  ufw:
-    rule: allow
-    port: "80"
-    proto: tcp
-
 - name: Allow HTTPS through the firewall
   ufw:
     rule: allow
