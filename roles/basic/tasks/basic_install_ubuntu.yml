@@ -21,7 +21,12 @@
         - vim 
         - openssh-server
       state: latest
-  
+
+  - name: Remove fwupd
+    apt:
+      name: fwupd
+      state: absent
+
   - name: install python3
     apt:
       name: ['python3', 'python3-pip']
