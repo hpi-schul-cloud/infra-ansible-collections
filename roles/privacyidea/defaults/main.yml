@@ -5,5 +5,4 @@ mariadb_packages:
   - python3-mysqldb
   - mariadb-server
   - mariadb-client
-  - PyMySQL
 privacyidea_version: "3.9.2-1jammy"
