@@ -1,6 +1,6 @@
 ---
-mariadb_root_password: root
-db_user_password: root
+mariadb_root_password: ""
+db_user_password: ""
 mariadb_packages:
   - python3-mysqldb
   - mariadb-server
