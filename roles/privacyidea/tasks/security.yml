@@ -34,7 +34,7 @@
 
 - name: Copy PrivacyIDEA Fail2Ban filter
   template:
-    src: privacyidea.conf.j2
+    src: privacyidea.conf
     dest: /etc/fail2ban/filter.d/privacyidea.conf
   notify: restart fail2ban
 

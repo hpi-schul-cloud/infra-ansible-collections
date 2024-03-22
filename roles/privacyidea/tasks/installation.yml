@@ -47,3 +47,6 @@
   command: "pi-manage admin add {{ privacyidea_admin_username }} -p {{ privacyidea_admin_password }}"
   become: yes
   become_user: privacyidea
+  when: 
+    - privacyidea_admin_username is defined
+    - privacyidea_admin_password is defined
