@@ -32,3 +32,24 @@
     hour: "0"
     minute: "21"
     job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"
+
+- name: Copy PrivacyIDEA Fail2Ban filter
+  template:
+    src: privacyidea.conf.j2
+    dest: /etc/fail2ban/filter.d/privacyidea.conf
+  notify: restart fail2ban
+
+- name: Copy PrivacyIDEA Fail2Ban jail configuration
+  template:
+    src: privacyidea-jail.conf.j2
+    dest: /etc/fail2ban/jail.d/privacyidea.conf
+  notify: restart fail2ban
+
+- name: copy ssh-jail for fail2ban
+  copy:
+    src: sshd.local
+    dest: /etc/fail2ban/jail.d/sshd.local
+    owner: root
+    group: root
+    mode: 0744
+  notify: restart fail2ban
