@@ -6,5 +6,4 @@ mariadb_packages:
   - mariadb-server
   - mariadb-client
 privacyidea_version: "3.9.2-1jammy"
-privacyidea_admin_username: ""
 privacyidea_admin_password: ""
