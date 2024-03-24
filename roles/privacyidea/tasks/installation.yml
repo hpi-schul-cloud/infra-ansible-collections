@@ -1,7 +1,7 @@
 ---
 - name: Install MariaDB for PrivacyIDEA
   apt:
-    name: "{{ mariadb_packages }}"
+    name: "{{ privacyidea_mariadb_packages }}"
     state: present
 
 - name: Configure MariaDB for PrivacyIDEA

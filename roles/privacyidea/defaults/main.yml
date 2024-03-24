@@ -1,7 +1,7 @@
 ---
 privacyidea_mariadb_root_password: "" 
 privacyidea_db_user_password: ""
-mariadb_packages:
+privacyidea_mariadb_packages:
   - python3-mysqldb
   - mariadb-server
   - mariadb-client
