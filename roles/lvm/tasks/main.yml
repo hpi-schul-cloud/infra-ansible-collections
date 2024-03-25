@@ -14,6 +14,7 @@
     lv: "{{ lvm_lv }}"
     vg: "{{ lvm_vg }}"
     size: 100%VG
+    resizefs: true
   become: true
 - name: Make filesystem
   filesystem:
