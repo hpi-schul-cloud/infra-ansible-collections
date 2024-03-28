@@ -1,1 +1,9 @@
 ---
+privacyidea_mariadb_root_password: "" 
+privacyidea_db_user_password: ""
+privacyidea_mariadb_packages:
+  - python3-mysqldb
+  - mariadb-server
+  - mariadb-client
+privacyidea_version: "3.9.2-1jammy"
+privacyidea_admin_password: ""
