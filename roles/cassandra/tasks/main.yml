@@ -54,3 +54,34 @@
     release_namespace: monitoring
     values:
       "{{ cassandra_values }}"
+
+- name: Create Cassandra cleanup cronjob script
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: "{{ instance_name }}-script"
+        namespace: "{{ cronjob_namespace }}"
+      data:
+        script.sh: |-
+          "{{ get_kubectl_command }}"
+          for pod in $(kubectl -n monitoring get po | grep "cassandra-.+");
+          do
+            kubectl -n monitoring exec $pod -c cassandra -- for file in $(find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print); do du rm -rf $file; done;
+          done
+
+- name: Install Cassandra cleanup cronjob
+  kubernetes.core.helm:
+    name: "cassandra-cleanup"
+    chart_ref: "{{ playbook_dir }}/../charts/cronjob"
+    wait: true
+    chart_version: "{{ cassandra_cleanup_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "monitoring"
+    values:
+      "{{ cassandra_cleanup_values }}"
