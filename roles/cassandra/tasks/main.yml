@@ -69,10 +69,11 @@
         namespace: "monitoring"
       data:
         script.sh: |-
-          "{{ get_kubectl_command }}"
-          for pod in $(kubectl -n monitoring get po | grep "cassandra-.+");
+          #! /bin/bash
+          {{ get_kubectl_command }}
+          for pod in $(kubectl -n monitoring get po | grep "cassandra-.+")
           do
-            kubectl -n monitoring exec $pod -c cassandra -- for file in $(find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print); do rm -rf $file; done;
+            kubectl -n monitoring exec $pod -c cassandra -- for file in $(find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print) do rm -rf $file; done
           done
 
 - name: Install Cassandra cleanup cronjob
