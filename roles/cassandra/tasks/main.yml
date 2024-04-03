@@ -66,7 +66,7 @@
       kind: ConfigMap
       metadata:
         name: "{{ instance_name }}-script"
-        namespace: "{{ cronjob_namespace }}"
+        namespace: "monitoring"
       data:
         script.sh: |-
           "{{ get_kubectl_command }}"
