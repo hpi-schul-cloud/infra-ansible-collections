@@ -72,7 +72,7 @@
           #! /bin/bash
           {{ get_kubectl_command }}
 
-          for pod in $(kubectl -n monitoring get po -o name | grep -E "cassandra-[0-9]+")
+          for pod in $(kubectl -n monitoring get pod -o jsonpath='{.items[*].metadata.name}' | grep -E "cassandra-[0-9]+")
           do
             echo "Pod: $pod"
             toDelete=$(kubectl -n monitoring exec $pod -c cassandra -- find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print)
