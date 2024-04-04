@@ -73,7 +73,9 @@
           {{ get_kubectl_command }}
           for pod in $(kubectl -n monitoring get po | grep "cassandra-.+")
           do
-            kubectl -n monitoring exec $pod -c cassandra -- for file in $(find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print) do rm -rf $file; done
+            toDelete=$(kubectl -n monitoring exec $pod -c cassandra -- find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print)
+            kubectl -n monitoring exec $pod -c cassandra -- echo $toDelete; done
+            # kubectl -n monitoring exec $pod -c cassandra -- rm -rf $toDelete; done
           done
 
 - name: Install Cassandra cleanup cronjob
