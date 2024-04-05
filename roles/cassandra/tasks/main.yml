@@ -78,7 +78,7 @@
             toDelete=$(kubectl -n monitoring exec $pod -c cassandra -- find /bitnami/cassandra/data/data/loki/ -maxdepth 1 -mtime +30 -print)
             if [ -n "$toDelete" ]
             then
-              ls -la $toDelete
+              kubectl -n monitoring exec $pod -c cassandra -- ls -la $toDelete
               # kubectl -n monitoring exec $pod -c cassandra -- rm -rf $toDelete
             else
               echo "Nothing to delete"
