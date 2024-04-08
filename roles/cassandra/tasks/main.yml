@@ -83,6 +83,7 @@
               echo "Nothing to delete"
             fi
           done
+  when: cassandra_cleanup_enabled
 
 - name: Install Cassandra cleanup cronjob
   kubernetes.core.helm:
@@ -94,3 +95,4 @@
     release_namespace: "monitoring"
     values:
       "{{ cassandra_cleanup_values }}"
+  when: cassandra_cleanup_enabled
