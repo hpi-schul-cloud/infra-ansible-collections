@@ -21,7 +21,7 @@
           apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
-            name: postgres-13
+            name: postgres-15-awx-postgres-15-0
             namespace: "{{ awx_namespace }}"
           spec:
             accessModes:
@@ -30,6 +30,49 @@
             resources: "{{ awx_postgres_storage_requirements }}"
       tags:
         - awx
+
+    - name: Prepare AWX Postgres PV permissions
+      kubernetes.core.k8s:
+        state: "present"
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        definition:
+          apiVersion: batch/v1
+          kind: Job
+          ttlSecondsAfterFinished: 120
+          metadata:
+            name: postgres-permissions
+            namespace: awx
+          spec:
+            template:
+              spec:
+                containers:
+                - name: init-chown
+                  image: quay.io/sclorg/postgresql-15-c9s:latest
+                  securityContext:
+                    runAsUser: 0
+                  volumeMounts:
+                  - mountPath: /var/lib/pgsql/data
+                    name: postgres-15
+                    subPath: data
+                  command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    chown 26:0 /var/lib/pgsql/data
+                    chmod 700 /var/lib/pgsql/data
+                    ls -l /var/lib/pgsql/
+                restartPolicy: OnFailure
+                    # echo " chown -R postgres:root /var/lib/pgsql" && chown -R postgres:root /var/lib/pgsql
+                    # echo " chown -R postgres:root /var/lib/pgsql/data" && chown -R postgres:root /var/lib/pgsql/data
+                    # echo " chown -R postgres:root /var/lib/pgsql" && chown -R postgres:root /var/lib/pgsql/userdata
+                volumes:
+                - name: postgres-15
+                  persistentVolumeClaim:
+                    claimName: postgres-15-awx-postgres-15-0
+                tags:
+                  - awx
 
     - name: Install awx
       kubernetes.core.k8s:
