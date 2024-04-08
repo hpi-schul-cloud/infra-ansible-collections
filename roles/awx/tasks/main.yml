@@ -5,7 +5,7 @@
         kubeconfig: "{{ kubeconfig }}"
         proxy: "{{ proxy_url | default(omit, true) }}"
         proxy_headers: "{{ proxy_headers | default(omit, true) }}"
-        template:  awx-operator.yml
+        template:  "{{ project }}/awx-operator.yml"
       tags:
         - awx
 
