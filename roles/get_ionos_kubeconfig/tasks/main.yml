@@ -16,7 +16,9 @@
 # This gets the Kubeconfig even in check mode
 - name: Get k8s config
   ionoscloudsdk.ionoscloud.k8s_config:
-    token: "{{ ionos_token }}"
+    username: "{{ ionos_username | default(omit) }}"
+    password: "{{ ionos_password | default(omit) }}"
+    token: "{{ ionos_token | default(omit) }}"
     k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value }}"
     config_file: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
     state: present

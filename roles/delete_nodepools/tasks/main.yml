@@ -25,7 +25,9 @@
   ionoscloudsdk.ionoscloud.k8s_nodepool:
     k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value }}"
     nodepool_id: "{{ pool_id }}"
-    token: "{{ ionos_token }}"
+    username: "{{ ionos_username | default(omit) }}"
+    password: "{{ ionos_password | default(omit) }}"
+    token: "{{ ionos_token | default(omit) }}"
     state: absent
   loop: "{{ nodepools_to_delete }}"
   loop_control:
