@@ -64,9 +64,6 @@
                     chmod 700 /var/lib/pgsql/data
                     ls -l /var/lib/pgsql/
                 restartPolicy: OnFailure
-                    # echo " chown -R postgres:root /var/lib/pgsql" && chown -R postgres:root /var/lib/pgsql
-                    # echo " chown -R postgres:root /var/lib/pgsql/data" && chown -R postgres:root /var/lib/pgsql/data
-                    # echo " chown -R postgres:root /var/lib/pgsql" && chown -R postgres:root /var/lib/pgsql/userdata
                 volumes:
                 - name: postgres-15
                   persistentVolumeClaim:
