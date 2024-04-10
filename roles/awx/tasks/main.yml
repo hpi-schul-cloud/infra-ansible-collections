@@ -63,13 +63,13 @@
                     chown 26:0 /var/lib/pgsql/data
                     chmod 700 /var/lib/pgsql/data
                     ls -l /var/lib/pgsql/
-                restartPolicy: OnFailure
+                restartPolicy: Never
                 volumes:
                 - name: postgres-15
                   persistentVolumeClaim:
                     claimName: postgres-15-awx-postgres-15-0
-                tags:
-                  - awx
+      tags:
+        - awx
 
     - name: Install awx
       kubernetes.core.k8s:
