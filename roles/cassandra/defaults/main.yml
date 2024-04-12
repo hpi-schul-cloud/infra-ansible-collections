@@ -1,0 +1,3 @@
+---
+cassandra_cleanup_enabled: false
+cassandra_cleanup_pod_regex: cassandra-[0-9]+
