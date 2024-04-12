@@ -2456,14 +2456,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: awx-operator-controller-manager
-  namespace: awx
+  namespace: {{ awx_namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   creationTimestamp: null
   name: awx-operator-awx-manager-role
-  namespace: awx
+  namespace: {{ awx_namespace }}
 rules:
 - apiGroups:
   - route.openshift.io
@@ -2614,7 +2614,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: awx-operator-leader-election-role
-  namespace: awx
+  namespace: {{ awx_namespace }}
 rules:
 - apiGroups:
   - ""
@@ -2680,7 +2680,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: awx-operator-awx-manager-rolebinding
-  namespace: awx
+  namespace: {{ awx_namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -2688,13 +2688,13 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: awx-operator-controller-manager
-  namespace: awx
+  namespace: {{ awx_namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: awx-operator-leader-election-rolebinding
-  namespace: awx
+  namespace: {{ awx_namespace }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -2702,7 +2702,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: awx-operator-controller-manager
-  namespace: awx
+  namespace: {{ awx_namespace }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -2715,7 +2715,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: awx-operator-controller-manager
-  namespace: awx
+  namespace: {{ awx_namespace }}
 ---
 apiVersion: v1
 data:
@@ -2743,7 +2743,7 @@ data:
 kind: ConfigMap
 metadata:
   name: awx-operator-awx-manager-config
-  namespace: awx
+  namespace: {{ awx_namespace }}
 ---
 apiVersion: v1
 kind: Service
@@ -2751,7 +2751,7 @@ metadata:
   labels:
     control-plane: controller-manager
   name: awx-operator-controller-manager-metrics-service
-  namespace: awx
+  namespace: {{ awx_namespace }}
 spec:
   ports:
   - name: https
@@ -2767,7 +2767,7 @@ metadata:
   labels:
     control-plane: controller-manager
   name: awx-operator-controller-manager
-  namespace: awx
+  namespace: {{ awx_namespace }}
 spec:
   replicas: 1
   selector:
