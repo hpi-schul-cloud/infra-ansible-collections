@@ -61,9 +61,7 @@
             projects_persistence: "{{ awx_projects_persistence }}"
             projects_storage_access_mode: "{{ awx_projects_storage_access_mode }}"
             projects_storage_size: "{{ awx_projects_storage_size }}"
-            postgres_data_volume_init: true
-            postgres_init_container_commands: |
-              chown 26:0 /var/lib/pgsql/data
-              chmod 700 /var/lib/pgsql/data
+            postgres_data_volume_init: "{{ postgres_data_volume_init | default(omit, true) }}"
+            postgres_init_container_commands: "{{ postgres_init_container_commands | default(omit, true) }}"
       tags:
         - awx
