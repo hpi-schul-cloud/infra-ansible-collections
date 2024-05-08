@@ -1,3 +1,4 @@
+---
 ###################### Terraform setup ##########################################################
 # Executes terraform apply on normal ansible-playbook run. When the option --check is given,
 # terraform plan is executed. For all terraform tasks the variable resource_pool must be defined.
@@ -9,8 +10,6 @@
     IONOS_TOKEN: "{{ ionos_token | default(omit) }}"
     AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
     AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
-    OS_ACCESS_KEY: "{{ os_access_key }}"
-    OS_SECRET_KEY: "{{ os_secret_key }}"
   community.general.terraform:
     project_path: '{{ playbook_dir }}/../terraform/resource-pools/{{ resource_pool }}'
     state: "{{ 'planned' if terraform_plan else 'present' }}"
