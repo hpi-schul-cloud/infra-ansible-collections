@@ -1,9 +1,4 @@
 ###################### Terraform setup ##########################################################
-
-- name: Print if changes are present in awx
-  debug:
-    msg: "Updated"
-
 # Executes terraform apply on normal ansible-playbook run. When the option --check is given,
 # terraform plan is executed. For all terraform tasks the variable resource_pool must be defined.
 # See https://docs.ansible.com/ansible/latest/collections/community/general/terraform_module.html
