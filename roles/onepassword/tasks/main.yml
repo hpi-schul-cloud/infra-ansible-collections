@@ -47,7 +47,7 @@
         name: "{{ onepassword_connector_token_name }}"
         namespace: default
       data:
-        token: "{{ onepassword_connector_token_value }}"
+        token: "{{ onepassword_connector_token_value | b64encode}}"
   when: stage not in ["prod", "staging"] or "schulcloud" not in group_names
 
 # This clusterrolebinding is used in the dev environment to grant access for the 1password operator to all namespaces
