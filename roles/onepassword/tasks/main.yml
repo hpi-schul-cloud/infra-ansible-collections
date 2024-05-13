@@ -29,7 +29,7 @@
         name: "{{ onepassword_connector_credentials_name }}"
         namespace: default
       data:
-        1password-credentials.json: "{{ onepassword_connector_credentials_json }}"
+        1password-credentials.json: "{{ onepassword_connector_credentials_json | b64encode | b64encode}}"
 
 # The onepassword token is used by the operator to retrieve the secrets from the connector
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
