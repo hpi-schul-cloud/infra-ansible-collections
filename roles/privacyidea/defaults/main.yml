@@ -7,4 +7,4 @@ privacyidea_mariadb_packages:
   - mariadb-client
 privacyidea_version: "3.8.1"
 privacyidea_admin_password: ""
-privacyidea_mariadb: false
+privacyidea_enable_mariadb_setup: false
