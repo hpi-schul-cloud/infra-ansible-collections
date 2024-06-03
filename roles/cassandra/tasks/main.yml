@@ -70,6 +70,7 @@
       data:
         script.sh: |-
           #! /bin/bash
+          set -e
           {{ get_kubectl_command }}
 
           for pod in $(kubectl -n monitoring get pod -o name | grep -E "{{ cassandra_cleanup_pod_regex }}")
