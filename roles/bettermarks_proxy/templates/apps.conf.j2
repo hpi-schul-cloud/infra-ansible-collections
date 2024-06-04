@@ -11,7 +11,6 @@ server{
     proxy_set_header Accept-Encoding "";
     # Replace bettermarks apps domain with proxy host
     sub_filter acc.{{ bettermarks_domain }} {{ bettermarks_proxy_subdomains['school'] }}.{{ bettermarks_proxy_maindomain }};
-    sub_filter {{ bettermarks_subdomain }}.{{ bettermarks_domain }} {{ proxy_subdomain }}.{{ bettermarks_proxy_maindomain }};
     sub_filter .{{ bettermarks_domain }} .{{ bettermarks_proxy_maindomain }};
     sub_filter_once off;
     sub_filter_types application/json  text/javascript;
