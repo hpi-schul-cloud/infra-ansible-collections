@@ -4,20 +4,21 @@
     name: "{{ privacyidea_packages }}"
     state: present
 
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+  become: yes
+
 - name: Create Python virtual environment
   command:
     cmd: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
   args:
     creates: "{{ privacyidea_dir }}/virtualenv"
+  become: yes
 
-- name: Set correct permissions for virtual environment directory
-  ansible.builtin.file:
-    path: "{{ privacyidea_dir }}/virtualenv"
-    mode: '0755'
-    recurse: yes
-    
-- name: Activate virtual environment
-  command: "{{ privacyidea_dir }}/virtualenv/bin/activate"
+#- name: Activate virtual environment
+#  command: "{{ privacyidea_dir }}/virtualenv/bin/activate"
+#  become: yes
 
 - name: Install privacyidea dependencies
   pip:
