@@ -14,7 +14,8 @@
 #  shell: "source {{ privacyidea_dir }}/virtualenv/bin/activate"
 
 - name: Activate virtual environment
-  command: "source {{ privacyidea_dir }}/virtualenv/bin/activate"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/activate"
+
 
 
 - name: Install privacyidea dependencies
