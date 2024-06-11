@@ -10,13 +10,14 @@
   args:
     creates: "{{ privacyidea_dir }}/virtualenv"
 
-#- name: Activate virtual environment
-#  shell: "source {{ privacyidea_dir }}/virtualenv/bin/activate"
-
+- name: Set correct permissions for virtual environment directory
+  ansible.builtin.file:
+    path: "{{ privacyidea_dir }}/virtualenv"
+    mode: '0755'
+    recurse: yes
+    
 - name: Activate virtual environment
   command: "{{ privacyidea_dir }}/virtualenv/bin/activate"
-
-
 
 - name: Install privacyidea dependencies
   pip:
