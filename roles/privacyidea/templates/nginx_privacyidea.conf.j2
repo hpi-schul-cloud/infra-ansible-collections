@@ -1,7 +1,7 @@
 # privacyidea.nginx.conf.j2
 server {
     listen 80;
-    server_name privacyidea.infra.dev.spsh.dbildungsplattform.de;
+    server_name {{ server_name }} ;
 
     location / {
         proxy_pass http://127.0.0.1:5000;

@@ -16,9 +16,6 @@
     creates: "{{ privacyidea_dir }}/virtualenv"
   become: yes
 
-#- name: Activate virtual environment
-#  command: "{{ privacyidea_dir }}/virtualenv/bin/activate"
-#  become: yes
 
 - name: Install privacyidea dependencies
   pip:

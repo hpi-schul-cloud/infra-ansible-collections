@@ -4,3 +4,13 @@
     src: nginx_privacyidea.conf.j2
     dest: /etc/nginx/conf.d/privacyidea.conf
   notify: restart nginx
+
+# The default  value for server_names_hash_bucket_size 64 lead to issue:Unable to restart service nginx
+# Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
+- name: Configure Nginx
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+  notify:
+    - reload nginx
