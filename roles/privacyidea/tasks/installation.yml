@@ -11,10 +11,10 @@
     mode: '0755'
   become: yes
 
-- name: Install virtualenv
-  pip:
-    name: virtualenv
-  become: yes
+#- name: Install virtualenv
+#  pip:
+#    name: virtualenv
+#  become: yes
 
 - name: Create Python virtual environment
   command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
@@ -30,4 +30,4 @@
 - name: Install privacyIDEA {{ privacyidea_version }}
   pip:
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
-    name: "privacyidea=={{ privacyidea_version }}"
+    name: "privacyIDEA=={{ privacyidea_version }}"
