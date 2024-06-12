@@ -7,6 +7,6 @@ privacyidea_packages:
     - libmysqlclient-dev # provide the necessary header files and libraries for building and compiling other software that needs to interface with MySQL/MariaDB.
 
 #privacyidea_dir: "{{ lookup('env', 'HOME') }}/privacyidea"
-privacyidea_dir: "opt/privacyidea_env"
+privacyidea_dir: "/opt/privacyidea_env"
 ansible_python_interpreter: /usr/bin/python3
 server_name: "privacyidea.infra.dev.spsh.dbildungsplattform.de"
