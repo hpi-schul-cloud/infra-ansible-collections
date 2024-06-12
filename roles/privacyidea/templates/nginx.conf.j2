@@ -19,8 +19,7 @@ http {
         types_hash_max_size 2048;
         # server_tokens off;
 
-        server_names_hash_bucket_size 128; #with the defualt value 64,  I get issue : Unable to restart service nginx
-        # The recommended value for server_names_hash_bucket_size is usually a power of 2, 
+        server_names_hash_bucket_size 128; # The recommended value for server_names_hash_bucket_size is usually a power of 2, 
         #such as 64, 128, 256, or higher, depending on the number of server names in your configuration.
         # server_name_in_redirect off;
 

@@ -2,8 +2,10 @@
 privacyidea_version: "3.8.1"
 privacyidea_packages:
     - python3-venv
+    - python3-pip
     - nginx
     - libmysqlclient-dev # provide the necessary header files and libraries for building and compiling other software that needs to interface with MySQL/MariaDB.
+
 privacyidea_dir: "{{ lookup('env', 'HOME') }}/privacyidea"
 ansible_python_interpreter: /usr/bin/python3
 server_name: "privacyidea.infra.dev.spsh.dbildungsplattform.de"

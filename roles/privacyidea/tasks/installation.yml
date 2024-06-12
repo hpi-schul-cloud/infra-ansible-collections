@@ -4,18 +4,23 @@
     name: "{{ privacyidea_packages }}"
     state: present
 
+- name: Create "{{ privacyidea_dir }} directory for virtual environment
+  file:
+    path: "{{ privacyidea_dir }}"
+    state: directory
+    mode: '0755'
+  become: yes
+
 - name: Install virtualenv
   pip:
     name: virtualenv
   become: yes
 
 - name: Create Python virtual environment
-  command:
-    cmd: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
+  command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
   args:
     creates: "{{ privacyidea_dir }}/virtualenv"
   become: yes
-
 
 - name: Install privacyidea dependencies
   pip:
