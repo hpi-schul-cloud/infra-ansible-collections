@@ -14,16 +14,17 @@
   notify:
     - restart nginx
 
-- name: create SSL directory 
-  file:
-    path: /etc/nginx/ssl
-    state: directory
-    mode: '0755'
-  become: true
+# #- name: create SSL directory 
+#   file:
+#     path: /etc/ssl
+#     state: directory
+#     mode: '0755'
+#   become: true
 
 - name: Generate SSL certificate and key
-  command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name }}"
+  become_user: root
   become: true
+  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/privacyidea.key -out /etc/ssl/certs/privacyidea-bundle.crt -subj "/CN={{ server_name }}"
 
 - name: Update Nginx configuration for SSL
   template:
