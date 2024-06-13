@@ -1,9 +1,9 @@
 ---
-- name: Copy Nginx configuration
-  template:
-    src: nginx_privacyidea.conf.j2
-    dest: /etc/nginx/conf.d/privacyidea.conf
-  notify: restart nginx
+#- name: Copy Nginx configuration
+#  template:
+#    src: nginx_privacyidea.conf.j2
+#    dest: /etc/nginx/conf.d/privacyidea.conf
+#  notify: restart nginx
 
 # Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
 - name: Configure Nginx
@@ -14,7 +14,7 @@
   notify:
     - restart nginx
 
-- name: create SSL directory exists
+- name: create SSL directory 
   file:
     path: /etc/nginx/ssl
     state: directory
@@ -29,18 +29,9 @@
 
 - name: Update Nginx configuration for SSL
   template:
-    src:  /etc/nginx/nginx.conf
-    dest: /etc/nginx/sites-available/privacyidea
+    src:  nginx_privacyidea.conf.j2
+    dest: /etc/nginx/conf.d/privacyidea.conf
     mode: '0644'
-  notify:
-    - Restart Nginx
-  become: true
-
-- name: Enable privacyidea site
-  file:
-    src: /etc/nginx/sites-available/privacyidea
-    dest: /etc/nginx/sites-enabled/privacyidea
-    state: link
   notify:
     - Restart Nginx
   become: true

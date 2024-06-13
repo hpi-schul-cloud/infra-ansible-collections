@@ -1,7 +1,10 @@
 # privacyidea.nginx.conf.j2
 server {
-    listen 80;
-    server_name {{ server_name }} ;
+    listen 443 ssl;
+    server_name {{ server_name }};
+
+    ssl_certificate /etc/nginx/ssl/privacyidea.crt;
+    ssl_certificate_key /etc/nginx/ssl/privacyidea.key;
 
     location / {
         proxy_pass http://127.0.0.1:5000;
