@@ -6,6 +6,7 @@ privacyidea_packages:
     - nginx
     - libmysqlclient-dev # provide the necessary header files and libraries for building and compiling other software that needs to interface with MySQL/MariaDB.
     - mariadb-client
+    - python3-mysqldb
 
 privacyidea_dir: "/opt/privacyidea"
 ansible_python_interpreter: /usr/bin/python3
