@@ -4,7 +4,7 @@
     name: "{{ privacyidea_packages }}"
     state: present
 
-- name: Create "{{ privacyidea_dir }}" directory for virtual environment
+- name: Create {{ privacyidea_dir }} directory for virtual environment
   file:
     path: "{{ privacyidea_dir }}"
     state: directory
