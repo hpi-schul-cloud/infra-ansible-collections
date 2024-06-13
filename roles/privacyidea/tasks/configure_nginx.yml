@@ -23,14 +23,33 @@
 
 - name: Generate SSL certificate and key
   command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name }}"
-  #shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name}}"
   become: true
 
 - name: Update Nginx configuration for SSL
   template:
     src:  nginx_privacyidea.conf.j2
-    dest: /etc/nginx/conf.d/privacyidea.conf
+    dest: /etc/nginx/sites-available/privacyidea.conf
     mode: '0644'
   notify:
     - restart nginx
+  become: true
+
+- name: Create symbolic link to enable PrivacyIDEA site
+  file:
+    src: /etc/nginx/sites-available/privacyidea.conf
+    dest: /etc/nginx/sites-enabled/privacyidea.conf
+    state: link
+  notify:
+    - restart nginx
+  become: true
+
+- name: Allow HTTPS traffic through firewall
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  become: true
+
+- name: Reload firewall rules
+  command: ufw reload
   become: true
