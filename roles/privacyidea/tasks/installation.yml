@@ -36,15 +36,15 @@
   mysql_db:
     name: privacyidea_mariadb
     login_user: root
-    login_password: "{{ privacyidea_mariadb_password }}"
+    login_password: "{{ terraform_variables.privacyidea_mariadb_password }}"
     state: present
   become: true
 
 - name: Create PrivacyIDEA User in MariaDB
   mysql_user:
     name: privacyidea_mariadb_user
-    password: "{{ privacyidea_mariadb_password }}"
+    password: "{{ terraform_variables.privacyidea_mariadb_password }}"
     login_user: root
-    login_password: "{{ privacyidea_mariadb_password }}"
+    login_password: "{{ terraform_variables.privacyidea_mariadb_password }}"
     priv: 'privacyidea_db.*:ALL'
     state: present
