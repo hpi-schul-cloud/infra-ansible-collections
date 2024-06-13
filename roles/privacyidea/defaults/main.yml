@@ -10,8 +10,6 @@ privacyidea_packages:
 privacyidea_dir: "/opt/privacyidea"
 ansible_python_interpreter: /usr/bin/python3
 server_name: "privacyidea.infra.dev.spsh.dbildungsplattform.de"
-
+privacyidea_mariadb_username: ""
+privacyidea_mariadb_password: ""
 privacyidea_mariadb_private_ip: ""
-terraform_variables:
-  privacyidea_mariadb_password: ""
-  privacyidea_mariadb_username: ""
