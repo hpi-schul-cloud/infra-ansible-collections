@@ -21,7 +21,6 @@
     mode: '0755'
   become: true
 
-
 - name: Generate SSL certificate and key
   command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name }}"
   #shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name}}"
@@ -33,5 +32,5 @@
     dest: /etc/nginx/conf.d/privacyidea.conf
     mode: '0644'
   notify:
-    - Restart Nginx
+    - restart nginx
   become: true
