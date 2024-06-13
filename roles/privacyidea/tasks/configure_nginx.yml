@@ -13,3 +13,34 @@
     mode: '0644'
   notify:
     - restart nginx
+
+- name: create SSL directory exists
+  file:
+    path: /etc/nginx/ssl
+    state: directory
+    mode: '0755'
+  become: true
+
+
+- name: Generate SSL certificate and key
+  command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name }}"
+  #shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/privacyidea.key -out /etc/nginx/ssl/privacyidea.crt -subj "/CN={{ server_name}}"
+  become: true
+
+- name: Update Nginx configuration for SSL
+  template:
+    src:  /etc/nginx/nginx.conf
+    dest: /etc/nginx/sites-available/privacyidea
+    mode: '0644'
+  notify:
+    - Restart Nginx
+  become: true
+
+- name: Enable privacyidea site
+  file:
+    src: /etc/nginx/sites-available/privacyidea
+    dest: /etc/nginx/sites-enabled/privacyidea
+    state: link
+  notify:
+    - Restart Nginx
+  become: true

@@ -9,7 +9,7 @@
     path: "{{ privacyidea_dir }}"
     state: directory
     mode: '0755'
-  become: yes
+  become: true
 
 #- name: Install virtualenv
 #  pip:
@@ -20,7 +20,7 @@
   command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
   args:
     creates: "{{ privacyidea_dir }}/virtualenv"
-  become: yes
+  become: true
 
 - name: Install privacyidea dependencies
   pip:
