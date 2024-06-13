@@ -11,6 +11,11 @@
     mode: '0755'
   become: true
 
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+  become: true
+
 - name: Create Python virtual environment
   command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
   args:
