@@ -1,0 +1,8 @@
+Example: Ensuring Integrity of Audit Logs with Digital Signatures
+Scenario
+Imagine you have a system that logs every administrative action taken on your server, such as creating new users, 
+changing permissions, or modifying configurations. These logs are stored as audit logs.
+To ensure these logs are not tampered with, PrivacyIDEA uses digital signatures.
+
+secret_key is use for autehntification:Authentication: Only  privacyidea can create valid tokens because only 
+prrivacyidea knows the SECRET_KEY

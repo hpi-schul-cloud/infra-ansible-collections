@@ -32,19 +32,3 @@
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
     name: "privacyIDEA=={{ privacyidea_version }}"
 
-- name: Configure MariaDB for PrivacyIDEA
-  mysql_db:
-    name: privacyidea_mariadb
-    login_user: root
-    login_password: "{{ privacyidea_mariadb_password }}"
-    state: present
-  become: true
-
-- name: Create PrivacyIDEA User in MariaDB
-  mysql_user:
-    name: privacyidea_mariadb_user
-    password: "{{ privacyidea_mariadb_password }}"
-    login_user: root
-    login_password: "{{ privacyidea_mariadb_password }}"
-    priv: 'privacyidea_db.*:ALL'
-    state: present

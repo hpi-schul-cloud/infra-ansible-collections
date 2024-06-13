@@ -54,3 +54,28 @@
 - name: Reload firewall rules
   command: ufw reload
   become: true
+
+- name: Ensure privacyidea directory to store private and public key for audit logs
+  file:
+    path: /etc/privacyidea
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Generate private key for audit logs
+  command: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
+  args:
+    creates: /etc/privacyidea/private.pem
+  become: true
+
+- name: Generate public key for audit logs
+  command: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
+  args:
+    creates: /etc/privacyidea/public.pem
+  become: true
+
+
+- name: Generate encryption key file
+  command: openssl rand -base64 32 > /etc/privacyidea/enckey
+  args:
+    creates: /etc/privacyidea/enckey
