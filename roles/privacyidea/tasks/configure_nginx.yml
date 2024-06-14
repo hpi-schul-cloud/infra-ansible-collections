@@ -22,8 +22,10 @@
 #   become: true
 
 - name: Generate SSL certificate and key
+  become_user: root
   become: true
-  command: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/privacyidea.key -out /etc/ssl/certs/privacyidea-bundle.crt -subj "/CN={{ server_name }}"
+  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/privacyidea.key -out /etc/ssl/certs/privacyidea-bundle.crt -subj "/CN={{ server_name }}"
+
 
 - name: Update Nginx configuration for SSL
   template:
