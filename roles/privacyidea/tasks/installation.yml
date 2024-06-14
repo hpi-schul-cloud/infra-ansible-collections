@@ -32,3 +32,9 @@
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
     name: "privacyIDEA=={{ privacyidea_version }}"
 
+- name: Create log file for PrivacyIDEA
+  file:
+    path: /var/log/privacyidea/privacyidea.log
+    state: touch
+    mode: '0755'
+  become: true
