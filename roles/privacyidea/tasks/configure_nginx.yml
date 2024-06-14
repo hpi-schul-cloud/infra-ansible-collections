@@ -24,7 +24,7 @@
 - name: Generate SSL certificate and key
   become_user: root
   become: true
-  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/privacyidea.key -out /etc/ssl/certs/privacyidea-bundle.crt -subj "/CN={{ server_name }}"
+  cmd: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/privacyidea.key -out /etc/ssl/certs/privacyidea-bundle.crt -subj "/CN={{ server_name }}"
 
 - name: Update Nginx configuration for SSL
   template:
@@ -63,21 +63,24 @@
   become: true
 
 - name: Generate private key for audit logs
-  shell: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
+  become_user: root 
+  cmd: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
   args:
     creates: /etc/privacyidea/private.pem
   become: true
 
 - name: Generate public key for audit logs
-  shell: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
+  become_user: root
+  cmd: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
   args:
     creates: /etc/privacyidea/public.pem
   become: true
 
 # This is used to encrypt the token data and token passwords
-# generate a random encryption key
+# Generate a random encryption key
 - name: Generate encryption key file
-  shell: openssl rand -base64 > /etc/privacyidea/enckey
+  become_user: root
+  cmd: "openssl rand -base64 32 | sudo tee /etc/privacyidea/enckey > /dev/null"
   args:
     creates: /etc/privacyidea/enckey
   become: true
