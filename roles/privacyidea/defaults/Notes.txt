@@ -6,3 +6,5 @@ To ensure these logs are not tampered with, PrivacyIDEA uses digital signatures.
 
 secret_key is use for autehntification:Authentication: Only  privacyidea can create valid tokens because only 
 prrivacyidea knows the SECRET_KEY
+
+> /dev/null: Discards the output from tee to avoid printing it to the terminal or logs.
