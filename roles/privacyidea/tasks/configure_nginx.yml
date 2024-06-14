@@ -77,7 +77,7 @@
 # This is used to encrypt the token data and token passwords
 # generate a random encryption key
 - name: Generate encryption key file
-  shell: openssl rand -base64 -out /etc/privacyidea/enckey
+  shell: openssl rand -base64 > /etc/privacyidea/enckey
   args:
     creates: /etc/privacyidea/enckey
   become: true
