@@ -7,7 +7,7 @@ SUPERUSER_REALM = ['super']
 # Your database
  SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@10.7.240.1/spshinfra-dev-schulportal-01'
 # This is used to encrypt the auth_token
-#SECRET_KEY = "{{ secret_key }}"
+SECRET_KEY = "{{ secret_key }}"
 # This is used to encrypt the admin passwords
 PI_PEPPER = "Never know..."
 # This is used to encrypt the token data and token passwords
