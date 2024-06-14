@@ -46,3 +46,10 @@
     state: touch
     mode: '0755'
   become: true
+
+- name: Configure PrivacyIDEA
+  template:
+    src: pi.cfg.j2
+    dest: /etc/privacyidea/pi.cfg
+    mode: '0644'
+  become: true
