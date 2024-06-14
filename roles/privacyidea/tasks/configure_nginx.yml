@@ -63,19 +63,21 @@
   become: true
 
 - name: Generate private key for audit logs
-  command: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
+  shell: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
   args:
     creates: /etc/privacyidea/private.pem
   become: true
 
 - name: Generate public key for audit logs
-  command: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
+  shell: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
   args:
     creates: /etc/privacyidea/public.pem
   become: true
 
-
+# This is used to encrypt the token data and token passwords
+# generate a random encryption key
 - name: Generate encryption key file
-  command: openssl rand -base64 32 > /etc/privacyidea/enckey
+  shell: openssl rand -base64 -out /etc/privacyidea/enckey
   args:
     creates: /etc/privacyidea/enckey
+  become: true
