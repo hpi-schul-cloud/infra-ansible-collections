@@ -81,17 +81,15 @@
   become: true
 
 
-- name: Grant privileges to PrivacyIDEA Mariadb user
+- name: Create PrivacyIDEA User in MariaDB
   mysql_user:
-    name: "{{ privacyidea_mariadb_user }}"
-    password: "{{ mariadbuser_password }}"
-    priv: "{{ privacyidea_mariadb_name }}.*:ALL"
-    state: present
-    host: "{{ privacyidea_mariadb_private_ip }}"
-    login_user: "{{ privacyidea_mariadb_username }}"
+    name: privacyidea_user
+    password: "{{ privacyidea_db_user_password }}"
+    login_user: root
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
-  become: true
+    priv: "{{ privacyidea_mariadb_name }}.*:ALL"
+    state: present
 
 
 
