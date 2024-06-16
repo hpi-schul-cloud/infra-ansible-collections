@@ -13,7 +13,7 @@ ansible_python_interpreter: /usr/bin/python3
 server_name: "privacyidea.infra.dev.spsh.dbildungsplattform.de"
 privacyidea_mariadb_username: ""
 privacyidea_mariadb_password: ""
-privacyidea_mariadb_private_ip: ""
+privacyidea_mariadb_private_ip: "10.7.240.1"
 privacyidea_mariadb_display_name: ""
 privacyidea_audit_key_password: ""
 SECRET_KEY: ""
