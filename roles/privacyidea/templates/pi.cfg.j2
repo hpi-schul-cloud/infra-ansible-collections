@@ -5,4 +5,4 @@ import logging
 # The realm, where users are allowed to login as administrators
 SUPERUSER_REALM = ['super']
 # Your database
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@10.7.240.1/spshinfra-dev-schulportal-01'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}/{{ privacyidea_mariadb_name }}'

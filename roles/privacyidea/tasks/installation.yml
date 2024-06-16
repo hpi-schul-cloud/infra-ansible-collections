@@ -73,9 +73,10 @@
 
 - name: Create the MySQL database 
   mysql_db:
-    name: "{{ privacyidea_db_name }}"
+    name: "{{ privacyidea_mariadb_name }}"
     state: present
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
+
