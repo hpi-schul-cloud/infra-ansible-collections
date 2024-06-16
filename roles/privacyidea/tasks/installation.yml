@@ -46,6 +46,8 @@
   file:
     path: /var/log/privacyidea/privacyidea.log
     state: touch
+    owner: www-data
+    group: www-data
     mode: '0644'
   become: true
 
