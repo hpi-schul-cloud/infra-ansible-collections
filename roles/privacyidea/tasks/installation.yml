@@ -46,6 +46,13 @@
     mode: '0644'
   become: true
 
+- name: Ensure privacyidea directory to store 'pi.cfg' file
+  file:	
+    path: /etc/privacyidea	
+    state: directory	
+    mode: '0755'	
+  become: true
+
 - name: Configure PrivacyIDEA
   template:
     src: pi.cfg.j2
