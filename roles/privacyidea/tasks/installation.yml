@@ -51,12 +51,11 @@
     mode: '0644'
   become: true
 
-
 - name: Ensure privacyidea directory to store 'pi.cfg' file
-  file:	
-    path: /etc/privacyidea	
-    state: directory	
-    mode: '0755'	
+  file:
+    path: /etc/privacyidea
+    state: directory
+    mode: '0755'
   become: true
 
 - name: Configure PrivacyIDEA
@@ -65,3 +64,16 @@
     dest: /etc/privacyidea/pi.cfg
     mode: '0644'
   become: true
+#this step is added cause :PermissionError: [Errno 13] Permission denied: '/var/log/privacyidea/privacyidea.log'
+- name: Ensure correct permissions on PrivacyIDEA log directory and file
+  command: "chown -R www-data:www-data /var/log/privacyidea && chmod -R 755 /var/log/privacyidea"
+  become: true
+
+- name: Initialize PrivacyIDEA database
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
+  args:
+    chdir: "{{ privacyidea_dir }}"
+  become: true
+  environment:
+    PI_LOGLEVEL: "DEBUG"
+    PI_LOGFILE: "/var/log/privacyidea/privacyidea.log"
