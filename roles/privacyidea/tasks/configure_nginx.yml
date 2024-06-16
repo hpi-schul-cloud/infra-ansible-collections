@@ -1,10 +1,4 @@
 ---
-#- name: Copy Nginx configuration
-#  template:
-#    src: nginx_privacyidea.conf.j2
-#    dest: /etc/nginx/conf.d/privacyidea.conf
-#  notify: restart nginx
-
 # Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
 - name: Configure Nginx
   template:
@@ -13,19 +7,6 @@
     mode: '0644'
   notify:
     - restart nginx
-
-# #- name: create SSL directory 
-#   file:
-#     path: /etc/ssl
-#     state: directory
-#     mode: '0755'
-#   become: true
-
-- name: Generate SSL certificate and key
-  become_user: root
-  become: true
-  shell: openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/privacyidea.key -out /etc/ssl/certs/privacyidea-bundle.crt -subj "/CN={{ server_name }}"
-
 
 - name: Update Nginx configuration for SSL
   template:
@@ -54,31 +35,4 @@
 
 - name: Reload firewall rules
   command: ufw reload
-  become: true
-
-- name: Ensure privacyidea directory to store private and public key for audit logs
-  file:
-    path: /etc/privacyidea
-    state: directory
-    mode: '0755'
-  become: true
-
-- name: Generate private key for audit logs 
-  command: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
-  args:
-    creates: /etc/privacyidea/private.pem
-  become: true
-
-- name: Generate public key for audit logs
-  command: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
-  args:
-    creates: /etc/privacyidea/public.pem
-  become: true
-
-# This is used to encrypt the token data and token passwords
-# Generate a random encryption key
-- name: Generate encryption key file
-  shell: "openssl rand -base64 32 | sudo tee /etc/privacyidea/enckey > /dev/null"
-  args:
-    creates: /etc/privacyidea/enckey
   become: true
