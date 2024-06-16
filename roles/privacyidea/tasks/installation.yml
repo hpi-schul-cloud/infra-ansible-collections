@@ -36,8 +36,6 @@
   file:
     path: /var/log/privacyidea
     state: directory
-    owner: www-data
-    group: www-data
     recurse: yes
     mode: '0755'
   become: true
@@ -46,8 +44,6 @@
   file:
     path: /var/log/privacyidea/privacyidea.log
     state: touch
-    owner: www-data
-    group: www-data
     mode: '0644'
   become: true
 
@@ -65,9 +61,14 @@
     mode: '0644'
   become: true
 #this step is added cause :PermissionError: [Errno 13] Permission denied: '/var/log/privacyidea/privacyidea.log'
-- name: Ensure correct permissions on PrivacyIDEA log directory and file
-  command: "chown -R www-data:www-data /var/log/privacyidea && chmod -R 755 /var/log/privacyidea"
+- name: Set permissions for PrivacyIDEA log file
+  file:
+    path: /var/log/privacyidea/privacyidea.log
+    owner: www-data
+    group: www-data
+    mode: 0644
   become: true
+
 
 - name: Initialize PrivacyIDEA database
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
