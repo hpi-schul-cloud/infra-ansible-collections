@@ -80,10 +80,11 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
+
 - name: Grant privileges to PrivacyIDEA Mariadb user
   mysql_user:
     name: "{{ privacyidea_mariadb_user }}"
-    password: "{{ privacyidea_mariadb_password }}"
+    password: "{{ mariadbuser_password }}"
     priv: "{{ privacyidea_mariadb_name }}.*:ALL"
     state: present
     host: "{{ privacyidea_mariadb_private_ip }}"
@@ -91,6 +92,7 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
+
 
 
 
