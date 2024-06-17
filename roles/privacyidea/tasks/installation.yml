@@ -71,7 +71,7 @@
     mode: 0644
   become: true
 
-- name: Create the MySQL database
+- name: Create mariadb database
   mysql_db:
     name: "{{ privacyidea_mariadb_name }}"
     state: present
