@@ -80,6 +80,17 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
+- name: Create PrivacyIDEA database user
+  mysql_user:
+    name: "{{ privacyidea_mariadb_user }}"
+    password: "{{ mariadbuser_password }}"
+    state: present
+    host: "%"
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+  become: true
+
 - name: Grant privileges to PrivacyIDEA database user
   mysql_user:
     name: "{{ privacyidea_mariadb_user }}"
