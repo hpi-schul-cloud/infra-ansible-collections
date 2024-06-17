@@ -7,6 +7,10 @@ server{
     add_header 'Access-Control-Allow-Origin' $http_origin;
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
+    # Hide original CSP Headers
+    proxy_hide_header 'Content-Security-Policy';
+    proxy_hide_header 'Content-Security-Policy-Report-Only';
+    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} {{ root_domain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
     # Proxy to the origin
     proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
@@ -27,6 +31,10 @@ server{
     add_header 'Access-Control-Allow-Origin' $http_origin;
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
+    # Hide original CSP Headers
+    proxy_hide_header 'Content-Security-Policy';
+    proxy_hide_header 'Content-Security-Policy-Report-Only';
+    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} {{ root_domain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
     # Proxy to the origin
     proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
@@ -49,6 +57,10 @@ server{
     add_header 'Access-Control-Allow-Origin' $http_origin;
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
+    # Hide original CSP Headers
+    proxy_hide_header 'Content-Security-Policy';
+    proxy_hide_header 'Content-Security-Policy-Report-Only';
+    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} {{ root_domain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
     # Proxy to the origin
     proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
