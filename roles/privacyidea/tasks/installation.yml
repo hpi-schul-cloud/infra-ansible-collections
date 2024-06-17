@@ -32,33 +32,41 @@
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
     name: "privacyIDEA=={{ privacyidea_version }}"
 
-- name: Create log directory for PrivacyIDEA
-  file:
-    path: /var/log/privacyidea
-    state: directory
-    owner: www-data
-    group: www-data
-    recurse: yes
-    mode: '0755'
-  become: true
-
-- name: Create log file for PrivacyIDEA
-  file:
-    path: /var/log/privacyidea/privacyidea.log
-    state: touch
-    owner: www-data
-    group: www-data
-    mode: '0644'
-  become: true
-
-# - name: Set permissions for PrivacyIDEA log file
+# - name: Create log directory for PrivacyIDEA
 #   file:
-#     path: /var/log/privacyidea/privacyidea.log
+#     path: /var/log/privacyidea
+#     state: directory
 #     owner: www-data
 #     group: www-data
-#     mode: 0644
+#     recurse: yes
+#     mode: '0755'
 #   become: true
 
+# - name: Create log file for PrivacyIDEA
+#   file:
+#     path: /var/log/privacyidea/privacyidea.log
+#     state: touch
+#     owner: www-data
+#     group: www-data
+#     mode: '0644'
+#   become: true
+
+- name: Set permissions for PrivacyIDEA log file
+  file:
+    path: /opt/privacyidea/privacyidea.log
+    owner: www-data
+    group: www-data
+    mode: 0644
+  become: true
+
+- name: Create the MySQL database
+  mysql_db:
+    name: "{{ privacyidea_mariadb_name }}"
+    state: present
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+  become: true
 
 - name: Ensure privacyidea directory to store 'pi.cfg' file
   file:
@@ -74,24 +82,6 @@
     mode: '0644'
   become: true
 #this step is added cause :PermissionError: [Errno 13] Permission denied: '/var/log/privacyidea/privacyidea.log' when i run pi-manage createdb 
-
-
-
-- name: Create the MySQL database
-  mysql_db:
-    name: "{{ privacyidea_mariadb_name }}"
-    state: present
-    login_user: "{{ privacyidea_mariadb_username }}"
-    login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
-  become: true
-
-- name: Configure PrivacyIDEA
-  template:
-    src: pi.cfg.j2
-    dest: /etc/privacyidea/pi.cfg
-    mode: '0644'
-  become: true
 
 - name: Initialize PrivacyIDEA database
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
