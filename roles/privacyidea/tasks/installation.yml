@@ -61,7 +61,6 @@
     mode: '0644'
   become: true
 #this step is added cause :PermissionError: [Errno 13] Permission denied: '/var/log/privacyidea/privacyidea.log' when i run pi-manage createdb 
-#to test SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@10.7.240.1/spshinfra-dev-schulportal-01'
 
 - name: Set permissions for PrivacyIDEA log file
   file:
@@ -80,25 +79,18 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
-- name: Create PrivacyIDEA database user
-  mysql_user:
-    name: "{{ privacyidea_mariadb_user }}"
-    password: "{{ mariadbuser_password }}"
-    state: present
-    host: "%"
-    login_user: "{{ privacyidea_mariadb_username }}"
-    login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
+- name: Configure PrivacyIDEA
+  template:
+    src: pi.cfg.j2
+    dest: /etc/privacyidea/pi.cfg
+    mode: '0644'
   become: true
 
-- name: Grant privileges to PrivacyIDEA database user
-  mysql_user:
-    name: "{{ privacyidea_mariadb_user }}"
-    password: "{{ mariadbuser_password }}"
-    priv: "{{ privacyidea_mariadb_name }}.*:ALL"
-    state: present
-    host: "%"
-    login_user: "{{ privacyidea_mariadb_username }}"
-    login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
+- name: Initialize PrivacyIDEA database
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
+  args:
+    chdir: "{{ privacyidea_dir }}"
+  environment:
+    PI_LOGLEVEL: "DEBUG"
+    PI_LOGFILE: "/var/log/privacyidea/privacyidea.log"
   become: true

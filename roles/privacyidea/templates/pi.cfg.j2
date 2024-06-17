@@ -6,3 +6,22 @@ import logging
 SUPERUSER_REALM = ['super']
 # Your database
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}/{{ privacyidea_mariadb_name }}'
+# This is used to encrypt the auth_token
+#SECRET_KEY = 't0p s3cr3t'
+# This is used to encrypt the admin passwords
+#PI_PEPPER = "Never know..."
+# This is used to encrypt the token data and token passwords
+#PI_ENCFILE = '/home/cornelius/src/privacyidea/enckey'
+# This is the dummy base class
+#PI_AUDIT_MODULE = 'privacyidea.lib.auditmodules.base'
+# This is the default
+#PI_AUDIT_MODULE = 'privacyidea.lib.auditmodules.sqlaudit'
+# This is used to sign the audit log
+#PI_AUDIT_KEY_PRIVATE = '/home/cornelius/src/privacyidea/private.pem'
+#PI_AUDIT_KEY_PUBLIC = '/home/cornelius/src/privacyidea/public.pem'
+#PI_AUDIT_SQL_TRUNCATE = True
+# The Class for managing the SQL connection pool
+#PI_ENGINE_REGISTRY_CLASS = "shared"
+#PI_AUDIT_POOL_SIZE = 20
+
+#PI_LOGLEVEL = logging.INFO
