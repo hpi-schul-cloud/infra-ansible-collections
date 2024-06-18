@@ -31,13 +31,12 @@
   pip:
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
     name: "privacyIDEA=={{ privacyidea_version }}"
-
-
 #privacyidea.log file under /opt/privacyidea suggests 
 #that the logging configuration in your application is set to use this path by default
 #application logs are stored in /var/log/<application_name>/ because it’s a standard practice to keep logs in a centralized and organized manner.
 
 #www-data is the default user for web servers like Apache and Nginx on Debian-based systems.
+
 - name: Create log directory for PrivacyIDEA
   file:
     path: /var/log/privacyidea
@@ -65,12 +64,13 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
-
 # https://privacyidea.readthedocs.io/en/latest/installation/system/inifile.html
 - name: Create privacyidea directory to store 'pi.cfg' file
   file:
     path: /etc/privacyidea
     state: directory
+    owner: root
+    group: www-data
     mode: '0755'
   become: true
 
@@ -78,10 +78,11 @@
   template:
     src: pi.cfg.j2
     dest: /etc/privacyidea/pi.cfg
-    mode: '0644'
+    owner: root
+    group: www-data
+    mode: '0640'
   become: true
 
- 
 - name: Initialize PrivacyIDEA database
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
   args:
@@ -90,15 +91,18 @@
     PI_LOGLEVEL: "DEBUG"
     PI_LOGFILE: "/var/log/privacyidea/privacyidea.log"
   become: true
-
 #https://privacyidea.readthedocs.io/en/latest/installation/system/wsgiscript.html#wsgiscript
+
 - name: Create WSGI script for PrivacyIDEA
   template:
     src: privacyideaapp.py.j2
     dest: /etc/privacyidea/privacyideaapp.py
+    owner: root
+    group: www-data
     mode: '0644'
   become: true
 # Create the runtime directory for Gunicorn socket
+
 - name: Create Gunicorn socket directory
   file:
     path: /run/privacyidea

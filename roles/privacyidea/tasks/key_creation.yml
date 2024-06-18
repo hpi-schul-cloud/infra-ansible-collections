@@ -14,4 +14,32 @@
     group: www-data
     mode: '0600'
   become: true
+  
 #Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, ensuring that the audit log entries are tamper-proof and can be verified.
+- name: Generate private key for PrivacyIDEA
+  command: openssl genpkey -algorithm RSA -out /etc/privacyidea/private.pem -aes256 -pass pass:{{ privacyidea_audit_key_password }}
+  args:
+    creates: /etc/privacyidea/private.pem
+  become: true
+
+- name: Generate public key for PrivacyIDEA
+  command: openssl rsa -pubout -in /etc/privacyidea/private.pem -out /etc/privacyidea/public.pem -passin pass:{{ privacyidea_audit_key_password }}
+  args:
+    creates: /etc/privacyidea/public.pem
+  become: true
+
+- name: Set permissions for private key
+  file:
+    path: /etc/privacyidea/private.pem
+    owner: www-data
+    group: www-data
+    mode: '0600'
+  become: true
+
+- name: Set permissions for public key
+  file:
+    path: /etc/privacyidea/public.pem
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  become: true
