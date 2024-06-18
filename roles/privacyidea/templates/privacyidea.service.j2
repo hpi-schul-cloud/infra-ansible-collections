@@ -1,0 +1,14 @@
+[Unit]
+Description=Gunicorn instance to serve PrivacyIDEA
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory={{ privacyidea_dir }}
+Environment="PI_LOGLEVEL=DEBUG"
+Environment="PI_LOGFILE=/var/log/privacyidea/privacyidea.log"
+ExecStart={{ privacyidea_dir }}/virtualenv/bin/gunicorn --workers 3 --bind unix:/run/privacyidea/privacyidea.sock --chdir /etc/privacyidea privacyideaapp:application
+
+[Install]
+WantedBy=multi-user.target

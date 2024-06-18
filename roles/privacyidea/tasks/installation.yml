@@ -80,6 +80,7 @@
     dest: /etc/privacyidea/pi.cfg
     mode: '0644'
   become: true
+
  
 - name: Initialize PrivacyIDEA database
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
@@ -97,3 +98,19 @@
     dest: /etc/privacyidea/privacyideaapp.py
     mode: '0644'
   become: true
+
+
+- name: Create systemd service for Gunicorn
+  template:
+    src: privacyidea.service.j2
+    dest: /etc/systemd/system/privacyidea.service
+    mode: '0644'
+  become: true
+  notify: 
+    - Start the PrivacyIDEA service
+
+- name: Reload systemd to recognize the new service
+  command: systemctl daemon-reload
+  become: true
+  notify:
+    - Start the PrivacyIDEA service

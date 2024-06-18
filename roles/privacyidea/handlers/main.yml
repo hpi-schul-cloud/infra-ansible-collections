@@ -1,3 +1,10 @@
 ---
-  - name: restart nginx
-    service: name=nginx state=restarted
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: Start the PrivacyIDEA service
+  systemd:
+    name: privacyidea
+    state: started
+    enabled: true
+  become: true
