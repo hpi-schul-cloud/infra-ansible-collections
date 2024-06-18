@@ -98,6 +98,16 @@
     dest: /etc/privacyidea/privacyideaapp.py
     mode: '0644'
   become: true
+# Create the runtime directory for Gunicorn socket
+- name: Create Gunicorn socket directory
+  file:
+    path: /run/privacyidea
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+    mode: '0755'
+  become: true
 
 - name: Install Gunicorn
   pip:
