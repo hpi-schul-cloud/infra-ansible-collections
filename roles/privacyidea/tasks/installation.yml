@@ -89,3 +89,11 @@
     PI_LOGLEVEL: "DEBUG"
     PI_LOGFILE: "/var/log/privacyidea/privacyidea.log"
   become: true
+
+#https://privacyidea.readthedocs.io/en/latest/installation/system/wsgiscript.html#wsgiscript
+- name: Create WSGI script for PrivacyIDEA
+  template:
+    src: privacyideaapp.py.j2
+    dest: /etc/privacyidea/privacyideaapp.py
+    mode: '0644'
+  become: true
