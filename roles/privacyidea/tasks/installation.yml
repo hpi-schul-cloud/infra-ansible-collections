@@ -99,6 +99,10 @@
     mode: '0644'
   become: true
 
+- name: Install Gunicorn
+  pip:
+    virtualenv: "{{ privacyidea_dir }}/virtualenv"
+    name: gunicorn
 
 - name: Create systemd service for Gunicorn
   template:
