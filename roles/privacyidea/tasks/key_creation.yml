@@ -24,15 +24,11 @@
 - name: Generate PI_PEPPER for PrivacyIDEA
   shell: |
     PI_PEPPER=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
-    echo "PI_PEPPER = '$PEPPER'" >> /etc/privacyidea/pi.cfg
-  args:
-    creates: /etc/privacyidea/pi.cfg
+    echo "PI_PEPPER = '$PI_PEPPER'" >> /etc/privacyidea/pi.cfg
   become: true
 
 - name: Generate SECRET_KEY for PrivacyIDEA
   shell: |
     SECRET_KEY=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
     echo "SECRET_KEY = '$SECRET_KEY'" >> /etc/privacyidea/pi.cfg
-  args:
-    creates: /etc/privacyidea/pi.cfg
   become: true
