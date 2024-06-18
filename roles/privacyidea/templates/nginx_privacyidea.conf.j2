@@ -1,11 +1,4 @@
 # https://github.com/privacyidea/privacyidea/blob/master/deploy/nginx/sites-available/privacyidea
-# If you want to forward http request to https enable the
-# following virtual server.
-#server {
-#        listen  80;
-#        server_name     {{ server_name }};
-#        return 301 https://$hostname$request_uri;
-#}
 server {
     listen 443 ssl;
     server_name {{ server_name }};
