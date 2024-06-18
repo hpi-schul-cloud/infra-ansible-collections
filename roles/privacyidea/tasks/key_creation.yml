@@ -2,7 +2,7 @@
 #dd reads 32 bytes from /dev/urandom
 #This command will generate a 32-byte random encryption key
 - name: Generate encryption key for PrivacyIDEA
-  command: dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 > /etc/privacyidea/enckey
+  shell: dd if=/dev/urandom bs=32 count=1 2>/dev/null | base64 > /etc/privacyidea/enckey
   args:
     creates: /etc/privacyidea/enckey
   become: true
