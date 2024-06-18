@@ -1,6 +1,7 @@
 ---
-# Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
-- name: Create nginx directory nginx configuration
+# Nginx is installed, but the necessary subdirectories (sites-available and sites-enabled) are missing in /etc/nginx
+# create these directories manually
+- name: Create nginx directory
   file:
     path: /etc/nginx
     state: directory
@@ -9,6 +10,26 @@
     mode: '0755'
   become: true
 
+- name: Create sites-available directory
+  file:
+    path: /etc/nginx/sites-available
+    state: directory
+    owner: root
+    group: www-data
+    mode: '0755'
+  become: true
+
+- name: Create sites-enabled directory 
+  file:
+    path: /etc/nginx/sites-enabled
+    state: directory
+    owner: root
+    group: www-data
+    mode: '0755'
+  become: true
+
+
+# Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
 - name: Configure Nginx
   template:
     src: nginx.conf.j2
