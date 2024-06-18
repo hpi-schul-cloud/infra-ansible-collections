@@ -1,5 +1,14 @@
 ---
 # Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
+- name: Create nginx directory nginx configuration
+  file:
+    path: /etc/privacyidea
+    state: directory
+    owner: root
+    group: www-data
+    mode: '0755'
+  become: true
+
 - name: Configure Nginx
   template:
     src: nginx.conf.j2
