@@ -84,7 +84,7 @@
   become: true
 
 - name: Initialize PrivacyIDEA database
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage createdb"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
   args:
     chdir: "{{ privacyidea_dir }}"
   environment:
@@ -132,3 +132,8 @@
   become: true
   notify:
     - Start the PrivacyIDEA service
+
+- name: Create PrivacyIDEA admin user
+  command: "pi-manage admin add adminuser -p {{ privacyidea_admin_password }}"
+  become: true
+  become_user: privacyidea
