@@ -133,6 +133,7 @@
   notify:
     - Start the PrivacyIDEA service
 
+
 - name: Create PrivacyIDEA admin user
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add adminuser -p {{ privacyidea_admin_password }}"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add adminuser --password {{ privacyidea_admin_password }}"
   become: true
