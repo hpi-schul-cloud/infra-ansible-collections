@@ -1,4 +1,13 @@
 ---
+# Remove default Nginx configuration to avoid conflict
+#Erreur from AWX:Unable to restart service nginx: Job for nginx.service failed because the control process exited with error code
+- name: Remove default Nginx site configuration
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  become: true
+  notify:
+    - restart nginx
 # Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
 - name: Configure Nginx
   template:
