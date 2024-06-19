@@ -1,54 +1,142 @@
 ---
-- name: Install MariaDB for PrivacyIDEA
+- name: Install packages
   apt:
-    name: "{{ privacyidea_mariadb_packages }}"
+    name: "{{ privacyidea_packages }}"
     state: present
-  when: privacyidea_enable_mariadb_setup
 
-- name: Configure MariaDB for PrivacyIDEA
+- name: Create {{ privacyidea_dir }} directory for virtual environment
+  file:
+    path: "{{ privacyidea_dir }}"
+    state: directory
+    mode: '0755'
+  become: true
+
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+  become: true
+
+- name: Create Python virtual environment
+  command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
+  args:
+    creates: "{{ privacyidea_dir }}/virtualenv"
+  become: true
+
+- name: Install privacyidea dependencies
+  pip:
+    virtualenv: "{{ privacyidea_dir }}/virtualenv"
+    requirements: "https://raw.githubusercontent.com/privacyidea/privacyidea/v{{ privacyidea_version }}/requirements.txt"
+
+- name: Install privacyIDEA {{ privacyidea_version }}
+  pip:
+    virtualenv: "{{ privacyidea_dir }}/virtualenv"
+    name: "privacyIDEA=={{ privacyidea_version }}"
+
+#privacyidea.log file under /opt/privacyidea suggests 
+#that the logging configuration in your application is set to use this path by default
+#application logs are stored in /var/log/<application_name>/ because it’s a standard practice to keep logs in a centralized and organized manner.
+#www-data is the default user for web servers like Apache and Nginx on Debian-based systems.
+
+- name: Create log directory for PrivacyIDEA
+  file:
+    path: /var/log/privacyidea
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+    mode: '0755'
+  become: true
+
+- name: Create log file for PrivacyIDEA
+  file:
+    path: /var/log/privacyidea/privacyidea.log
+    state: touch
+    owner: www-data
+    group: www-data
+    mode: '0644' 
+  become: true
+
+- name: Create the MySQL database
   mysql_db:
-    name: privacyidea_db
-    login_user: root
-    login_password: "{{ privacyidea_mariadb_root_password }}"
+    name: "{{ privacyidea_mariadb_name }}"
     state: present
-  when: privacyidea_enable_mariadb_setup
-
-- name: Create PrivacyIDEA User in MariaDB
-  mysql_user:
-    name: privacyidea_user
-    password: "{{ privacyidea_db_user_password }}"
-    login_user: root
-    login_password: "{{ privacyidea_mariadb_root_password }}"
-    priv: 'privacyidea_db.*:ALL'
-    state: present
-  when: privacyidea_enable_mariadb_setup
-
-- name: Add PrivacyIDEA Repository
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
-  block:
-    - name: Download the signing key
-      apt_key:
-        url: https://lancelot.netknights.it/NetKnights-Release.asc
-        state: present
-
-    - name: Add repository
-      apt_repository:
-        repo: 'deb http://lancelot.netknights.it/community/jammy/stable jammy main'
-        state: present
-
-- name: Update APT package
-  ansible.builtin.apt:
-    update_cache: yes
+# https://privacyidea.readthedocs.io/en/latest/installation/system/inifile.html
+- name: Create privacyidea directory to store 'pi.cfg' file
+  file:
+    path: /etc/privacyidea
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
   become: true
 
-- name: Install PrivacyIDEA with Nginx
-  apt:
-    name: "privacyidea-nginx={{ privacyidea_version }}"
-    state: present
+- name: Configure PrivacyIDEA
+  template:
+    src: pi.cfg.j2
+    dest: /etc/privacyidea/pi.cfg
+    owner: root
+    group: www-data
+    mode: '0640'
+  become: true
+
+- name: Initialize PrivacyIDEA database
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
+  args:
+    chdir: "{{ privacyidea_dir }}"
+  environment:
+    PI_LOGLEVEL: "DEBUG"
+    PI_LOGFILE: "/var/log/privacyidea/privacyidea.log"
+  become: true
+#https://privacyidea.readthedocs.io/en/latest/installation/system/wsgiscript.html#wsgiscript
+
+- name: Create WSGI script for PrivacyIDEA
+  template:
+    src: privacyideaapp.py.j2
+    dest: /etc/privacyidea/privacyideaapp.py
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  become: true
+# Create the runtime directory for Gunicorn socket
+
+- name: Create Gunicorn socket directory
+  file:
+    path: /run/privacyidea
+    state: directory
+    owner: www-data
+    group: www-data
+    recurse: yes
+    mode: '0755'
+  become: true
 
 - name: Create PrivacyIDEA admin user
-  command: "pi-manage admin add adminuser -p {{ privacyidea_admin_password }}"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add adminuser --password {{ privacyidea_admin_password }}"
   become: true
-  become_user: privacyidea
-  when: 
-    - privacyidea_admin_password is defined
+
+
+# Create the uWSGI configuration file for PrivacyIDEA
+- name: Create directory for uWSGI socket
+  file:
+    path: /run/uwsgi/app/privacyidea
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+  become: true
+
+- name: Create uWSGI configuration for PrivacyIDEA
+  template:
+    src: privacyidea.ini.j2
+    dest: /etc/uwsgi/apps-available/privacyidea.ini
+    mode: '0644'
+  become: true
+  notify:
+    - Restart uWSGI
+
+- name: Reload systemd to recognize the new service
+  command: systemctl daemon-reload
+  become: true

@@ -1,0 +1,42 @@
+#Encryption Key is used to encrypt sensitive data within PrivacyIDEA, such as tokens and passwords
+#https://privacyidea.readthedocs.io/en/latest/installation/system/pi-manage.html#pimanage
+
+- name: Generate encryption key for PrivacyIDEA
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_enckey"
+  args:
+    creates: /etc/privacyidea/enckey
+  become: true
+
+# This is used to encrypt the token data and token passwords
+- name: Set permissions for encryption key
+  file:
+    path: /etc/privacyidea/enckey
+    owner: www-data
+    group: www-data
+    mode: '0600'
+  become: true
+
+# This is used to encrypt the admin passwords
+- name: Generate PI_PEPPER for PrivacyIDEA
+  shell: |
+    PI_PEPPER=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
+    echo "PI_PEPPER = '$PI_PEPPER'" >> /etc/privacyidea/pi.cfg
+  become: true
+
+# This is used to encrypt the auth_token
+- name: Generate SECRET_KEY for PrivacyIDEA
+  shell: |
+    SECRET_KEY=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
+    echo "SECRET_KEY = '$SECRET_KEY'" >> /etc/privacyidea/pi.cfg
+  become: true
+
+
+#Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, 
+#ensuring that the audit log entries are tamper-proof and can be verified.
+#https://privacyidea.readthedocs.io/en/latest/installation/system/pi-manage.html#pimanage
+- name: Generate private key for PrivacyIDEA audit log
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_audit_keys"
+  args:
+    chdir: "{{ privacyidea_dir }}"
+    creates: /etc/privacyidea/private.pem
+  become: true

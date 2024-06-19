@@ -1,0 +1,54 @@
+---
+- name: Install MariaDB for PrivacyIDEA
+  apt:
+    name: "{{ privacyidea_mariadb_packages }}"
+    state: present
+  when: privacyidea_enable_mariadb_setup
+
+- name: Configure MariaDB for PrivacyIDEA
+  mysql_db:
+    name: privacyidea_db
+    login_user: root
+    login_password: "{{ privacyidea_mariadb_root_password }}"
+    state: present
+  when: privacyidea_enable_mariadb_setup
+
+- name: Create PrivacyIDEA User in MariaDB
+  mysql_user:
+    name: privacyidea_user
+    password: "{{ privacyidea_db_user_password }}"
+    login_user: root
+    login_password: "{{ privacyidea_mariadb_root_password }}"
+    priv: 'privacyidea_db.*:ALL'
+    state: present
+  when: privacyidea_enable_mariadb_setup
+
+- name: Add PrivacyIDEA Repository
+  become: true
+  block:
+    - name: Download the signing key
+      apt_key:
+        url: https://lancelot.netknights.it/NetKnights-Release.asc
+        state: present
+
+    - name: Add repository
+      apt_repository:
+        repo: 'deb http://lancelot.netknights.it/community/jammy/stable jammy main'
+        state: present
+
+- name: Update APT package
+  ansible.builtin.apt:
+    update_cache: yes
+  become: true
+
+- name: Install PrivacyIDEA with Nginx
+  apt:
+    name: "privacyidea-nginx={{ privacyidea_version }}"
+    state: present
+
+- name: Create PrivacyIDEA admin user
+  command: "pi-manage admin add adminuser -p {{ privacyidea_admin_password }}"
+  become: true
+  become_user: privacyidea
+  when: 
+    - privacyidea_admin_password is defined

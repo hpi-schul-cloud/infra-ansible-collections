@@ -1,0 +1,20 @@
+[uwsgi]
+plugin = python3
+chdir = /etc/privacyidea
+module = privacyideaapp
+master = true
+processes = 4
+harakiri = 60
+reload-mercy = 8
+cpu-affinity = 1
+stats = /tmp/stats.socket
+max-requests = 2000
+limit-as = 1024
+reload-on-as = 368
+reload-on-rss = 192
+reload-on-exception = true
+no-orphans = true
+uid = www-data
+gid = www-data
+vacuum = true
+socket = /run/uwsgi/app/privacyidea/privacyidea.socket

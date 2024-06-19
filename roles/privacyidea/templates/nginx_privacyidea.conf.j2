@@ -1,0 +1,15 @@
+# https://github.com/privacyidea/privacyidea/blob/master/deploy/nginx/sites-available/privacyidea
+server {
+    listen 80;
+    server_name {{ server_name }};
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
+    }
+
+    location /static {
+        alias /etc/privacyidea/static;
+    }
+}
+

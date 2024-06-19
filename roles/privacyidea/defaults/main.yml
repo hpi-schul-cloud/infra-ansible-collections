@@ -1,12 +1,19 @@
 ---
-privacyidea_mariadb_root_password: "" 
-privacyidea_db_user_password: ""
-privacyidea_mariadb_packages:
-  - python3-mysqldb
-  - mariadb-server
-  - mariadb-client
 privacyidea_version: "3.8.1"
+privacyidea_packages:
+    - python3-venv
+    - python3-pip
+    - nginx
+    - libmysqlclient-dev # provide the necessary header files and libraries for building and compiling other software that needs to interface with MySQL/MariaDB.
+    - mariadb-client
+    - python3-mysqldb
+    - uwsgi
+    - uwsgi-plugin-python3
+
+privacyidea_dir: "/opt/privacyidea"
+server_name: "privacyidea.infra.dev.spsh.dbildungsplattform.de"
+privacyidea_mariadb_username: ""
+privacyidea_mariadb_password: ""
+privacyidea_mariadb_private_ip: "10.7.240.1"
+privacyidea_mariadb_name: "privacyidea_mariadb"
 privacyidea_admin_password: ""
-# privacyidea_enable_mariadb_setup: Controls the installation and configuration of MariaDB directly on this VM. 
-# Set to true to enable setup, false if using an external MariaDB instance.
-privacyidea_enable_mariadb_setup: false

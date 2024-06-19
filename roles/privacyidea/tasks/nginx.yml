@@ -1,0 +1,38 @@
+---
+# Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
+- name: Configure Nginx
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    mode: '0644'
+  notify:
+    - restart nginx
+
+- name: Update Nginx configuration for SSL
+  template:
+    src:  nginx_privacyidea.conf.j2
+    dest: /etc/nginx/sites-available/privacyidea.conf
+    mode: '0644'
+  notify:
+    - restart nginx
+  become: true
+
+- name: Create symbolic link to enable PrivacyIDEA site
+  file:
+    src: /etc/nginx/sites-available/privacyidea.conf
+    dest: /etc/nginx/sites-enabled/privacyidea.conf
+    state: link
+  notify:
+    - restart nginx
+  become: true
+
+- name: Allow HTTPS traffic through firewall
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+  become: true
+
+- name: Reload firewall rules
+  command: ufw reload
+  become: true
