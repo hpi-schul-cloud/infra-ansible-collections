@@ -7,7 +7,7 @@ server{
     proxy_hide_header 'Content-Security-Policy';
     proxy_hide_header 'Content-Security-Policy-Report-Only';
     # We don't know how to add root domain.
-    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} {{ root_domain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
+    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} *.{{ root_domain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
     proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
     proxy_ssl_server_name on;
