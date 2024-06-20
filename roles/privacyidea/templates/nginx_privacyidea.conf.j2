@@ -1,7 +1,12 @@
 # https://github.com/privacyidea/privacyidea/blob/master/deploy/nginx/sites-available/privacyidea
 server {
-    listen 80;
-    server_name {{ server_name }};
+    listen 443 ssl;
+    server_name privacyidea.infra.dev.spsh.dbildungsplattform.de;
+
+    # ssl certificat are created manually 
+    ssl_certificate /etc/letsencrypt/live/privacyidea.infra.dev.spsh.dbildungsplattform.de/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/privacyidea.infra.dev.spsh.dbildungsplattform.de/privkey.pem;
+
 
     location / {
         include uwsgi_params;
@@ -12,4 +17,3 @@ server {
         alias /etc/privacyidea/static;
     }
 }
-
