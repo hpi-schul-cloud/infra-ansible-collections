@@ -67,7 +67,8 @@
     loop_control:
       label: "{{ item.name }}"
 
-  - name: set password for technicaluser 
+  - name: set password for technicaluser
+    throttle: 1
     user: 
       name: technicaluser
       update_password: always
