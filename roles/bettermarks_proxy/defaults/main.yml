@@ -11,6 +11,7 @@ bettermarks_subdomains:
   apps: apps
   events: events
   translations: translations
+  csp: csp-report
 bettermarks_proxy_subdomains:
   apm: apm
   school: school
@@ -23,6 +24,7 @@ proxy_identification_header: "x-schulcloud-proxy"
 bettermarks_proxy_ingress_enabled: false
 bettermarks_proxy_ingress_tls: false
 bettermarks_proxy_ingress_annotations: {}
+bettermarks_proxy_csp_enabled: true
 bettermarks_proxy_chart_values:
   replicaCount: 1
   containerSecurityContext:
