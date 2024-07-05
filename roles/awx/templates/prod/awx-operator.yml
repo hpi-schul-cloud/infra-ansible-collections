@@ -1449,7 +1449,6 @@ data:
       healthProbeBindAddress: :6789
     metrics:
       bindAddress: 127.0.0.1:8080
-
     leaderElection:
       leaderElect: true
       resourceName: 811c9dc5.ansible.com
