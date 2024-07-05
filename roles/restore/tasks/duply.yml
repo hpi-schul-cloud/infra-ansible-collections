@@ -17,8 +17,8 @@
     loop_control:
       loop_var: sc_item
     vars:
-      backupS3Key: "{{ lookup('dbildungscloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.s3.key', session_shorthand='ansible-run') }}"
-      backupS3Secret: "{{ lookup('dbildungscloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.s3.secret', session_shorthand='ansible-run') }}"
+      backupS3Key: "{{ lookup('dbildungscloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.s3.key', session_shorthand='ansible-run', credentials=op_credentials) }}"
+      backupS3Secret: "{{ lookup('dbildungscloud.onepwd.onepwd', vault='sc-prod', secret_name='backup.s3.secret', session_shorthand='ansible-run', credentials=op_credentials) }}"
 
 # Prepares duply profiles and gpg keys for each user in devops and support group 
   - name: Create duply profiles

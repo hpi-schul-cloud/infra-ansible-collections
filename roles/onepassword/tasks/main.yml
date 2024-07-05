@@ -29,7 +29,7 @@
         name: "{{ onepassword_connector_credentials_name }}"
         namespace: default
       data:
-        1password-credentials.json: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='onepassword.credentials', vault=vault, session_shorthand='ansible-run') | b64encode | b64encode }}"
+        1password-credentials.json: "{{ onepassword_connector_credentials_json | b64encode | b64encode }}"
 
 # The onepassword token is used by the operator to retrieve the secrets from the connector
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
@@ -47,7 +47,7 @@
         name: "{{ onepassword_connector_token_name }}"
         namespace: default
       data:
-        token: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='onepassword.token', vault=vault, session_shorthand='ansible-run')  | b64encode }}"
+        token: "{{ onepassword_connector_token_value | b64encode}}"
   when: stage not in ["prod", "staging"] or "schulcloud" not in group_names
 
 # This clusterrolebinding is used in the dev environment to grant access for the 1password operator to all namespaces
