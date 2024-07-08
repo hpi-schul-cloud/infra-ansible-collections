@@ -25,6 +25,7 @@ bettermarks_proxy_ingress_enabled: false
 bettermarks_proxy_ingress_tls: false
 bettermarks_proxy_ingress_annotations: {}
 bettermarks_proxy_csp_enabled: true
+bettermarks_proxy_csp_enforced: true
 bettermarks_proxy_chart_values:
   replicaCount: 1
   containerSecurityContext:
