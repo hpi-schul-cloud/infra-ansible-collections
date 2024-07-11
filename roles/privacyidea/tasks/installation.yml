@@ -98,6 +98,6 @@
 
 # create an admin user for privacyIDEA
 - name: Create privacyIDEA admin user
-  command: 
-    cmd: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -e {{ privacyidea_admin_password}}"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -p {{ privacyidea_admin_password}}"
   become: true
+  become_user: privacyidea
