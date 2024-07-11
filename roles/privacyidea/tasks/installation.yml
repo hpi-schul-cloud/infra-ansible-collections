@@ -59,21 +59,21 @@
   template:
     src: privacyidea.ini.j2
     dest: /etc/uwsgi/apps-available/privacyidea.ini
-  notify: Restart uWSGI
+  notify: restart uWSGI
 
 # Sets up the uWSGI service for privacyIDEA
 - name: Copy uWSGI service file
   template:
     src: uwsgi.service.j2
     dest: /etc/systemd/system/uwsgi.service
-  notify: Restart uWSGI
+  notify: restart uWSGI
 
 # Configures Nginx to serve privacyIDEA
 - name: Copy Nginx configuration
   template:
     src: nginx_privacyidea.conf.j2
     dest: /etc/nginx/sites-available/privacyidea.conf
-  notify: Restart Nginx
+  notify: restart nginx
 
 # Enables the Nginx configuration for privacyIDEA
 - name: Enable Nginx site
@@ -81,7 +81,7 @@
     src: /etc/nginx/sites-available/privacyidea.conf
     dest: /etc/nginx/sites-enabled/privacyidea.conf
     state: link
-  notify: Restart Nginx
+  notify: restart nginx
 
 # Sets up the database configuration for privacyIDEA
 - name: Configure database connection
