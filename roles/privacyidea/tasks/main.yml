@@ -1,4 +1,4 @@
 ---
 - import_tasks: installation.yml
-- import_tasks: nginx.yml
 - import_tasks: key.yml
+- import_tasks: nginx.yml

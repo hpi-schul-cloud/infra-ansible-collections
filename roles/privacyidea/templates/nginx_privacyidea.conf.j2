@@ -1,19 +1,25 @@
 # https://github.com/privacyidea/privacyidea/blob/master/deploy/nginx/sites-available/privacyidea
 server {
     listen 443 ssl;
-    server_name {{ server_name }};
+    server_name {{ privacyidea_server_name }};
 
-    # ssl certificat are created manually 
-    ssl_certificate /etc/letsencrypt/live/{ server_name }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{ server_name }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ privacyidea_server_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ privacyidea_server_name }}/privkey.pem;
 
+    access_log /var/log/nginx/privacyidea.access.log;
+    error_log /var/log/nginx/privacyidea.error.log;
 
     location / {
         include uwsgi_params;
         uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
+
+        # Add the following timeout settings
+        proxy_connect_timeout 75s;
+        proxy_read_timeout 300s;
+        proxy_send_timeout 300s;
     }
 
     location /static {
-        alias /etc/privacyidea/static;
+        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
     }
 }

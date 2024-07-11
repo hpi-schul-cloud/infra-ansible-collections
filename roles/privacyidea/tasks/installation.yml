@@ -1,22 +1,32 @@
 ---
+# Ensures all necessary packages are installed
 - name: Install packages
   apt:
     name: "{{ privacyidea_packages }}"
     state: present
 
-- name: Create {{ privacyidea_dir }} directory for virtual environment
+#https://privacyidea.readthedocs.io/en/latest/installation/pip.html
+- name: Create privacyIDEA directories
   file:
-    path: "{{ privacyidea_dir }}"
+    path: "{{ item }}"
     state: directory
+    owner: www-data
+    group: www-data
     mode: '0755'
-  become: true
-
+  loop:
+    - /etc/privacyidea # stores the configuration files(enckey,pi.cfg,privacyideaapp.py,private.pem,public.pem)
+    - /opt/privacyidea # contains the virtualenv
+    - /var/log/privacyidea # contains privacyidea.log
+    - /run/uwsgi/app/privacyidea # contains the Unix socket file for uWSGI(privacyidea.socket)
+    - /var/log/uwsgi
+    
+#Install virtualenv using pip
 - name: Install virtualenv
   pip:
     name: virtualenv
   become: true
 
-- name: Create Python virtual environment
+- name: Create a virtualenv for privacyIDEA
   command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
   args:
     creates: "{{ privacyidea_dir }}/virtualenv"
@@ -32,29 +42,6 @@
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
     name: "privacyIDEA=={{ privacyidea_version }}"
 
-#privacyidea.log file under /opt/privacyidea suggests 
-#that the logging configuration in your application is set to use this path by default
-#application logs are stored in /var/log/<application_name>/ because it’s a standard practice to keep logs in a centralized and organized manner.
-#www-data is the default user for web servers like Apache and Nginx on Debian-based systems.
-
-- name: Create log directory for PrivacyIDEA
-  file:
-    path: /var/log/privacyidea
-    state: directory
-    owner: www-data
-    group: www-data
-    recurse: yes
-    mode: '0755'
-  become: true
-
-- name: Create log file for PrivacyIDEA
-  file:
-    path: /var/log/privacyidea/privacyidea.log
-    state: touch
-    owner: www-data
-    group: www-data
-    mode: '0644' 
-  become: true
 
 - name: Create the MySQL database
   mysql_db:
@@ -64,79 +51,56 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
-# https://privacyidea.readthedocs.io/en/latest/installation/system/inifile.html
-- name: Create privacyidea directory to store 'pi.cfg' file
-  file:
-    path: /etc/privacyidea
-    state: directory
-    owner: www-data
-    group: www-data
-    mode: '0755'
-  become: true
 
-- name: Configure PrivacyIDEA
-  template:
-    src: pi.cfg.j2
-    dest: /etc/privacyidea/pi.cfg
-    owner: root
-    group: www-data
-    mode: '0640'
-  become: true
+#Grant user
 
-- name: Initialize PrivacyIDEA database
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
-  args:
-    chdir: "{{ privacyidea_dir }}"
-  environment:
-    PI_LOGLEVEL: "DEBUG"
-    PI_LOGFILE: "/var/log/privacyidea/privacyidea.log"
-  become: true
-#https://privacyidea.readthedocs.io/en/latest/installation/system/wsgiscript.html#wsgiscript
-
-- name: Create WSGI script for PrivacyIDEA
-  template:
-    src: privacyideaapp.py.j2
-    dest: /etc/privacyidea/privacyideaapp.py
-    owner: www-data
-    group: www-data
-    mode: '0644'
-  become: true
-# Create the runtime directory for Gunicorn socket
-
-- name: Create Gunicorn socket directory
-  file:
-    path: /run/privacyidea
-    state: directory
-    owner: www-data
-    group: www-data
-    recurse: yes
-    mode: '0755'
-  become: true
-
-- name: Create PrivacyIDEA admin user
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add adminuser --password {{ privacyidea_admin_password }}"
-  become: true
-
-
-# Create the uWSGI configuration file for PrivacyIDEA
-- name: Create directory for uWSGI socket
-  file:
-    path: /run/uwsgi/app/privacyidea
-    state: directory
-    owner: www-data
-    group: www-data
-    mode: '0755'
-  become: true
-
-- name: Create uWSGI configuration for PrivacyIDEA
+#Copies the uWSGI configuration file for privacyIDEA
+- name: Copy uWSGI configuration
   template:
     src: privacyidea.ini.j2
     dest: /etc/uwsgi/apps-available/privacyidea.ini
-    mode: '0644'
-  become: true
-  notify:
-    - Restart uWSGI
+  notify: Restart uWSGI
 
-- name: Reload systemd to recognize the new service
-  command: systemctl daemon-reload
+# Sets up the uWSGI service for privacyIDEA
+- name: Copy uWSGI service file
+  template:
+    src: uwsgi.service.j2
+    dest: /etc/systemd/system/uwsgi.service
+  notify: Restart uWSGI
+
+# Configures Nginx to serve privacyIDEA
+- name: Copy Nginx configuration
+  template:
+    src: privacyidea.conf.j2
+    dest: /etc/nginx/sites-available/privacyidea.conf
+  notify: Restart Ngin
+
+# Enables the Nginx configuration for privacyIDEA
+- name: Enable Nginx site
+  file:
+    src: /etc/nginx/sites-available/privacyidea.conf
+    dest: /etc/nginx/sites-enabled/privacyidea.conf
+    state: link
+  notify: Restart Nginx
+
+# Sets up the database configuration for privacyIDEA
+- name: Configure database connection
+  template:
+    src: pi.cfg.j2
+    dest: /etc/privacyidea/pi.cfg
+
+#https://privacyidea.readthedocs.io/en/latest/installation/pip.html
+- name: Create database tables
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
+
+- name: Stamping the database to the current database schema
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
+
+- name: Run database migrations
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db upgrade -d {{ privacyidea_dir }}/lib/privacyidea/migrations/"
+
+# create an admin user for privacyIDEA
+- name: Create privacyIDEA admin user
+  command: 
+    cmd: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -e {{ privacyidea_admin_password}}"
   become: true

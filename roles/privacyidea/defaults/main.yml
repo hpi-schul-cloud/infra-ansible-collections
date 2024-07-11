@@ -11,7 +11,7 @@ privacyidea_packages:
     - uwsgi-plugin-python3
 
 privacyidea_dir: "/opt/privacyidea"
-server_name: "privacyidea.infra.dev.spsh.dbildungsplattform.de"
+privacyidea_server_name: ""
 privacyidea_mariadb_username: ""
 privacyidea_mariadb_password: ""
 privacyidea_mariadb_private_ip: ""
