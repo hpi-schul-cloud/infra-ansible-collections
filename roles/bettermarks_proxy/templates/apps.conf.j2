@@ -7,9 +7,9 @@ server{
     proxy_hide_header 'Content-Security-Policy';
     proxy_hide_header 'Content-Security-Policy-Report-Only';
 {% if bettermarks_proxy_csp_enabled and bettermarks_proxy_csp_enforced %}
-    add_header 'Content-Security-Policy' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} *.{{ bettermarks_instancedomain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp-report'] }}.{{ bettermarks_proxy_maindomain }}/csp";
+    add_header 'Content-Security-Policy' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} *.{{ bettermarks_instancedomain }} {{ bettermarks_instancedomain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp-report'] }}.{{ bettermarks_proxy_maindomain }}/csp";
 {% elif bettermarks_proxy_csp_enabled %}
-    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} *.{{ bettermarks_instancedomain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp-report'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
+    add_header 'Content-Security-Policy-Report-Only' "default-src 'self' 'unsafe-eval' 'unsafe-inline' *.{{ bettermarks_proxy_maindomain }} *.{{ bettermarks_instancedomain }} {{ bettermarks_instancedomain }}; report-uri https://{{ bettermarks_proxy_subdomains['csp-report'] }}.{{ bettermarks_proxy_maindomain }}/csp/report-only";
 {% endif %}
     proxy_set_header {{ proxy_identification_header }} true;
     proxy_pass https://{{ bettermarks_subdomain }}.{{ bettermarks_domain }};
