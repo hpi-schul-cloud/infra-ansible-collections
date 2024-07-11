@@ -96,13 +96,6 @@
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
-# this command does not run properly run manual:
-#sudo /opt/privacyidea/virtualenv/bin/pi-manage db upgrade -d /opt/privacyidea/lib/privacyidea/migrations/
-- name: Run database migrations
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db upgrade -d {{ privacyidea_dir }}/lib/privacyidea/migrations/"
-  become: true
-  become_user: www-data
-
 # create an admin user for privacyIDEA
 - name: Create privacyIDEA admin user
   command: 
