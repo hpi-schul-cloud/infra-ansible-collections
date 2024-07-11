@@ -71,9 +71,9 @@
 # Configures Nginx to serve privacyIDEA
 - name: Copy Nginx configuration
   template:
-    src: privacyidea.conf.j2
+    src: nginx_privacyidea.conf.j2
     dest: /etc/nginx/sites-available/privacyidea.conf
-  notify: Restart Ngin
+  notify: Restart Nginx
 
 # Enables the Nginx configuration for privacyIDEA
 - name: Enable Nginx site
