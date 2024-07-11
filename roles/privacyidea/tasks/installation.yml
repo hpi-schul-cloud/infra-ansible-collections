@@ -68,6 +68,8 @@
     dest: /etc/systemd/system/uwsgi.service
   notify: restart uWSGI
 
+# remeber that you should create ssl cert manually
+# sudo certbot certonly --nginx -d privacyidea.staging.spsh.dbildungsplattform.de -m devops@dbildunsplattform.de --pre-hook "ufw allow IN 80/tcp" --post-hook "ufw delete allow IN 80/tcp"
 # Configures Nginx to serve privacyIDEA
 - name: Copy Nginx configuration
   template:

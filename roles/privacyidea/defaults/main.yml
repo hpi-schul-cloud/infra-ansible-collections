@@ -9,6 +9,11 @@ privacyidea_packages:
     - python3-mysqldb
     - uwsgi
     - uwsgi-plugin-python3
+    - certbot
+    - python3-certbot-nginx
+
+
+
 
 privacyidea_dir: "/opt/privacyidea"
 privacyidea_server_name: ""
