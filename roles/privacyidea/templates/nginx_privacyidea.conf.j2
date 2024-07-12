@@ -1,10 +1,6 @@
-# https://github.com/privacyidea/privacyidea/blob/master/deploy/nginx/sites-available/privacyidea
 server {
-    listen 443 ssl;
+    listen 80
     server_name {{ privacyidea_server_name }};
-
-    ssl_certificate /etc/letsencrypt/live/{{ privacyidea_server_name }}/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/{{ privacyidea_server_name }}/privkey.pem;
 
     access_log /var/log/nginx/privacyidea.access.log;
     error_log /var/log/nginx/privacyidea.error.log;
