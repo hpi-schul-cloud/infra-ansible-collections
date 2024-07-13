@@ -18,4 +18,8 @@ server {
     location /static {
         alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
     }
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/letsencrypt;
+    }
 }
