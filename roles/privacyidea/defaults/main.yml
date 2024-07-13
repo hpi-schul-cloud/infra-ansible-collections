@@ -12,9 +12,6 @@ privacyidea_packages:
     - certbot
     - python3-certbot-nginx
 
-
-
-
 privacyidea_dir: "/opt/privacyidea"
 privacyidea_server_name: ""
 privacyidea_mariadb_username: ""
