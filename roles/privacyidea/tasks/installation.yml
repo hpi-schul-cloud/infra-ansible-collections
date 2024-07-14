@@ -57,7 +57,7 @@
   mysql_user:
     name: "{{ mariadb_user }}"
     password: "{{ privacyidea_db_user_password }}"
-    priv: "*.*:{{ db_privileges_global | join(',') }},{{ db_name }}.*:{{ db_privileges_specific | join(',') }}"
+    priv: "*.*:{{ db_privileges_global | join(',') }},{{ privacyidea_mariadb_name }}.*:{{ db_privileges_specific | join(',') }}"
     host: "{{ privacyidea_mariadb_private_ip }}"
     state: present
     login_user: "{{ privacyidea_mariadb_username }}"
