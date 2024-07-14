@@ -43,7 +43,7 @@
     name: "privacyIDEA=={{ privacyidea_version }}"
 
 
-- name: Create the MySQL database
+- name: Create MariaDB database
   mysql_db:
     name: "{{ privacyidea_mariadb_name }}"
     state: present
@@ -52,7 +52,18 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
-#Grant user
+- name: Create MariaDB user
+  mysql_user:
+    name: "{{ mariadb_user }}"
+    password: "{{ privacyidea_db_user_password }}"
+    host: "%"
+    priv: "{{ privacyidea_mariadb_name }}.*:ALL"
+    state: present
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+
+#Grant privileges to PrivacyIDEA user
 
 #Copies the uWSGI configuration file for privacyIDEA
 - name: Copy uWSGI configuration
