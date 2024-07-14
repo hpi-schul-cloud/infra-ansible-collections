@@ -58,13 +58,13 @@
     name: "{{ mariadb_user }}"
     password: "{{ privacyidea_db_user_password }}"
     priv: "*.*:{{ db_privileges_global | join(',') }},{{ privacyidea_mariadb_name }}.*:{{ db_privileges_specific | join(',') }}"
-    host: "{{ privacyidea_mariadb_private_ip }}"
+    host: "%"  
     state: present
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+  become: true
 
-
-#Grant privileges to PrivacyIDEA user
 
 #Copies the uWSGI configuration file for privacyIDEA
 - name: Copy uWSGI configuration
