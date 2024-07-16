@@ -31,3 +31,19 @@
     chdir: "{{ privacyidea_dir }}"
     creates: /etc/privacyidea/private.pem
   become: true
+
+
+- name: Set PrivacyIDEA file permissions
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: www-data
+    group: www-data
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: '/etc/privacyidea/1', mode: '0755' }
+    - { path: '/etc/privacyidea/enckey', mode: '0755' }
+    - { path: '/etc/privacyidea/pi.cfg', mode: '0755' }
+    - { path: '/etc/privacyidea/privacyideaapp.py', mode: '0755' }
+    - { path: '/etc/privacyidea/private.pem', mode: '0755' }
+    - { path: '/etc/privacyidea/public.pem', mode: '0755' }
+  become: true
