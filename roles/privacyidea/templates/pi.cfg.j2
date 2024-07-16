@@ -6,10 +6,6 @@ import logging
 SUPERUSER_REALM = ['super']
 # Your database
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}/{{ privacyidea_mariadb_name }}'
-# This is used to encrypt the auth_token
-#SECRET_KEY = ''
-# This is used to encrypt the admin passwords
-#PI_PEPPER = ''
 # This is used to encrypt the token data and token passwords
 PI_ENCFILE = '/etc/privacyidea/enckey'
 # This is the dummy base class
@@ -24,4 +20,8 @@ PI_AUDIT_KEY_PUBLIC = '/etc/privacyidea/public.pem'
 #PI_ENGINE_REGISTRY_CLASS = "shared"
 #PI_AUDIT_POOL_SIZE = 20
 PI_LOGLEVEL = 20
-PI_LOGFILE = '/var/log/privacyidea/privacyidea.log' 
+PI_LOGFILE = '/var/log/privacyidea/privacyidea.log'
+# This is used to encrypt the admin passwords
+#PI_PEPPER = ''
+# This is used to encrypt the auth_token
+#SECRET_KEY = ''
