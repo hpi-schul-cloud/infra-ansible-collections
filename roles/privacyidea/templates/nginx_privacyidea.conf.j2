@@ -3,7 +3,7 @@
 
 server {
     listen 80;
-    server_name privacyidea.staging.spsh.dbildungsplattform.de;
+    server_name {{ privacyidea_server_name }};
  
     location /.well-known/acme-challenge/ {
         root /var/www/letsencrypt;
@@ -25,10 +25,10 @@ server {
 # Note: Ensure that port 443 is open in the IONOS firewall for HTTPS traffic.
 #server {
 #    listen 443 ssl;
-#    server_name privacyidea.infra.dev.spsh.dbildungsplattform.de;
+#    server_name {{ privacyidea_server_name }};
 #
-#    ssl_certificate /etc/letsencrypt/live/privacyidea.infra.dev.spsh.dbildungsplattform.de/fullchain.pem;
-#    ssl_certificate_key /etc/letsencrypt/live/privacyidea.infra.dev.spsh.dbildungsplattform.de/privkey.pem;
+#    ssl_certificate /etc/letsencrypt/live/{{ privacyidea_server_name }}/fullchain.pem;
+#    ssl_certificate_key /etc/letsencrypt/live/{{ privacyidea_server_name }}/privkey.pem;
 
 #    access_log /var/log/nginx/privacyidea.access.log;
 #   error_log /var/log/nginx/privacyidea.error.log;
