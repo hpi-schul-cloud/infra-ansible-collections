@@ -1,13 +1,15 @@
 ---
 # Remove default Nginx configuration to avoid conflict
 #Erreur from AWX:Unable to restart service nginx: Job for nginx.service failed because the control process exited with error code
-- name: Remove default and PrivacyIDEA Nginx site configurations
+- name: Remove default and PrivacyIDEA Nginx site and enable configurations
   file:
     path: "{{ item }}"
     state: absent
   loop:
     - /etc/nginx/sites-available/default
     - /etc/nginx/sites-available/privacyidea
+    - /etc/nginx/sites-enabled/default
+    - /etc/nginx/sites-enabled/privacyidea
   become: true
   notify:
     - restart nginx
