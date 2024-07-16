@@ -8,30 +8,32 @@
 #https://privacyidea.readthedocs.io/en/latest/installation/pip.html
 - name: Create privacyIDEA directories
   file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: directory
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: "{{ item.mode }}"
   loop:
-    - /etc/privacyidea # stores the configuration files(enckey,pi.cfg,privacyideaapp.py,private.pem,public.pem)
-    - /opt/privacyidea # contains the virtualenv
-    - /var/log/privacyidea # contains privacyidea.log
-    - /run/uwsgi/app/privacyidea # contains the Unix socket file for uWSGI(privacyidea.socket)
-    - /var/log/uwsgi
+    - { path: '/etc/privacyidea', mode: '0755' }
+    - { path: '/opt/privacyidea', mode: '0755' }
+    - { path: '/var/log/privacyidea', mode: '0755' }
+    - { path: '/run/uwsgi/app/privacyidea', mode: '0775' }
+    - { path: '/var/log/uwsgi', mode: '0755' }
+  become: true
 
 - name: Create uWSGI log files
   file:
-    path: "{{ item }}"
+    path: "{{ item.path }}"
     state: touch
-    mode: '0660'
     owner: www-data
     group: www-data
+    mode: '0664'
   loop:
-    - "/var/log/uwsgi/privacyidea.log"
-    - "/var/log/uwsgi/error.log"
-    - "/var/log/uwsgi/request.log"
-    
+    - { path: '/var/log/uwsgi/privacyidea.log' }
+    - { path: '/var/log/uwsgi/error.log' }
+    - { path: '/var/log/uwsgi/request.log' }
+  become: true
+
 #Install virtualenv using pip
 - name: Install virtualenv
   pip:
