@@ -44,6 +44,16 @@
     creates: "{{ privacyidea_dir }}/virtualenv"
   become: true
 
+# this task is created cause i get :
+#-bash: /opt/privacyidea/virtualenv/bin/activate: Permission denied
+- name: Ensure virtual environment has correct ownership and permissions
+  ansible.builtin.file:
+    path: "{{ privacyidea_dir }}/virtualenv"
+    owner: www-data
+    group: www-data
+    mode: '0755'
+    recurse: yes
+
 - name: Install privacyidea dependencies
   pip:
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
