@@ -1,25 +1,45 @@
+# Make sure that port 80 is open in the IONOS firewall for HTTP traffic.
+# This configuration is necessary to complete the initial SSL certificate setup using Certbot.
+
 server {
     listen 80;
-    server_name {{ privacyidea_server_name }};
-
-    access_log /var/log/nginx/privacyidea.access.log;
-    error_log /var/log/nginx/privacyidea.error.log;
-
-    location / {
-        include uwsgi_params;
-        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
-
-        # Add the following timeout settings
-        proxy_connect_timeout 75s;
-        proxy_read_timeout 300s;
-        proxy_send_timeout 300s;
-    }
-
-    location /static {
-        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
-    }
-    
+    server_name privacyidea.staging.spsh.dbildungsplattform.de;
+ 
     location /.well-known/acme-challenge/ {
         root /var/www/letsencrypt;
     }
+ 
+    location /static {
+        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
+    }
+ 
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
+    }
 }
+
+# After creating the SSL certificate, you can remove the block above that listens on port 80
+# and activate the block below that listens on port 443 for HTTPS traffic.
+# This ensures secure communication using the SSL certificate.
+# Note: Ensure that port 443 is open in the IONOS firewall for HTTPS traffic.
+#server {
+#    listen 443 ssl;
+#    server_name privacyidea.infra.dev.spsh.dbildungsplattform.de;
+#
+#    ssl_certificate /etc/letsencrypt/live/privacyidea.infra.dev.spsh.dbildungsplattform.de/fullchain.pem;
+#    ssl_certificate_key /etc/letsencrypt/live/privacyidea.infra.dev.spsh.dbildungsplattform.de/privkey.pem;
+
+#    access_log /var/log/nginx/privacyidea.access.log;
+#   error_log /var/log/nginx/privacyidea.error.log;
+
+#    location / {
+#        include uwsgi_params;
+#        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
+
+#    }
+
+#    location /static {
+#        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
+#   }
+#}

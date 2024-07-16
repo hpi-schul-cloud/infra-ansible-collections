@@ -7,7 +7,6 @@
     creates: /etc/privacyidea/enckey
   become: true
 
-
 # This is used to encrypt the admin passwords
 - name: Generate PI_PEPPER for PrivacyIDEA
   shell: |
@@ -31,18 +30,4 @@
   args:
     chdir: "{{ privacyidea_dir }}"
     creates: /etc/privacyidea/private.pem
-  become: true
-
-- name: Set correct permissions for PrivacyIDEA files
-  file:
-    path: "/etc/privacyidea/{{ item }}"
-    owner: www-data
-    group: www-data
-    mode: '0755'
-  loop:
-    - enckey
-    - pi.cfg
-    - privacyideaapp.py
-    - private.pem
-    - public.pem
   become: true
