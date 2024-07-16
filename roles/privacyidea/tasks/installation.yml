@@ -19,6 +19,18 @@
     - /var/log/privacyidea # contains privacyidea.log
     - /run/uwsgi/app/privacyidea # contains the Unix socket file for uWSGI(privacyidea.socket)
     - /var/log/uwsgi
+
+- name: Create uWSGI log files
+  file:
+    path: "{{ item }}"
+    state: touch
+    mode: '0660'
+    owner: www-data
+    group: www-data
+  loop:
+    - "/var/log/uwsgi/privacyidea.log"
+    - "/var/log/uwsgi/error.log"
+    - "/var/log/uwsgi/request.log"
     
 #Install virtualenv using pip
 - name: Install virtualenv
@@ -64,6 +76,7 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
+
 
 
 #Copies the uWSGI configuration file for privacyIDEA
