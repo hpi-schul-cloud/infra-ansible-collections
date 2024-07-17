@@ -19,7 +19,7 @@
     username: "{{ ionos_username | default(omit) }}"
     password: "{{ ionos_password | default(omit) }}"
     token: "{{ ionos_token | default(omit) }}"
-    k8s_cluster_id: "{{ terraform_run.outputs.cluster_id.value }}"
+    k8s_cluster: "{{ terraform_run.outputs.cluster_id.value }}"
     config_file: "{{ lookup('env','HOME') }}/.kube/{{ terraform_run.outputs.cluster_name.value }}.yaml"
     state: present
   when: terraform_run is defined and terraform_run.outputs is defined
