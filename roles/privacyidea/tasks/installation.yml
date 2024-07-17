@@ -22,17 +22,18 @@
     - { path: '/run/uwsgi', mode: '0775' }
   become: true
 
-- name: Create uWSGI log files
+- name: Create uWSGI and privacyidea log files
   file:
     path: "{{ item.path }}"
     state: touch
     owner: www-data
     group: www-data
-    mode: '0664'
+    mode: '0755' # was 0664
   loop:
     - { path: '/var/log/uwsgi/privacyidea.log' }
     - { path: '/var/log/uwsgi/error.log' }
     - { path: '/var/log/uwsgi/request.log' }
+    - { path: '/var/log/privacyidea/privacyidea.log' }
   become: true
 
 #Install virtualenv using pip
