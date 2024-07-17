@@ -19,6 +19,7 @@
     - { path: '/var/log/privacyidea', mode: '0755' }
     - { path: '/run/uwsgi/app/privacyidea', mode: '0775' }
     - { path: '/var/log/uwsgi', mode: '0755' }
+    - { path: '/run/uwsgi', mode: '0775' }
   become: true
 
 - name: Create uWSGI log files
