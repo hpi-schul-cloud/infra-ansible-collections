@@ -7,18 +7,16 @@
     creates: /etc/privacyidea/enckey
   become: true
 
-# This is used to encrypt the admin passwords
 - name: Generate PI_PEPPER for PrivacyIDEA
-  shell: |
+  ansible.builtin.shell: |
     PI_PEPPER=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
-    echo "PI_PEPPER = '$PI_PEPPER'" >> /etc/privacyidea/pi.cfg
+    sed -i "/^PI_PEPPER/c\PI_PEPPER = '$PI_PEPPER'" /etc/privacyidea/pi.cfg
   become: true
 
-# This is used to encrypt the auth_token
 - name: Generate SECRET_KEY for PrivacyIDEA
-  shell: |
+  ansible.builtin.shell: |
     SECRET_KEY=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
-    echo "SECRET_KEY = '$SECRET_KEY'" >> /etc/privacyidea/pi.cfg
+    sed -i "/^SECRET_KEY/c\SECRET_KEY = '$SECRET_KEY'" /etc/privacyidea/pi.cfg
   become: true
 
 
