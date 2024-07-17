@@ -48,13 +48,13 @@
 
 # this task is created cause i get :
 #-bash: /opt/privacyidea/virtualenv/bin/activate: Permission denied
-- name: Ensure virtual environment has correct ownership and permissions
-  ansible.builtin.file:
-    path: "{{ privacyidea_dir }}/virtualenv"
-    owner: www-data
-    group: www-data
-    mode: '0755'
-    recurse: yes
+#- name: Ensure virtual environment has correct ownership and permissions
+#  ansible.builtin.file:
+#    path: "{{ privacyidea_dir }}/virtualenv"
+#    owner: www-data
+#    group: www-data
+#    mode: '0755'
+#    recurse: yes
 
 - name: Install privacyidea dependencies
   pip:
@@ -88,7 +88,6 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
-
 
 
 #Copies the uWSGI configuration file for privacyIDEA
