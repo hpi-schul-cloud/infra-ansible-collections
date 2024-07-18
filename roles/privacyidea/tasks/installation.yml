@@ -1,11 +1,9 @@
 ---
-# Ensures all necessary packages are installed
 - name: Install packages
   apt:
     name: "{{ privacyidea_packages }}"
     state: present
 
-#https://privacyidea.readthedocs.io/en/latest/installation/pip.html
 - name: Create privacyIDEA directories
   file:
     path: "{{ item.path }}"
@@ -28,7 +26,7 @@
     state: touch
     owner: www-data
     group: www-data
-    mode: '0755' # was 0664
+    mode: '0755'
   loop:
     - { path: '/var/log/uwsgi/privacyidea.log' }
     - { path: '/var/log/uwsgi/error.log' }
@@ -36,27 +34,17 @@
     - { path: '/var/log/privacyidea/privacyidea.log' }
   become: true
 
-#Install virtualenv using pip
 - name: Install virtualenv
   pip:
     name: virtualenv
   become: true
+
 
 - name: Create a virtualenv for privacyIDEA
   command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
   args:
     creates: "{{ privacyidea_dir }}/virtualenv"
   become: true
-
-# this task is created cause i get :
-#-bash: /opt/privacyidea/virtualenv/bin/activate: Permission denied
-#- name: Ensure virtual environment has correct ownership and permissions
-#  ansible.builtin.file:
-#    path: "{{ privacyidea_dir }}/virtualenv"
-#    owner: www-data
-#    group: www-data
-#    mode: '0755'
-#    recurse: yes
 
 - name: Install privacyidea dependencies
   pip:
@@ -68,7 +56,6 @@
     virtualenv: "{{ privacyidea_dir }}/virtualenv"
     name: "privacyIDEA=={{ privacyidea_version }}"
 
-
 - name: Create MariaDB database
   mysql_db:
     name: "{{ privacyidea_mariadb_name }}"
@@ -77,7 +64,6 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
-
 
 - name: Create database user and grant all necessary privileges
   mysql_user:
@@ -91,42 +77,34 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
-
-#Copies the uWSGI configuration file for privacyIDEA
 - name: Copy uWSGI configuration
   template:
     src: privacyidea.ini.j2
     dest: /etc/uwsgi/apps-available/privacyidea.ini
   notify: restart uWSGI
 
-# Sets up the uWSGI service for privacyIDEA
 - name: Copy uWSGI service file
   template:
     src: uwsgi.service.j2
     dest: /etc/systemd/system/uwsgi.service
   notify: restart uWSGI
 
-# Sets up the database configuration for privacyIDEA
 - name: Configure database connection
   template:
     src: pi.cfg.j2
     dest: /etc/privacyidea/pi.cfg
-
 
 - name: Copy PrivacyIDEA WSGI script
   template:
     src: privacyideaapp.py.j2
     dest: /etc/privacyidea/privacyideaapp.py
 
-#https://privacyidea.readthedocs.io/en/latest/installation/pip.html
 - name: Create database tables
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
 
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
-# create an admin user for privacyIDEA
 - name: Create privacyIDEA admin user
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -p {{ privacyidea_admin_password}}"
   become: true
-  no_log: true
