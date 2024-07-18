@@ -105,6 +105,15 @@
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
+- name: debug become true ------- 
+  command: "whoami"
+  become: true
+
+- name: debug  become user --------
+  command: "whoami"
+  become: true
+  become_user: www-data
+
 - name: Create privacyIDEA admin user
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -p {{ privacyidea_admin_password }}"
   become: true
