@@ -105,32 +105,7 @@
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
-#- name: Create privacyIDEA admin user
-#  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -p {{ privacyidea_admin_password }}"
-# become: true
-#  become_user: www-data
-
-
-
-- name: Ensure the environment is correct
-  shell: |
-    . {{ privacyidea_dir }}/virtualenv/bin/activate
-    echo $PATH
-    which pi-manage
-  become: true
-  become_user: www-data
-  register: debug_env
-
-- debug:
-    var: debug_env.stdout
-
 - name: Create privacyIDEA admin user
-  shell: |
-    . {{ privacyidea_dir }}/virtualenv/bin/activate
-    {{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -p {{ privacyidea_admin_password }}
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} -p {{ privacyidea_admin_password }}" 
   become: true
   become_user: www-data
-  register: create_admin_result
-
-- debug:
-    var: create_admin_result.stdout
