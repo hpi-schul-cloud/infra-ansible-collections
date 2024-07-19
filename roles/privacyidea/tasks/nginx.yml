@@ -6,20 +6,9 @@
     path: "{{ item }}"
     state: absent
   loop:
-    - /etc/nginx/sites-available/default
     - /etc/nginx/sites-available/privacyidea
-    - /etc/nginx/sites-enabled/default
     - /etc/nginx/sites-enabled/privacyidea
   become: true
-  notify:
-    - restart nginx
-
-# Increasing the hash table size to 128, to provid more buckets for Nginx to store and look up the server name
-- name: Configure Nginx
-  template:
-    src: nginx.conf.j2
-    dest: /etc/nginx/nginx.conf
-    mode: '0644'
   notify:
     - restart nginx
 
