@@ -15,7 +15,7 @@
     - { path: '/etc/privacyidea', mode: '0755' }
     - { path: '/opt/privacyidea', mode: '0755' }
     - { path: '/var/log/privacyidea', mode: '0755' }
-    - { path: '/run/uwsgi/app/privacyidea', mode: '0775' }
+    - { path: '/run/uwsgi/app/privacyidea', mode: '0755' }
     - { path: '/var/log/uwsgi', mode: '0755' }
     - { path: '/run/uwsgi', mode: '0775' }
   become: true
@@ -26,7 +26,7 @@
     state: touch
     owner: www-data
     group: www-data
-    mode: '0755'
+    mode: '0664'
   loop:
     - { path: '/var/log/uwsgi/privacyidea.log' }
     - { path: '/var/log/uwsgi/error.log' }
