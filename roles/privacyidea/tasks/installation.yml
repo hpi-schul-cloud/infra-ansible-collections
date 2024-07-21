@@ -19,6 +19,7 @@
     - { path: '/var/log/uwsgi', mode: '0755' }
     - { path: '/run/uwsgi', mode: '0775' }
   become: true
+  notify: restart uWSGI
 
 - name: Create uWSGI and privacyidea log files
   file:
@@ -33,12 +34,12 @@
     - { path: '/var/log/uwsgi/request.log' }
     - { path: '/var/log/privacyidea/privacyidea.log' }
   become: true
-
+  notify: restart uWSGI
+  
 - name: Install virtualenv
   pip:
     name: virtualenv
   become: true
-
 
 - name: Create a virtualenv for privacyIDEA
   command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
@@ -83,6 +84,13 @@
     dest: /etc/uwsgi/apps-available/privacyidea.ini
   notify: restart uWSGI
 
+- name: Enable uWSGI app for PrivacyIDEA
+  file:
+    src: /etc/uwsgi/apps-available/privacyidea.ini
+    dest: /etc/uwsgi/apps-enabled/privacyidea.ini
+    state: link
+  notify: restart uWSGI
+
 - name: Copy uWSGI service file
   template:
     src: uwsgi.service.j2
@@ -93,11 +101,13 @@
   template:
     src: pi.cfg.j2
     dest: /etc/privacyidea/pi.cfg
+  notify: restart uWSGI
 
 - name: Copy PrivacyIDEA WSGI script
   template:
     src: privacyideaapp.py.j2
     dest: /etc/privacyidea/privacyideaapp.py
+  notify: restart uWSGI
 
 - name: Create database tables
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"

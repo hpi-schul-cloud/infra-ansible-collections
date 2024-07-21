@@ -4,14 +4,12 @@ privacyidea_packages:
     - python3-venv
     - python3-pip
     - nginx
-    - libmysqlclient-dev # provide the necessary header files and libraries for building and compiling other software that needs to interface with MySQL/MariaDB.
     - mariadb-client
     - python3-mysqldb
     - uwsgi
     - uwsgi-plugin-python3
     - certbot
     - python3-certbot-nginx
-
 privacyidea_dir: "/opt/privacyidea"
 privacyidea_server_name: ""
 privacyidea_mariadb_username: ""
