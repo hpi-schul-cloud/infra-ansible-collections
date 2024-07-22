@@ -1,0 +1,13 @@
+[config]
+database = mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}:{{ privacyidea_sql_port }}/{{ privacyidea_mariadb_name }}
+
+table = admin
+map = {"username": "username",
+       "email": "email",
+       "password": "password"}
+where = 
+database_encoding = utf-8
+limit = 500
+pool size = 5
+pool timeout = 30
+pool recycle = 3600
