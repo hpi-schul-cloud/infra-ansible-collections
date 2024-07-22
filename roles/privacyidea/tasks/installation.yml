@@ -134,7 +134,7 @@
   notify: restart uWSGI
 
 - name: Create SQL admin resolver
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} SQL -f /etc/privacyidea/sql_resolver.ini"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} sqlresolver /etc/privacyidea/sql_resolver.ini"
   become: true
   become_user: www-data
   notify: restart uWSGI
