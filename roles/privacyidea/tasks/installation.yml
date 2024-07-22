@@ -109,6 +109,10 @@
     dest: /etc/privacyidea/privacyideaapp.py
   notify: restart uWSGI
 
+- name: Reload systemd to recognize uwsgi service
+  command: systemctl daemon-reload
+  become: true
+
 - name: Create database tables
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
 
