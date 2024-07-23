@@ -150,3 +150,5 @@
   command: "/opt/privacyidea/virtualenv/bin/pi-manage admin add test --password test"
   become: true
   become_user: www-data
+  environment:
+    PI_CFG: /etc/privacyidea/pi.cfg
