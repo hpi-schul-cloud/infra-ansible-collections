@@ -154,9 +154,4 @@
 
 - name: Create privacyIDEA admin policy
   command: "/opt/privacyidea/virtualenv/bin/pi-manage policy create -f /etc/privacyidea/admin_policy.json"
-  register: create_policy_output
   ignore_errors: true
-  
-- name: Debug  Create privacyIDEA admin policy
-  debug:
-    var: create_policy_output
