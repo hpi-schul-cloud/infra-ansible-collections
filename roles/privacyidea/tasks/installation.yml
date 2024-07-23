@@ -151,9 +151,12 @@
     dest: /etc/privacyidea/admin_policy.json
   notify: restart uWSGI
 
+
 - name: Create privacyIDEA admin policy
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage policy create admin_full_access_policy admin \"init,enable,disable,revoke,set,setOTPPIN,setMOTPPIN,resync,assign,unassign,import,remove,userlist,checkstatus,manageToken,getserial,getrandom,getchallenges,losttoken,adduser,updateuser,deleteuser,copytokenuser,copytokenpin,smtpserver_write\" -f /etc/privacyidea/admin_policy.json"
+  command: "/opt/privacyidea/virtualenv/bin/pi-manage policy create -f /etc/privacyidea/admin_policy.json"
   register: create_policy_output
-  become: true
-  become_user: www-data
-  notify: restart uWSGI
+  ignore_errors: true
+  
+- name: Debug  Create privacyIDEA admin policy
+  debug:
+    var: create_policy_output
