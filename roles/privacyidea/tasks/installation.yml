@@ -147,8 +147,8 @@
 
 - name: Create policy JSON file
   template:
-  src: admin_policy.json.j2
-  dest: /etc/privacyidea/admin_policy.json
+    src: admin_policy.json.j2
+    dest: /etc/privacyidea/admin_policy.json
   notify: restart uWSGI
 
 - name: Create privacyIDEA admin policy
