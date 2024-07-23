@@ -120,27 +120,27 @@
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
 - name: Create privacyIDEA admin user
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }}" 
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }} -e {{ privacyidea_admin }}@{{ admin_realm }} " 
   become: true
   become_user: www-data
 
-# - name: Create SQL resolver configuration file
-#   template:
-#     src: sql_resolver.ini.j2
-#     dest: /etc/privacyidea/sql_resolver.ini
-#     owner: www-data
-#     group: www-data
-#     mode: '0600'
-#   notify: restart uWSGI
+- name: Create SQL resolver configuration file
+  template:
+    src: sql_resolver.ini.j2
+    dest: /etc/privacyidea/sql_resolver.ini
+    owner: www-data
+    group: www-data
+    mode: '0600'
+  notify: restart uWSGI
 
-# - name: Create SQL admin resolver
-#   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} sqlresolver /etc/privacyidea/sql_resolver.ini"
-#   become: true
-#   become_user: www-data
-#   notify: restart uWSGI
+- name: Create SQL admin resolver
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} sqlresolver /etc/privacyidea/sql_resolver.ini"
+  become: true
+  become_user: www-data
+  notify: restart uWSGI
 
-# - name: Create admin realm
-#   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage realm create {{ admin_realm }} {{ sql_admin_resolver }}"
-#   become: true
-#   become_user: www-data
-#   notify: restart uWSGI
+- name: Create admin realm
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage realm create {{ admin_realm }} {{ sql_admin_resolver }}"
+  become: true
+  become_user: www-data
+  notify: restart uWSGI
