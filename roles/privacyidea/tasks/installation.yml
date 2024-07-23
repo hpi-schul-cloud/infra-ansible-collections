@@ -146,9 +146,16 @@
   notify: restart uWSGI
 
 
-- name: Create privacyIDEA test  admin user
-  command: "/opt/privacyidea/virtualenv/bin/pi-manage admin add test --password test"
+- name: Create admin full access policy
+  command: >
+    {{ privacyidea_dir }}/virtualenv/bin/pi-manage policy create admin_full_access_policy 
+    scope=admin 
+    action="init,enable,disable,revoke,set,setOTPPIN,setMOTPPIN,resync,assign,unassign,import,remove,userlist,checkstatus,manageToken,getserial,getrandom,getchallenges,losttoken,adduser,updateuser,deleteuser,copytokenuser,copytokenpin,smtpserver_write" 
+    user={{ privacyidea_admin }} 
+    realm={{ admin_realm }} 
+    resolver={{ sql_admin_resolver }}
   become: true
   become_user: www-data
-  environment:
-    PI_CFG: /etc/privacyidea/pi.cfg
+  notify: restart uWSGI
+
+
