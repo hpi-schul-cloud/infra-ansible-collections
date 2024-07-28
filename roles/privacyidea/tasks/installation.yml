@@ -80,8 +80,11 @@
 
 - name: Copy the SQL script
   copy:
-    src: create_users_table.sql
+    content: "{{ lookup('file', 'create_users_table.sql') }}"
     dest: /etc/privacyidea/create_users_table.sql
+    owner: www-data
+    group: www-data
+    mode: '0600'
 
 - name: Create users table in MariaDB
   mysql_db:
