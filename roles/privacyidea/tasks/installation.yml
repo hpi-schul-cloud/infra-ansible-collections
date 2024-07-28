@@ -138,7 +138,7 @@
 
 - name: Create SQL resolver configuration file
   template:
-    src: sql_resolver.ini.j2
+    src: user_sql_resolver_config.ini.j2
     dest: /etc/privacyidea/user_sql_resolver_config.ini
     owner: www-data
     group: www-data
