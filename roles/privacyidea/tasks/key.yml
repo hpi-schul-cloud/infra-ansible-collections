@@ -1,27 +1,35 @@
----
-- name: Generate encryption key
+#Encryption Key is used to encrypt sensitive data within PrivacyIDEA, such as tokens and passwords
+- name: Generate encryption key for PrivacyIDEA
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_enckey"
   args:
     creates: /etc/privacyidea/enckey
+  become: true
 
-- name: Generate PI_PEPPER
+#PI_PEPPER is used to add an additional layer of security for encrypting sensitive data,particularly passwords.
+- name: Generate PI_PEPPER for PrivacyIDEA
   ansible.builtin.shell: |
     PI_PEPPER=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
     sed -i "/^PI_PEPPER/c\PI_PEPPER = '$PI_PEPPER'" /etc/privacyidea/pi.cfg
+  become: true
 
-- name: Generate SECRET_KEY
+#SECRET_KEY is used to sign session data to prevent tampering.
+- name: Generate SECRET_KEY for PrivacyIDEA
   ansible.builtin.shell: |
     SECRET_KEY=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
     sed -i "/^SECRET_KEY/c\SECRET_KEY = '$SECRET_KEY'" /etc/privacyidea/pi.cfg
+  become: true
 
-- name: Generate private key for audit log
+#Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, 
+#ensuring that the audit log entries are tamper-proof and can be verified.
+- name: Generate private key for PrivacyIDEA audit log
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_audit_keys"
   args:
     chdir: "{{ privacyidea_dir }}"
     creates: /etc/privacyidea/private.pem
+  become: true
 
 - name: Set PrivacyIDEA file permissions
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     owner: www-data
     group: www-data
@@ -32,3 +40,12 @@
     - { path: '/etc/privacyidea/privacyideaapp.py', mode: '0755' }
     - { path: '/etc/privacyidea/private.pem', mode: '0600' }
     - { path: '/etc/privacyidea/public.pem', mode: '0644' }
+  become: true
+  notify: restart uWSGI
+
+
+
+- name: Create privacyIDEA admin user
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }} -e {{ privacyidea_admin }}@{{ admin_realm }} " 
+  become: true
+  become_user: www-data
