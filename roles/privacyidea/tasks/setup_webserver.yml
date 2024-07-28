@@ -1,0 +1,48 @@
+---
+- name: Copy uWSGI configuration
+  template:
+    src: privacyidea.ini.j2
+    dest: /etc/uwsgi/apps-available/privacyidea.ini
+
+- name: Enable uWSGI app for PrivacyIDEA
+  file:
+    src: /etc/uwsgi/apps-available/privacyidea.ini
+    dest: /etc/uwsgi/apps-enabled/privacyidea.ini
+    state: link
+
+- name: Copy uWSGI service file
+  template:
+    src: uwsgi.service.j2
+    dest: /etc/systemd/system/uwsgi.service
+
+- name: Reload systemd
+  systemd:
+    daemon_reload: yes
+
+- name: Remove default Nginx configurations
+  file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/nginx/sites-available/default
+    - /etc/nginx/sites-enabled/default
+
+- name: Copy Nginx configuration
+  template:
+    src: nginx_privacyidea.conf.j2
+    dest: /etc/nginx/sites-available/privacyidea.conf
+
+- name: Enable PrivacyIDEA Nginx site
+  file:
+    src: /etc/nginx/sites-available/privacyidea.conf
+    dest: /etc/nginx/sites-enabled/privacyidea.conf
+    state: link
+
+- name: Allow HTTPS traffic
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+
+- name: Reload firewall rules
+  command: ufw reload

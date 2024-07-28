@@ -1,4 +1,9 @@
 ---
-- import_tasks: installation.yml
-- import_tasks: key.yml
-- import_tasks: nginx.yml
+- import_tasks: install_packages.yml
+- import_tasks: setup_directories.yml
+- import_tasks: setup_privacyidea.yml
+- import_tasks: setup_database.yml
+- import_tasks: configure_privacyidea.yml
+- import_tasks: generate_keys.yml
+- import_tasks: create_admin.yml
+- import_tasks: setup_webserver.yml

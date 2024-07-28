@@ -1,13 +1,13 @@
 {
-    "type": "sqlresolver",
-    "database": "mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}:{{ privacyidea_sql_port }}/{{ privacyidea_mariadb_name }}",
     "Driver": "mysql+pymysql",
     "Server": "{{ privacyidea_mariadb_private_ip }}",
     "Database": "{{ privacyidea_mariadb_name }}",
     "User": "{{ mariadb_user }}",  
     "Password": "{{ privacyidea_db_user_password }}",
     "Table": "users",
+    "Editable": "1",
     "Map": {
+        "userid": "id",
         "username": "username",
         "email": "email",
         "password": "password",

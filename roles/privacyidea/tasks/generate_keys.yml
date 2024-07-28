@@ -1,35 +1,27 @@
-#Encryption Key is used to encrypt sensitive data within PrivacyIDEA, such as tokens and passwords
-- name: Generate encryption key for PrivacyIDEA
+---
+- name: Generate encryption key
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_enckey"
   args:
     creates: /etc/privacyidea/enckey
-  become: true
 
-#PI_PEPPER is used to add an additional layer of security for encrypting sensitive data,particularly passwords.
-- name: Generate PI_PEPPER for PrivacyIDEA
+- name: Generate PI_PEPPER
   ansible.builtin.shell: |
     PI_PEPPER=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
     sed -i "/^PI_PEPPER/c\PI_PEPPER = '$PI_PEPPER'" /etc/privacyidea/pi.cfg
-  become: true
 
-#SECRET_KEY is used to sign session data to prevent tampering.
-- name: Generate SECRET_KEY for PrivacyIDEA
+- name: Generate SECRET_KEY
   ansible.builtin.shell: |
     SECRET_KEY=$(tr -dc A-Za-z0-9_ < /dev/urandom | head -c24)
     sed -i "/^SECRET_KEY/c\SECRET_KEY = '$SECRET_KEY'" /etc/privacyidea/pi.cfg
-  become: true
 
-#Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, 
-#ensuring that the audit log entries are tamper-proof and can be verified.
-- name: Generate private key for PrivacyIDEA audit log
+- name: Generate private key for audit log
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_audit_keys"
   args:
     chdir: "{{ privacyidea_dir }}"
     creates: /etc/privacyidea/private.pem
-  become: true
 
 - name: Set PrivacyIDEA file permissions
-  ansible.builtin.file:
+  file:
     path: "{{ item.path }}"
     owner: www-data
     group: www-data
@@ -40,5 +32,3 @@
     - { path: '/etc/privacyidea/privacyideaapp.py', mode: '0755' }
     - { path: '/etc/privacyidea/private.pem', mode: '0600' }
     - { path: '/etc/privacyidea/public.pem', mode: '0644' }
-  become: true
-  notify: restart uWSGI

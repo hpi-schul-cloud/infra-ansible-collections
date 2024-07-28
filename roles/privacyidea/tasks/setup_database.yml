@@ -1,0 +1,38 @@
+---
+- name: Create MariaDB database
+  mysql_db:
+    name: "{{ privacyidea_mariadb_name }}"
+    state: present
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+
+- name: Create database user and grant privileges
+  mysql_user:
+    name: "{{ mariadb_user }}"
+    password: "{{ privacyidea_db_user_password }}"
+    priv: "*.*:{{ db_privileges_global | join(',') }}/{{ privacyidea_mariadb_name }}.*:{{ db_privileges_specific | join(',') }}"
+    host: "%"
+    state: present
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+
+- name: Create users table
+  mysql_query:
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+    login_db: "{{ mariadb_user }}"
+    query: |
+      CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255) UNIQUE NOT NULL,
+        surname VARCHAR(255),
+        givenname VARCHAR(255),
+        email VARCHAR(255),
+        password VARCHAR(255),
+        description TEXT,
+        mobile VARCHAR(255),
+        phone VARCHAR(255)
+      )

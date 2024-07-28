@@ -1,0 +1,5 @@
+---
+- name: Create privacyIDEA admin user
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }} -e {{ privacyidea_admin }}@{{ admin_realm }}"
+  become: true
+  become_user: www-data

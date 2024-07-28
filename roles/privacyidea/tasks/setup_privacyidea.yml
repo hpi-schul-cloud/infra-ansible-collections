@@ -1,0 +1,15 @@
+---
+- name: Create a virtualenv for privacyIDEA
+  command: python3 -m venv "{{ privacyidea_dir }}/virtualenv"
+  args:
+    creates: "{{ privacyidea_dir }}/virtualenv"
+
+- name: Install privacyidea dependencies
+  pip:
+    virtualenv: "{{ privacyidea_dir }}/virtualenv"
+    requirements: "https://raw.githubusercontent.com/privacyidea/privacyidea/v{{ privacyidea_version }}/requirements.txt"
+
+- name: Install privacyIDEA
+  pip:
+    virtualenv: "{{ privacyidea_dir }}/virtualenv"
+    name: "privacyIDEA=={{ privacyidea_version }}"
