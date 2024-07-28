@@ -78,23 +78,23 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
-- name: Copy the SQL script
-  copy:
-    content: "{{ lookup('file', 'create_users_table.sql') }}"
-    dest: /etc/privacyidea/create_users_table.sql
-    owner: www-data
-    group: www-data
-    mode: '0600'
+# - name: Copy the SQL script
+#   copy:
+#     content: "{{ lookup('file', 'create_users_table.sql') }}"
+#     dest: /etc/privacyidea/create_users_table.sql
+#     owner: www-data
+#     group: www-data
+#     mode: '0600'
 
-- name: Create users table in MariaDB
-  mysql_db:
-    login_user: "{{ privacyidea_mariadb_username }}"
-    login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
-    name: "{{ privacyidea_mariadb_name }}"
-    state: import
-    target: /etc/privacyidea/create_users_table.sql
-  become: true
+# - name: Create users table in MariaDB
+#   mysql_db:
+#     login_user: "{{ privacyidea_mariadb_username }}"
+#     login_password: "{{ privacyidea_mariadb_password }}"
+#     login_host: "{{ privacyidea_mariadb_private_ip }}"
+#     name: "{{ privacyidea_mariadb_name }}"
+#     state: import
+#     target: /etc/privacyidea/create_users_table.sql
+#   become: true
 
 - name: Copy uWSGI configuration
   template:
