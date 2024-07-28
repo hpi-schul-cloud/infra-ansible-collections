@@ -1,11 +1,22 @@
 {
+    "type": "sqlresolver",
     "database": "mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}:{{ privacyidea_sql_port }}/{{ privacyidea_mariadb_name }}",
-    "table": "admin",
-    "map": {"username": "username", "email": "email", "password": "password"},
+    "Driver": "mysql+pymysql",
+    "Server": "{{ privacyidea_mariadb_private_ip }}",
+    "Database": "{{ privacyidea_mariadb_name }}",
+    "User": "{{ mariadb_user }}",  
+    "Password": "{{ privacyidea_db_user_password }}",
+    "Table": "users",
+    "Map": {
+        "username": "username",
+        "email": "email",
+        "password": "password",
+        "phone": "phone",
+        "mobile": "mobile",
+        "surname": "surname",
+        "givenname": "givenname",
+        "description": "description"
+    },
     "where": "",
-    "database_encoding": "utf-8",
-    "limit": 500,
-    "pool_size": 5,
-    "pool_timeout": 30,
-    "pool_recycle_timeout": 3600
+    "Limit": 500
 }

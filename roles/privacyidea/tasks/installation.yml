@@ -78,6 +78,21 @@
     login_host: "{{ privacyidea_mariadb_private_ip }}"
   become: true
 
+- name: Copy the SQL script
+  copy:
+    src: create_users_table.sql
+    dest: /tmp/create_users_table.sql
+
+- name: Create users table in MariaDB
+  mysql_db:
+    login_user: "{{ privacyidea_mariadb_username }}"
+    login_password: "{{ privacyidea_mariadb_password }}"
+    login_host: "{{ privacyidea_mariadb_private_ip }}"
+    name: "{{ privacyidea_mariadb_name }}"
+    state: import
+    target: /tmp/create_users_table.sql
+  become: true
+
 - name: Copy uWSGI configuration
   template:
     src: privacyidea.ini.j2
@@ -119,11 +134,6 @@
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
-- name: Create privacyIDEA admin user
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }} -e {{ privacyidea_admin }}@{{ admin_realm }} " 
-  become: true
-  become_user: www-data
-
 - name: Create SQL resolver configuration file
   template:
     src: sql_resolver.ini.j2
@@ -144,16 +154,3 @@
   become: true
   become_user: www-data
   notify: restart uWSGI
-
-- name: Create policy JSON file
-  template:
-    src: admin_policy.json.j2
-    dest: /etc/privacyidea/admin_policy.json
-  notify: restart uWSGI
-
-# - name: Create privacyIDEA admin policy
-#   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage policy create admin_full_access_policy admin \"init,enable,disable,revoke,set,setOTPPIN,setMOTPPIN,resync,assign,unassign,import,remove,userlist,checkstatus,manageToken,getserial,getrandom,getchallenges,losttoken,adduser,updateuser,deleteuser,copytokenuser,copytokenpin,smtpserver_write,smtpserver_read,resolverread,radiusserver_read,resolverwrite,radiusserver_write,caconnectorread,caconnectorwrite,policyread,policywrite,auditlog,auditlog_download,machinelistread,machinelistwrite,mresolverread,mresolverwrite,clienttype\" -f /etc/privacyidea/admin_policy.json"
-#   register: create_policy_output
-#   become: true
-#   become_user: www-data
-#   notify: restart uWSGI
