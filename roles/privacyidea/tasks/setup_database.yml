@@ -1,4 +1,3 @@
----
 - name: Create MariaDB database
   mysql_db:
     name: "{{ privacyidea_mariadb_name }}"
@@ -23,7 +22,7 @@
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
-    login_db: "{{ mariadb_user }}"
+    login_db: "{{ privacyidea_mariadb_name }}"
     query: |
       CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -35,4 +34,4 @@
         description TEXT,
         mobile VARCHAR(255),
         phone VARCHAR(255)
-      )
+      );
