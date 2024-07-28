@@ -64,9 +64,8 @@
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
-  become: true
 
-- name: Create database user and grant all necessary privileges
+- name: Create database user and grant privileges
   mysql_user:
     name: "{{ mariadb_user }}"
     password: "{{ privacyidea_db_user_password }}"
@@ -76,7 +75,6 @@
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
-  become: true
 
 - name: Create users table
   mysql_query:
@@ -96,9 +94,6 @@
         mobile VARCHAR(255),
         phone VARCHAR(255)
       );
-  become: true
-  become_user: "{{ privacyidea_mariadb_username }}"
-  ignore_errors: true
 
 - name: Copy uWSGI configuration
   template:
