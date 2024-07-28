@@ -24,7 +24,7 @@
     mode: '0600'
 
 - name: Create SQL admin resolver
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} sqlresolver /etc/privacyidea/sql_resolver.ini"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} sqlresolver /etc/privacyidea/user_sql_resolver_config.ini"
   become: true
   become_user: www-data
 
