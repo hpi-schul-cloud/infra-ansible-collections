@@ -1,0 +1,62 @@
+---
+- name: Copy uWSGI configuration
+  template:
+    src: privacyidea.ini.j2
+    dest: /etc/uwsgi/apps-available/privacyidea.ini
+  notify: restart uWSGI
+
+- name: Enable uWSGI app for PrivacyIDEA
+  file:
+    src: /etc/uwsgi/apps-available/privacyidea.ini
+    dest: /etc/uwsgi/apps-enabled/privacyidea.ini
+    state: link
+  notify: restart uWSGI
+
+- name: Copy uWSGI service file
+  template:
+    src: uwsgi.service.j2
+    dest: /etc/systemd/system/uwsgi.service
+  notify: restart uWSGI
+
+- name: Configure database connection
+  template:
+    src: pi.cfg.j2
+    dest: /etc/privacyidea/pi.cfg
+  notify: restart uWSGI
+
+- name: Copy PrivacyIDEA WSGI script
+  template:
+    src: privacyideaapp.py.j2
+    dest: /etc/privacyidea/privacyideaapp.py
+  notify: restart uWSGI
+
+- name: Reload systemd to recognize uwsgi service
+  command: systemctl daemon-reload
+  become: true
+
+- name: Create database tables
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
+
+- name: Stamping the database to the current database schema
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
+
+- name: Create SQL resolver configuration file
+  template:
+    src: user_sql_resolver_config.ini.j2
+    dest: /etc/privacyidea/user_sql_resolver_config.ini
+    owner: www-data
+    group: www-data
+    mode: '0600'
+  notify: restart uWSGI
+
+- name: Create SQL admin resolver
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_admin_resolver }} sqlresolver /etc/privacyidea/user_sql_resolver_config.ini"
+  become: true
+  become_user: www-data
+  notify: restart uWSGI
+
+- name: Create admin realm
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage realm create {{ admin_realm }} {{ sql_admin_resolver }}"
+  become: true
+  become_user: www-data
+  notify: restart uWSGI
