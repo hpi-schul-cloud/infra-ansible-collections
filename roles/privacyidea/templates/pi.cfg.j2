@@ -2,7 +2,7 @@
 #https://github.com/privacyidea/privacyidea/blob/master/deploy/pi.cfg
 import logging
 # The realm, where users are allowed to login as administrators
-SUPERUSER_REALM = ['adminrealm1']
+SUPERUSER_REALM = ['administrator','userrealm']
 # Your database
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@{{ privacyidea_mariadb_private_ip }}/{{ privacyidea_mariadb_name }}'
 # This is used to encrypt the token data and token passwords
@@ -18,7 +18,7 @@ PI_AUDIT_KEY_PUBLIC = '/etc/privacyidea/public.pem'
 # The Class for managing the SQL connection pool
 #PI_ENGINE_REGISTRY_CLASS = "shared"
 #PI_AUDIT_POOL_SIZE = 20
-PI_LOGLEVEL = 20
+PI_LOGLEVEL = 10
 PI_LOGFILE = '/var/log/privacyidea/privacyidea.log'
 # This is used to encrypt the admin passwords
 PI_PEPPER = ''
