@@ -12,6 +12,11 @@
 #    location /static {
 #        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
 #    }
+#    Redirect all other HTTP requests to HTTPS if  the SSL certificate is obtained
+#    This Block can be removed if no SSL is obtained
+#    location / {
+#       return 301 https://$host$request_uri;
+#    }
  
 #    location / {
 #        include uwsgi_params;
