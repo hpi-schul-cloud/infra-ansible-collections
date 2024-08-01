@@ -18,21 +18,23 @@
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
 
-- name: Create users table
+
+# Creating the new users_service table in MariaDB based on the structure from admin2go
+- name: Create users_service table
   mysql_query:
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
     login_host: "{{ privacyidea_mariadb_private_ip }}"
     login_db: "{{ privacyidea_mariadb_name }}"
     query: |
-      CREATE TABLE IF NOT EXISTS users (
+      CREATE TABLE IF NOT EXISTS users_service (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(255) UNIQUE NOT NULL,
-        surname VARCHAR(255),
-        givenname VARCHAR(255),
-        email VARCHAR(255),
+        username VARCHAR(40) UNIQUE,
+        email VARCHAR(80),
         password VARCHAR(255),
-        description TEXT,
-        mobile VARCHAR(255),
-        phone VARCHAR(255)
-      );
+        phone VARCHAR(40),
+        mobile VARCHAR(40),
+        surname VARCHAR(40),
+        givenname VARCHAR(40),
+        description VARCHAR(255)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_german2_ci;
