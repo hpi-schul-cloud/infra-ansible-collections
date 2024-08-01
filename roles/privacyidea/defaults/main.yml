@@ -1,12 +1,50 @@
 ---
-privacyidea_mariadb_root_password: "" 
-privacyidea_db_user_password: ""
-privacyidea_mariadb_packages:
-  - python3-mysqldb
-  - mariadb-server
-  - mariadb-client
 privacyidea_version: "3.8.1"
+privacyidea_packages:
+    - python3-venv
+    - python3-pip
+    - nginx
+    - mariadb-client
+    - python3-mysqldb
+    - uwsgi
+    - uwsgi-plugin-python3
+    - certbot
+    - python3-certbot-nginx
+privacyidea_dir: "/opt/privacyidea"
+privacyidea_server_name: ""
+privacyidea_mariadb_username: ""
+privacyidea_mariadb_password: ""
+privacyidea_mariadb_private_ip: ""
+privacyidea_mariadb_name: "privacyidea_mariadb"
 privacyidea_admin_password: ""
-# privacyidea_enable_mariadb_setup: Controls the installation and configuration of MariaDB directly on this VM. 
-# Set to true to enable setup, false if using an external MariaDB instance.
-privacyidea_enable_mariadb_setup: false
+privacyidea_admin: "adminuser"
+privacyidea_db_user_password: ""
+mariadb_user: "privacyidea_db"
+privacyidea_sql_port: "3306"
+admin_realm: "administrator"
+sql_admin_resolver: "adminresolver"
+user_realm: "userrealm"
+sql_user_resolver: "userresolver"
+db_privileges_global:
+    - "SHOW DATABASES"
+    - "CREATE USER"
+    - "DELETE HISTORY"
+    - "SET USER"
+    - "READ_ONLY ADMIN"
+    - "SLAVE MONITOR"
+db_privileges_specific:
+    - "SELECT"
+    - "INSERT"
+    - "UPDATE"
+    - "DELETE"
+    - "CREATE"
+    - "DROP"
+    - "ALTER"
+    - "CREATE TEMPORARY TABLES"
+    - "LOCK TABLES"
+    - "EXECUTE"
+    - "CREATE VIEW"
+    - "SHOW VIEW"
+    - "CREATE ROUTINE"
+    - "ALTER ROUTINE"
+    - "TRIGGER"
