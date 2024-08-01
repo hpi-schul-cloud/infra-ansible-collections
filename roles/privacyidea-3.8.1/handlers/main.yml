@@ -1,0 +1,10 @@
+---
+- name: restart nginx
+  service: name=nginx state=restarted
+
+- name: restart uWSGI
+  systemd:
+    name: uwsgi
+    enabled: yes
+    state: restarted
+  become: true
