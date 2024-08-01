@@ -5,7 +5,7 @@
         kubeconfig: "{{ kubeconfig }}"
         proxy: "{{ proxy_url | default(omit, true) }}"
         proxy_headers: "{{ proxy_headers | default(omit, true) }}"
-        template:  awx-operator.yml
+        template:  "{{ project }}/awx-operator.yml"
       tags:
         - awx
 
@@ -21,7 +21,7 @@
           apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
-            name: postgres-13
+            name: postgres-15-awx-postgres-15-0
             namespace: "{{ awx_namespace }}"
           spec:
             accessModes:
@@ -61,5 +61,7 @@
             projects_persistence: "{{ awx_projects_persistence }}"
             projects_storage_access_mode: "{{ awx_projects_storage_access_mode }}"
             projects_storage_size: "{{ awx_projects_storage_size }}"
+            postgres_data_volume_init: "{{ postgres_data_volume_init | default(omit, true) }}"
+            postgres_init_container_commands: "{{ postgres_init_container_commands | default(omit, true) }}"
       tags:
         - awx
