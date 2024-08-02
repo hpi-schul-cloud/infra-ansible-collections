@@ -37,4 +37,4 @@
         surname VARCHAR(40),
         givenname VARCHAR(40),
         description VARCHAR(255)
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_german2_ci;
+      )
