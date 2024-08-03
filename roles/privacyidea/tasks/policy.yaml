@@ -1,0 +1,13 @@
+---
+- name: Create policy JSON file
+  template:
+    src: admin_policy.json.j2
+    dest: /etc/privacyidea/admin_policy.json
+  notify: restart uWSGI
+
+- name: Create privacyIDEA admin policy
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage policy create admin_full_access_policy admin \"init,enable,disable,revoke,set,setOTPPIN,setMOTPPIN,resync,assign,unassign,import,remove,userlist,checkstatus,manageToken,getserial,getrandom,getchallenges,losttoken,adduser,updateuser,deleteuser,copytokenuser,copytokenpin,smtpserver_write,smtpserver_read,resolverread,radiusserver_read,resolverwrite,radiusserver_write,caconnectorread,caconnectorwrite,policyread,policywrite,auditlog,auditlog_download,machinelistread,machinelistwrite,mresolverread,mresolverwrite,clienttype\" -f /etc/privacyidea/admin_policy.json"
+  register: create_policy_output
+  become: true
+  become_user: www-data
+  notify: restart uWSGI
