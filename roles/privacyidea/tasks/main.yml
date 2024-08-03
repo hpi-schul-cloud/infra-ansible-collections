@@ -7,4 +7,3 @@
 - import_tasks: generate_keys.yml
 - import_tasks: create_admin.yml
 - import_tasks: setup_nginx.yml
-- import_tasks: policy.yml
