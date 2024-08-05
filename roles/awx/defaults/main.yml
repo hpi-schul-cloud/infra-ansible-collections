@@ -39,7 +39,7 @@ awx_ee_resource_requirements:
   limits:
     cpu: 1000m
     memory: 2Gi
-awx_control_plane_ee_image: quay.io/ansible/awx-ee:24.5.0    
+awx_control_plane_ee_image: quay.io/ansible/awx-ee:24.4.0    
 awx_projects_persistence: true
 awx_projects_storage_access_mode: ReadWriteOnce
 awx_projects_storage_size: 8Gi
