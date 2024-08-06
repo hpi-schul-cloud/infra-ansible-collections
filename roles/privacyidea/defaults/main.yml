@@ -16,8 +16,19 @@ privacyidea_mariadb_username: ""
 privacyidea_mariadb_password: ""
 privacyidea_mariadb_private_ip: ""
 privacyidea_mariadb_name: "privacyidea_mariadb"
+# admin credentials
 privacyidea_admin_password: ""
-privacyidea_admin: "adminuser"
+privacyidea_admin: "admin"
+# token-admin credentials
+privacyidea_token-admin_password: ""
+privacyidea_token-admin: "token-admin"
+# super credentials
+privacyidea_super_password: ""
+privacyidea_super: "super"
+# seed-import credentials
+privacyidea_seed-import_password: ""
+privacyidea_seed-import: "seed-import"
+#Mariadb user credentials:
 privacyidea_db_user_password: ""
 mariadb_user: "privacyidea_db"
 privacyidea_sql_port: "3306"
