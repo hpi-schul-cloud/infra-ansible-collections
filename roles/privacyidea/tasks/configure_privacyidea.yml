@@ -18,11 +18,6 @@
     dest: /etc/systemd/system/uwsgi.service
   notify: restart uWSGI
 
-- name: Configure database connection
-  template:
-    src: pi.cfg.j2
-    dest: /etc/privacyidea/pi.cfg
-  notify: restart uWSGI
 
 - name: Copy PrivacyIDEA WSGI script
   template:

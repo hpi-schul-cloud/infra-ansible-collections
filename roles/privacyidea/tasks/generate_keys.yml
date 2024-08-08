@@ -1,3 +1,11 @@
+
+---
+- name: Copy privacyidea config file 'pi.cfg'
+  template:
+    src: pi.cfg.j2
+    dest: /etc/privacyidea/pi.cfg
+  notify: restart uWSGI
+
 #Encryption Key is used to encrypt sensitive data within PrivacyIDEA, such as tokens and passwords
 - name: Generate encryption key for PrivacyIDEA
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_enckey"
