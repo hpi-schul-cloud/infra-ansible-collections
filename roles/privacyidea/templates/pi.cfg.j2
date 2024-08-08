@@ -1,8 +1,8 @@
 
 #https://github.com/privacyidea/privacyidea/blob/master/deploy/pi.cfg
 import logging
-# The realm, where users are allowed to login as administrators
-SUPERUSER_REALM = ['administrator','userrealm']
+# The realm, where users are allowed to login as administrators,those realm are retrieved from the SUPERUSER_REALM and POLICY in Admin2go
+SUPERUSER_REALM = ['admin','service','(?#internaladmins)','super']
 # Your database
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@localhost/{{ privacyidea_mariadb_name }}'
 # This is used to encrypt the token data and token passwords
