@@ -4,7 +4,7 @@ import logging
 # The realm, where users are allowed to login as administrators,those realm are retrieved from the SUPERUSER_REALM and POLICY in Admin2go
 SUPERUSER_REALM = ['admin','service','(?#internaladmins)','super']
 # Your database
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ privacyidea_mariadb_username }}:{{ privacyidea_mariadb_password }}@localhost/{{ privacyidea_mariadb_name }}'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ mariadb_user }}:{{ privacyidea_db_user_password }}@localhost/{{ privacyidea_mariadb_name }}'
 # This is used to encrypt the token data and token passwords
 PI_ENCFILE = '/etc/privacyidea/enckey'
 # This is the dummy base class
