@@ -4,12 +4,13 @@ privacyidea_packages:
     - python3-venv
     - python3-pip
     - nginx
-    - mariadb-client
     - python3-mysqldb
     - uwsgi
     - uwsgi-plugin-python3
     - certbot
     - python3-certbot-nginx
+    - mariadb-server
+    - mariadb-client
 privacyidea_dir: "/opt/privacyidea"
 privacyidea_server_name: ""
 privacyidea_mariadb_username: ""
@@ -19,43 +20,25 @@ privacyidea_mariadb_name: "privacyidea_mariadb"
 # admin credentials
 privacyidea_admin_password: ""
 privacyidea_admin: "admin"
+# nolden credentials
+privacyidea_nolden_password: ""
+privacyidea_nolden: "nolden"
 # token-admin credentials
-privacyidea_token-admin_password: ""
-privacyidea_token-admin: "token-admin"
+privacyidea_token_admin_password: ""
+privacyidea_token_admin: "token-admin"
+# fvm credentials
+privacyidea_fvm_password: ""
+privacyidea_fvm: "fvm"
 # super credentials
 privacyidea_super_password: ""
 privacyidea_super: "super"
 # seed-import credentials
-privacyidea_seed-import_password: ""
-privacyidea_seed-import: "seed-import"
+privacyidea_seed_import_password: ""
+privacyidea_seed_import: "seed-import"
 #Mariadb user credentials:
 privacyidea_db_user_password: ""
 mariadb_user: "privacyidea_db"
-privacyidea_sql_port: "3306"
 admin_realm: "administrator"
 sql_admin_resolver: "adminresolver"
 user_realm: "userrealm"
 sql_user_resolver: "userresolver"
-db_privileges_global:
-    - "SHOW DATABASES"
-    - "CREATE USER"
-    - "DELETE HISTORY"
-    - "SET USER"
-    - "READ_ONLY ADMIN"
-    - "SLAVE MONITOR"
-db_privileges_specific:
-    - "SELECT"
-    - "INSERT"
-    - "UPDATE"
-    - "DELETE"
-    - "CREATE"
-    - "DROP"
-    - "ALTER"
-    - "CREATE TEMPORARY TABLES"
-    - "LOCK TABLES"
-    - "EXECUTE"
-    - "CREATE VIEW"
-    - "SHOW VIEW"
-    - "CREATE ROUTINE"
-    - "ALTER ROUTINE"
-    - "TRIGGER"

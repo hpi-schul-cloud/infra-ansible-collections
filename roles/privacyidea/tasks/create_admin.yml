@@ -1,8 +1,7 @@
 ---
 # The following admin users are defined in policies from admin2go:
-# - admin
-# - nolden
-# - token-admin
+# - admin - nolden: defined in superuser_internal policy
+# - token-admin -fvm : defined in token-admin policy
 # - super
 # - seed-import
 # To ensure data integrity with the dump file, we will create them in PrivacyIDEA.
@@ -12,8 +11,18 @@
   become: true
   become_user: www-data
 
+- name: Create PrivacyIDEA admin user 'nolden'
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_nolden }} --password {{ privacyidea_nolden_password }}"
+  become: true
+  become_user: www-data
+
 - name: Create PrivacyIDEA admin user 'token-admin'
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_token-admin }} --password {{ privacyidea_token-admin_password }}"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_token_admin }} --password {{ privacyidea_token_admin_password }}"
+  become: true
+  become_user: www-data
+
+- name: Create PrivacyIDEA admin user 'fvm'
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_fvm }} --password {{ privacyidea_fvm_password }}"
   become: true
   become_user: www-data
 
@@ -23,6 +32,6 @@
   become_user: www-data
 
 - name: Create PrivacyIDEA admin user 'seed-import'
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_seed-import }} --password {{ privacyidea_seed-import_password }}"
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_seed_import }} --password {{ privacyidea_seed_import_password }}"
   become: true
   become_user: www-data

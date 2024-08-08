@@ -5,29 +5,32 @@
     state: present
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
 
 - name: Create database user and grant privileges
   mysql_user:
     name: "{{ mariadb_user }}"
     password: "{{ privacyidea_db_user_password }}"
-    priv: "*.*:{{ db_privileges_global | join(',') }}/{{ privacyidea_mariadb_name }}.*:{{ db_privileges_specific | join(',') }}"
+    priv: '{{ privacyidea_mariadb_name }}.*:ALL'
     host: "%"
     state: present
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
-
 
 # Creating the new users_service table in MariaDB based on the structure from admin2go
 - name: Create users_service table
   mysql_query:
     login_user: "{{ privacyidea_mariadb_username }}"
     login_password: "{{ privacyidea_mariadb_password }}"
-    login_host: "{{ privacyidea_mariadb_private_ip }}"
     login_db: "{{ privacyidea_mariadb_name }}"
     query: |
       CREATE TABLE IF NOT EXISTS users_service (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(40) UNIQUE
+        username VARCHAR(40) UNIQUE,
+        email VARCHAR(80),
+        password VARCHAR(255),
+        phone VARCHAR(40),
+        mobile VARCHAR(40),
+        surname VARCHAR(40),
+        givenname VARCHAR(40),
+        description VARCHAR(255)
       )
