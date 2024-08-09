@@ -13,7 +13,7 @@ privacyidea_packages:
     - mariadb-client
 privacyidea_dir: "/opt/privacyidea"
 privacyidea_server_name: ""
-privacyidea_mariadb_name: "privacyidea_mariadb"
+privacyidea_mariadb_name: "privacyidea"
 # admin credentials
 privacyidea_admin_password: ""
 privacyidea_admin: "admin"
