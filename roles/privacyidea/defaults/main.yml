@@ -17,18 +17,9 @@ privacyidea_mariadb_name: "privacyidea"
 # admin credentials
 privacyidea_admin_password: ""
 privacyidea_admin: "admin"
-# nolden credentials
-privacyidea_nolden_password: ""
-privacyidea_nolden: "nolden"
 # token-admin credentials
 privacyidea_token_admin_password: ""
 privacyidea_token_admin: "token-admin"
-# fvm credentials
-privacyidea_fvm_password: ""
-privacyidea_fvm: "fvm"
-# super credentials
-privacyidea_super_password: ""
-privacyidea_super: "super"
 # seed-import credentials
 privacyidea_seed_import_password: ""
 privacyidea_seed_import: "seed-import"
