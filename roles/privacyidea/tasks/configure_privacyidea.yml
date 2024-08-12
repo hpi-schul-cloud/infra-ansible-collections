@@ -45,13 +45,6 @@
       CREATE TABLE IF NOT EXISTS users_service (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(40) UNIQUE,
-        email VARCHAR(80),
-        password VARCHAR(255),
-        phone VARCHAR(40),
-        mobile VARCHAR(40),
-        surname VARCHAR(40),
-        givenname VARCHAR(40),
-        description VARCHAR(255)
       )
       
 - name: Copy admin SQL resolver configuration file
