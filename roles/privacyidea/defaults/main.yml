@@ -41,11 +41,10 @@ privacyidea_mariadb_username: "root"
 privacyidea_mariadb_password: ""
 
 #The following values "user_realm", "sql_user_resolver", and "admin_realm" are taken from the admin2go dump file and are reflected in the policy table:
-#- user_realm: "ucs_users"
-#- sql_user_resolver: "ucs_users"
-#- admin_realm: "super"
+#resolver_name are  ucs_users,ucs_domain_admins
+#realm_name are ucs_users,  admin  
 
 user_realm: "ucs_users"
 sql_user_resolver: "ucs_users"
-admin_realm: "super"
-sql_admin_resolver: "superresolver"
+admin_realm: "admin"
+sql_admin_resolver: "ucs_domain_admins"
