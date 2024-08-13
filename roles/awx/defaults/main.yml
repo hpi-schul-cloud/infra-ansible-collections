@@ -16,8 +16,8 @@ awx_postgres_resource_requirements:
     memory: 4Gi
 awx_postgres_storage_access_mode: ReadWriteOnce
 awx_postgres_storage_requirements:
-    requests:
-      storage: 8Gi
+  requests:
+    storage: 8Gi
 awx_web_resource_requirements:
   requests:
     cpu: 1000m
