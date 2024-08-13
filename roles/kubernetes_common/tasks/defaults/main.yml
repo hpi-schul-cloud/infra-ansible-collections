@@ -1,2 +1,5 @@
 kubernetes_event_exporter_chart_version: 2.1.2
 sc_cert_manager_clusterissuer_enabled: false
+otcdns_wildcard_certificates: []
+# This is the default to keep backwards compatibility
+otc_cert_manager_enabled: "{{ otcdns_wildcard_certificates | length > 0 }}"
