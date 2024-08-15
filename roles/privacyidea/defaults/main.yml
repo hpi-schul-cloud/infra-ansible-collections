@@ -31,11 +31,18 @@ mysql_root_home: /root
 privacyidea_mariadb_username: "root"
 privacyidea_mariadb_password: ""
 
-#The following values "user_realm", "sql_user_resolver", and "admin_realm" are taken from the admin2go dump file and are reflected in the policy table:
-#resolver_name are  ucs_users,ucs_domain_admins
-#realm_name are ucs_users,  admin  
+# We will not create new realms as these will be imported from the dump file.
+# The existing realms will be utilized during the data migration process.
+# The following realms will be available after the import:
+#admin_realm: "admin"
+#ucs_users_realm: "ucs_users"
+#service_realm: "service"
 
-user_realm: "ucs_users"
-sql_user_resolver: "ucs_users"
-admin_realm: "admin"
-sql_admin_resolver: "ucs_domain_admins"
+#Based on the information retrieved from the Admin2go_dump file
+#sql_resolver_ucs_domain_admins :Likely used for admin users, specifically those in the Domain Admins group
+#sql_resolver_ucs_users: Likely used for general users
+#sql_resolver_service: This resolver is likely used to map users stored in the users_service table (sql in dump)
+
+sql_resolver_service: "service"
+sql_resolver_ucs_users: "ucs_users"
+sql_resolver_ucs_domain_admins: "ucs_domain_admins"
