@@ -65,31 +65,6 @@
     mode: '0600'
   notify: restart uWSGI
 
-# This task is responsible for creating the configuration file for the SQL resolver associated with the "service" realm. 
-- name: Create SQL service  resolver
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_resolver_service }} sqlresolver /etc/privacyidea/user_sql_resolver_config.ini"
-  become: true
-  become_user: www-data
-  notify: restart uWSGI
-
-# The ucs_domain_admins resolver, originally an LDAP resolver for managing admin users in admin2go,
-# is being converted to an SQL resolver in our setup. This resolver will now map to the admin table
-# instead of users_service to ensure only designated admin users retain elevated privileges, 
-#aligning with our shift away from LDAP. should be associated with the "admin" realm.
-
-- name: Create SQL ucs_domain_admins resolver
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_resolver_ucs_domain_admins }} sqlresolver /etc/privacyidea/admin_sql_resolver_config.ini"
-  become: true
-  become_user: www-data
-  notify: restart uWSGI
-
-# This task is responsible for creating the configuration file for the SQL resolver associated with the "ucs_users" realm. 
-- name: Create SQL ucs_users resolver
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage resolver create {{ sql_resolver_ucs_users }} sqlresolver /etc/privacyidea/user_sql_resolver_config.ini"
-  become: true
-  become_user: www-data
-  notify: restart uWSGI
-
 - name: Set PrivacyIDEA file permissions
   ansible.builtin.file:
     path: "{{ item.path }}"

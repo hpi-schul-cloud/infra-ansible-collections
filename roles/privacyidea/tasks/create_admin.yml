@@ -4,6 +4,8 @@
 # - token-admin : defined in token-admin policy
 # - seed-import
 # To ensure data integrity with the dump file, we will create them in PrivacyIDEA.
+#The existing admin users will be removed because they are imported from a dump file and will be overwritten. 
+#We will delete the current admin users from the database and manually recreate them afterward.
 
 - name: Create PrivacyIDEA admin user 'admin'
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }}"
