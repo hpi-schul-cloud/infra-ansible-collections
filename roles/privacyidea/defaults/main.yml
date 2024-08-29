@@ -42,7 +42,8 @@ privacyidea_mariadb_password: ""
 #sql_resolver_ucs_domain_admins :Likely used for admin users, specifically those in the Domain Admins group
 #sql_resolver_ucs_users: Likely used for general users
 #sql_resolver_service: This resolver is likely used to map users stored in the users_service table (sql in dump)
+# We will not create resolvers with an Ansible task; instead, we will create them manually since the resolvers will be overwritten after importing the dump file
 
-sql_resolver_service: "service"
-sql_resolver_ucs_users: "ucs_users"
-sql_resolver_ucs_domain_admins: "ucs_domain_admins"
+#sql_resolver_service: "service"
+#sql_resolver_ucs_users: "ucs_users"
+#sql_resolver_ucs_domain_admins: "ucs_domain_admins"
