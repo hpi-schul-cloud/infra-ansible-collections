@@ -7,3 +7,4 @@
 - import_tasks: configure_privacyidea.yml
 - import_tasks: create_admin.yml
 - import_tasks: setup_nginx.yml
+- import_tasks: import_data.yml
