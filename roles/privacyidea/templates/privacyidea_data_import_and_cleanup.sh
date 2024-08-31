@@ -7,7 +7,7 @@ DB_PASSWORD="{{ privacyidea_db_user_password }}"
 DUMP_FILE="CRQ000002489570_dump.sql"
 
 # Import the SQL dump
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < $DUMP_FILE
+mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /etc/privacyidea/$DUMP_FILE
 echo "SQL dump imported."
 
 # Verify the token count
