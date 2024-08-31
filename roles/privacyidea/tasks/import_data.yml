@@ -1,7 +1,7 @@
 ---
 - name: Copy the privacyideadata_import_and_cleanup script to /etc/privacyidea
   copy:
-    src: setup_privacyidea.sh
+    src: privacyideadata_import_and_cleanup.sh
     dest: /etc/privacyidea/privacyideadata_import_and_cleanup.sh
     owner: www-data
     group: www-data
