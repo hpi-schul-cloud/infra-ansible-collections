@@ -30,6 +30,12 @@ mariadb_user: "privacyidea_db"
 mysql_root_home: /root
 privacyidea_mariadb_username: "root"
 privacyidea_mariadb_password: ""
+privacyidea_pi_pepper: ''
+privacyidea_secret_key: ''
+
+
+
+
 
 # We will not create new realms as these will be imported from the dump file.
 # The existing realms will be utilized during the data migration process.
@@ -42,8 +48,7 @@ privacyidea_mariadb_password: ""
 #sql_resolver_ucs_domain_admins :Likely used for admin users, specifically those in the Domain Admins group
 #sql_resolver_ucs_users: Likely used for general users
 #sql_resolver_service: This resolver is likely used to map users stored in the users_service table (sql in dump)
-# We will not create resolvers with an Ansible task; instead, we will create them manually since the resolvers will be overwritten after importing the dump file
-
+# We will not create resolvers with an Ansible task; instead, we will create them manually in privacyidea_data_import_and_cleanup since the resolvers will be overwritten after importing the dump file
 #sql_resolver_service: "service"
 #sql_resolver_ucs_users: "ucs_users"
 #sql_resolver_ucs_domain_admins: "ucs_domain_admins"

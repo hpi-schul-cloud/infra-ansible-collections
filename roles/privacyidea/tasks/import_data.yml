@@ -1,5 +1,5 @@
 ---
-- name: Copy the privacyideadata_import_and_cleanup script to /etc/privacyidea
+- name: Copy the privacyidea_data_import_and_cleanup script to /etc/privacyidea
   template:
     src: privacyidea_data_import_and_cleanup.sh
     dest: /etc/privacyidea/privacyidea_data_import_and_cleanup.sh
