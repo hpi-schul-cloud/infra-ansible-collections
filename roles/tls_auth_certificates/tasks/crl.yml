@@ -11,7 +11,7 @@
 
 - name: Get CRL from 1Password
   set_fact:
-    tls_auth_ca_crl: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_crl_secret_name, field='ca.crt', vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+    tls_auth_ca_crl: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_crl_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
 
 - name: Create CRL file
   copy:
@@ -25,7 +25,7 @@
 - name: Generate CRL
   community.crypto.x509_crl:
     crl_mode: update
-    path: "{{ tls_auth_certs_dir }}/ {{ tls_auth_ca_crl_filename }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
     privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
     last_update: "+0s"
     next_update: "+7d"
@@ -53,4 +53,3 @@
         overwrite: true
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
-  when: ca_cert_content | length == 0

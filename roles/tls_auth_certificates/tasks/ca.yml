@@ -41,7 +41,7 @@
 
 - name: Get CA certificate from 1Password
   set_fact:
-    ca_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_cert_secret_name, field=tls_auth_ca_cert_filename | regex_replace('([\\.=\\\\])', '\\\\\\1'), vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+    ca_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_cert_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
 
 - name: Create CA certificate file
   copy:
