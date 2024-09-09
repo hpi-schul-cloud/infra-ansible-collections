@@ -11,6 +11,8 @@ privacyidea_packages:
     - python3-certbot-nginx
     - mariadb-server
     - mariadb-client
+    - ufw
+    - fail2ban
 privacyidea_dir: "/opt/privacyidea"
 privacyidea_server_name: ""
 privacyidea_mariadb_name: "privacyidea"
