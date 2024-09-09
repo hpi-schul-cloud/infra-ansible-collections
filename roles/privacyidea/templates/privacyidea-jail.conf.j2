@@ -1,8 +1,8 @@
-[privacyidea]
+[privacyidea-nginx]
 enabled = true
-port = https
 filter = auth-fail2ban
-logpath = /var/log/privacyidea/privacyidea.log
+logpath = /var/log/uwsgi/request.log
 maxretry = 3
-findtime = 600
 bantime = 3600
+findtime = 600
+action = iptables[name=NGINX, port=http, protocol=tcp]
