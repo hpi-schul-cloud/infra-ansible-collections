@@ -1,4 +1,7 @@
 ---
+- name: Check variables
+  include_tasks:
+    file: checks.yml
 - name: CA
   include_tasks:
     file: ca.yml

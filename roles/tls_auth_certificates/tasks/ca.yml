@@ -10,6 +10,7 @@
 - name: Get CA private key from 1Password
   set_fact:
     ca_key_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_key_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
 
 - name: Create CA private key file
   copy:
@@ -18,7 +19,7 @@
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
-  when: ca_key_content | length > 0
+  when: tls_auth_1password_enabled and ca_key_content | length > 0
 
 - name: Generate CA private key
   community.crypto.openssl_privatekey:
@@ -28,7 +29,7 @@
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
-  when: ca_key_content | length == 0
+  when: not tls_auth_1password_enabled or ca_key_content | length == 0
 
 - name: Upload CA private key to 1Password
   dbildungscloud.onepwd.document:
@@ -37,11 +38,12 @@
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
-  when: ca_key_content | length == 0
+  when: tls_auth_1password_enabled and ca_key_content | length == 0
 
 - name: Get CA certificate from 1Password
   set_fact:
     ca_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_cert_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
 
 - name: Create CA certificate file
   copy:
@@ -50,7 +52,7 @@
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
-  when: ca_cert_content | length > 0
+  when: tls_auth_1password_enabled and ca_cert_content | length > 0
 
 - name: Generate CA certificate signing request
   community.crypto.openssl_csr:
@@ -61,7 +63,7 @@
     basic_constraints_critical: true
     key_usage: "{{ tls_auth_ca_key_usage }}"
     key_usage_critical: true
-  when: ca_cert_content | length == 0
+  when: not tls_auth_1password_enabled or ca_cert_content | length == 0
 
 - name: Generate CA certificate
   community.crypto.x509_certificate:
@@ -71,7 +73,7 @@
     provider: selfsigned
     selfsigned_digest: "{{ tls_auth_ca_cert_digest }}"
     selfsigned_not_after: "{{ tls_auth_ca_cert_not_after }}"
-  when: ca_cert_content | length == 0
+  when: not tls_auth_1password_enabled or ca_cert_content | length == 0
 
 - name: Upload CA certificate to 1Password
   dbildungscloud.onepwd.document:
@@ -80,4 +82,4 @@
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
-  when: ca_cert_content | length == 0
+  when: tls_auth_1password_enabled and ca_cert_content | length == 0

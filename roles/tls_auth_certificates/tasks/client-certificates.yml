@@ -10,6 +10,7 @@
 - name: Get user private key from 1Password
   set_fact:
     user_key_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_key_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
 
 - name: Create user private key file
   copy:
@@ -18,14 +19,14 @@
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
-  when: user_key_content | length > 0
+  when: tls_auth_1password_enabled and user_key_content | length > 0
 
 - name: Generate user private key
   community.crypto.openssl_privatekey:
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
     size: "{{ tls_auth_client_key_size }}"
     type: "{{ tls_auth_client_key_type }}"
-  when: user_key_content | length == 0
+  when: not tls_auth_1password_enabled or user_key_content | length == 0
 
 - name: Upload user private key to 1Password
   dbildungscloud.onepwd.document:
@@ -34,11 +35,12 @@
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
-  when: user_key_content | length == 0
+  when: tls_auth_1password_enabled and user_key_content | length == 0
 
 - name: Get user certificate from 1Password
   set_fact:
     user_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_cert_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
 
 - name: Create user certificate file
   copy:
@@ -47,14 +49,14 @@
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
-  when: user_cert_content | length > 0
+  when: tls_auth_1password_enabled and user_cert_content | length > 0
 
 - name: Generate user certificate signing request
   community.crypto.openssl_csr:
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_csr_filename }}"
     common_name: "{{ tls_auth_client_cert_common_name }}"
     privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
-  when: user_cert_content | length == 0
+  when: not tls_auth_1password_enabled or user_cert_content | length == 0
 
 - name: Generate user certificate
   community.crypto.x509_certificate:
@@ -64,7 +66,7 @@
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
     provider: ownca
     ownca_not_after: "{{ tls_auth_client_cert_not_after }}"
-  when: user_cert_content | length == 0
+  when: not tls_auth_1password_enabled or user_cert_content | length == 0
 
 - name: Upload user certificate to 1Password
   dbildungscloud.onepwd.document:
@@ -73,15 +75,15 @@
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
-  when: user_cert_content | length == 0
+  when: tls_auth_1password_enabled and user_cert_content | length == 0
 
 - name: Create user pkcs12 file
   community.crypto.openssl_pkcs12:
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_filename }}"
     privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
-    certificate_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}.crt"
+    certificate_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
     friendly_name: "{{ tls_auth_client_cert_common_name }}"
-  when: user_cert_content | length == 0
+  when: not tls_auth_1password_enabled or user_cert_content | length == 0
 
 - name: Upload user pkcs12 file to 1Password
   dbildungscloud.onepwd.document:
@@ -90,4 +92,4 @@
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
-  when: user_cert_content | length == 0
+  when: tls_auth_1password_enabled and user_cert_content | length == 0

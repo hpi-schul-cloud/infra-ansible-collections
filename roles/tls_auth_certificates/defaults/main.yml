@@ -1,12 +1,13 @@
 ---
 op_session_shorthand: "ansible-run"
-tls_auth_certs_dir:
+# tls_auth_certs_dir:
 tls_auth_file_permissions:
   # owner:
   # group:
-  mode: "0700"
-tls_auth_purpose:
-tls_auth_vault:
+  mode: "0600"
+# tls_auth_purpose:
+tls_auth_1password_enabled: false
+# tls_auth_vault:
 tls_auth_present_clients: []
 tls_auth_absent_clients: []
 tls_auth_ca_secret_name_base: "{{ tls_auth_purpose }}-ca"
@@ -34,7 +35,7 @@ tls_auth_client_pkcs12_secret_name: "{{ tls_auth_client_secret_base_name }}-pkcs
 tls_auth_client_key_filename: "{{ tls_auth_client }}.key"
 tls_auth_client_key_size: 4096
 tls_auth_client_key_type: RSA
-tls_auth_client_csr_filename: "{{ tls_auth_client_csr_filename }}"
+tls_auth_client_csr_filename: "{{ tls_auth_client }}.csr"
 tls_auth_client_cert_filename: "{{ tls_auth_client }}.crt"
 tls_auth_client_cert_not_after: "+3650d"
 tls_auth_client_cert_common_name: "{{ tls_auth_purpose }}-{{ tls_auth_client }}"
