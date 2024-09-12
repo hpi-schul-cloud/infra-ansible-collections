@@ -1,0 +1,16 @@
+---
+- name: Check variables
+  include_tasks:
+    file: checks.yml
+- name: CA
+  include_tasks:
+    file: ca.yml
+- name: Clients
+  include_tasks:
+    file: client-certificates.yml
+  loop: "{{ tls_auth_present_clients }}"
+  loop_control:
+    loop_var: tls_auth_client
+- name: CRL
+  include_tasks:
+    file: crl.yml
