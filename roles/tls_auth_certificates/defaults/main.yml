@@ -7,7 +7,8 @@ tls_auth_file_permissions:
   mode: "0600"
 # tls_auth_purpose:
 tls_auth_1password_enabled: false
-# tls_auth_vault:
+tls_auth_ca_vault:
+tls_auth_clients_vault: "{{ tls_auth_ca_vault }}"
 tls_auth_present_clients: []
 tls_auth_absent_clients: []
 tls_auth_ca_secret_name_base: "{{ tls_auth_purpose }}-ca"

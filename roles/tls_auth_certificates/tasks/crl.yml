@@ -1,7 +1,7 @@
 ---
 - name: Create revoked certificates list from 1Password
   vars:
-    revoked_certificate_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_cert_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+    revoked_certificate_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_cert_secret_name, vault=tls_auth_clients_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
   set_fact:
     revoked_certificates: "{{ revoked_certificates | default([]) + [{'content': revoked_certificate_content, 'revocation_date': '+0s'}] }}"
   when: tls_auth_1password_enabled and revoked_certificate_content | length > 0
@@ -28,7 +28,7 @@
 
 - name: Get CRL from 1Password
   set_fact:
-    tls_auth_ca_crl: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_crl_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+    tls_auth_ca_crl: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_crl_secret_name, vault=tls_auth_ca_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
   when: tls_auth_1password_enabled
 
 - name: Create CRL file
@@ -54,7 +54,7 @@
 
 - name: Upload CRL to 1Password
   dbildungscloud.onepwd.document:
-    vault: "{{ tls_auth_vault }}"
+    vault: "{{ tls_auth_ca_vault }}"
     name: "{{ tls_auth_ca_crl_secret_name }}"
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
@@ -63,7 +63,7 @@
 
 - name: Add CRL to cert 1Password item for usage in ingress-nginx
   dbildungscloud.onepwd.item:
-    vault: "{{ tls_auth_vault }}"
+    vault: "{{ tls_auth_ca_vault }}"
     name: "{{ tls_auth_ca_cert_secret_name }}"
     fields:
       - name: "{{ tls_auth_ca_crl_filename | regex_replace('([\\.=\\\\])', '\\\\\\1') }}"
