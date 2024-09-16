@@ -9,7 +9,7 @@
 
 - name: Get CA private key from 1Password
   set_fact:
-    ca_key_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_key_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+    ca_key_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_key_secret_name, vault=tls_auth_ca_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
   when: tls_auth_1password_enabled
 
 - name: Create CA private key file
@@ -33,7 +33,7 @@
 
 - name: Upload CA private key to 1Password
   dbildungscloud.onepwd.document:
-    vault: "{{ tls_auth_vault }}"
+    vault: "{{ tls_auth_ca_vault }}"
     name: "{{ tls_auth_ca_key_secret_name }}"
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
@@ -42,7 +42,7 @@
 
 - name: Get CA certificate from 1Password
   set_fact:
-    ca_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_cert_secret_name, vault=tls_auth_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+    ca_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_cert_secret_name, vault=tls_auth_ca_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
   when: tls_auth_1password_enabled
 
 - name: Create CA certificate file
@@ -77,7 +77,7 @@
 
 - name: Upload CA certificate to 1Password
   dbildungscloud.onepwd.document:
-    vault: "{{ tls_auth_vault }}"
+    vault: "{{ tls_auth_ca_vault }}"
     name: "{{ tls_auth_ca_cert_secret_name }}"
     path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
