@@ -9,4 +9,4 @@
 - import_tasks: setup_nginx.yml
 - import_tasks: security.yml
 # Import Data is run only on spsh-dev and spsh-staging; for spshinfra-dev, no data is imported.
-#- import_tasks: import_data.yml
+- import_tasks: import_data.yml

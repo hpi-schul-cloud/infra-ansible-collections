@@ -7,7 +7,7 @@ DB_PASSWORD="{{ privacyidea_db_user_password }}"
 DUMP_FILE="CRQ000002489570_dump.sql"
 
 # Import the SQL dump
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /etc/privacyidea/$DUMP_FILE
+mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
 echo "SQL dump imported."
 
 # Verify the token count
@@ -59,6 +59,15 @@ sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create domai
 sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create domain_users sqlresolver /etc/privacyidea/user_sql_resolver_config.ini
 echo "Created domain_admins and domain_users sqlresolvers."
 
+
+# Determine the resolver_id of the domain_admins and domain_users resolvers and store them in a variable
+RESOLVER_ID_DOMAIN_USERS=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT id FROM resolver WHERE name = 'domain_users';")
+RESOLVER_ID_DOMAIN_ADMIN=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT id FROM resolver WHERE name = 'domain_admins';")
+
+#return the new resolver_id
+echo "The resolver ID for 'domain_users' is: $RESOLVER_ID_DOMAIN_USERS"
+echo "The resolver ID for 'domain_admin' is: $RESOLVER_ID_DOMAIN_ADMIN"
+
 # Remove ldap resolvers
 mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 0;
@@ -72,8 +81,8 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
      SET FOREIGN_KEY_CHECKS = 0;
      UPDATE resolver SET id = 6, name = 'ucs_users' WHERE name = 'domain_users';
      UPDATE resolver SET id = 9, name = 'ucs_domain_admins' WHERE name = 'domain_admins';
-     UPDATE resolverconfig SET resolver_id = 6 WHERE resolver_id = 11;
-     UPDATE resolverconfig SET resolver_id = 9 WHERE resolver_id = 10;"
+     UPDATE resolverconfig SET resolver_id = 6 WHERE resolver_id = $RESOLVER_ID_DOMAIN_USERS;
+     UPDATE resolverconfig SET resolver_id = 9 WHERE resolver_id = $RESOLVER_ID_DOMAIN_ADMIN;
 echo "Updated resolver IDs and names."
 
 #Separate step to delete specific policy conditions
