@@ -61,8 +61,9 @@ echo "Created domain_admins and domain_users sqlresolvers."
 
 
 # Determine the resolver_id of the domain_admins and domain_users resolvers and store them in a variable
-RESOLVER_ID_DOMAIN_USERS=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "SELECT id FROM resolver WHERE name = 'domain_users';")
-RESOLVER_ID_DOMAIN_ADMIN=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "SELECT id FROM resolver WHERE name = 'domain_admins';")
+#use awk to extract just the numeric ID
+RESOLVER_ID_DOMAIN_USERS=$(mysql -u $DB_USER -p$DB_PASSWORD -e "SELECT id FROM resolver WHERE name = 'domain_users';" $DB_NAME | awk '{print $NF}')
+RESOLVER_ID_DOMAIN_ADMIN=$(mysql -u $DB_USER -p$DB_PASSWORD -e "SELECT id FROM resolver WHERE name = 'domain_admin';" $DB_NAME | awk '{print $NF}')
 
 #return the new resolver_id
 echo "The resolver ID for 'domain_users' is: $RESOLVER_ID_DOMAIN_USERS"
