@@ -83,6 +83,8 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
      UPDATE resolver SET id = 9, name = 'ucs_domain_admins' WHERE name = 'domain_admins';
      UPDATE resolverconfig SET resolver_id = 6 WHERE resolver_id = $RESOLVER_ID_DOMAIN_USERS;
      UPDATE resolverconfig SET resolver_id = 9 WHERE resolver_id = $RESOLVER_ID_DOMAIN_ADMIN;
+     SET FOREIGN_KEY_CHECKS = 1;
+"
 echo "Updated resolver IDs and names."
 
 #Separate step to delete specific policy conditions
@@ -93,5 +95,3 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 1;
 "
 echo "Deleted 'no_student_token' policy."
-
-echo "All operations completed."
