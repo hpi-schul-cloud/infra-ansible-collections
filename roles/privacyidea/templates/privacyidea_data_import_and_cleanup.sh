@@ -96,3 +96,23 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 1;
 "
 echo "Deleted 'no_student_token' policy."
+
+# Step 1: Insert the new 'self-service' policy
+echo "Inserting new 'self-service' policy..."
+mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+INSERT INTO policy (active, check_all_resolvers, name, scope, action, realm, adminrealm, adminuser, resolver, pinode, user, client, time, priority)
+VALUES (1, 0, 'self-service', 'enrollment', 'verify_enrollment=totp', '', '', '', '', '', '', '', '', 5);
+"
+echo "New 'self-service' policy added."
+
+# Step 2: Retrieve the new policy ID
+POLICY_ID=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM policy WHERE name = 'self-service';" $DB_NAME)
+echo "The new policy ID for 'self-service' is: $POLICY_ID"
+
+# Step 3: Insert the new condition for the policy in the 'policycondition' table
+echo "Inserting policy condition for the new policy..."
+mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+INSERT INTO policycondition (policy_id, section, Key, comparator, Value, active)
+VALUES ($POLICY_ID, 'HTTP Request header', 'SelfService', 'equals', 'true', 1);
+"
+echo "Policy condition added."
