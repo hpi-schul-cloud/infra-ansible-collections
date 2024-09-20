@@ -112,7 +112,7 @@ echo "The new policy ID for 'self-service' is: $POLICY_ID"
 # Step 3: Insert the new condition for the policy in the 'policycondition' table
 echo "Inserting policy condition for the new policy..."
 mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
-INSERT INTO policycondition (policy_id, section, Key, comparator, Value, active)
+INSERT INTO policycondition (policy_id, section, \`Key\`, comparator, Value, active)
 VALUES ($POLICY_ID, 'HTTP Request header', 'SelfService', 'equals', 'true', 1);
 "
 echo "Policy condition added."
