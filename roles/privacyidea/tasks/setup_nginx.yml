@@ -14,7 +14,7 @@
   template:
     src: nginx_privacyidea.conf.j2
     dest: /etc/nginx/sites-available/privacyidea.conf
-  notify: restart nginx
+  notify: reload nginx
 
 - name: Create symbolic link to enable PrivacyIDEA site
   file:
@@ -22,7 +22,7 @@
     dest: /etc/nginx/sites-enabled/privacyidea.conf
     state: link
   become: true
-  notify: restart nginx
+  notify: reload nginx
 
 - name: Allow HTTPS traffic through firewall
   ufw:

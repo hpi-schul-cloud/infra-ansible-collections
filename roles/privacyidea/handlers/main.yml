@@ -20,3 +20,9 @@
     name: fail2ban
     state: restarted
     enabled: yes
+
+- name: reload nginx
+  systemd:
+    name: nginx
+    state: reloaded
+  become: true

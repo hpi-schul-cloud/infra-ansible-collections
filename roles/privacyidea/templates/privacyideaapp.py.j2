@@ -1,4 +1,23 @@
 import sys
+import socket
 sys.stdout = sys.stderr
 from privacyidea.app import create_app
-application = create_app(config_name="production", config_file="/etc/privacyidea/pi.cfg")
+
+# Get the hostname
+hostname = socket.gethostname()
+
+if  'spshinfra' in hostname or 'dev' in hostname:
+    config_name = "development"
+    debug_mode = True
+elif 'staging' in hostname:
+    config_name = "staging"
+    debug_mode = False
+elif 'prod' in hostname:
+    config_name = "production"
+    debug_mode = False
+else:
+    config_name = "development"  # Default to developement
+    debug_mode = True
+
+application = create_app(config_name=config_name, config_file="/etc/privacyidea/pi.cfg")
+application.debug = debug_mode
