@@ -3,23 +3,27 @@
   template:
     src: privacyidea.ini.j2
     dest: /etc/uwsgi/apps-available/privacyidea.ini
+  notify: restart uwsgi
 
 - name: Enable uWSGI app for PrivacyIDEA
   file:
     src: /etc/uwsgi/apps-available/privacyidea.ini
     dest: /etc/uwsgi/apps-enabled/privacyidea.ini
     state: link
+  notify: restart uwsgi
 
 - name: Copy uWSGI service file
   template:
     src: uwsgi.service.j2
     dest: /etc/systemd/system/uwsgi.service
+  notify: restart uWSGI
 
 
 - name: Copy PrivacyIDEA WSGI script
   template:
     src: privacyideaapp.py.j2
     dest: /etc/privacyidea/privacyideaapp.py
+  notify: restart uwsgi
 
 - name: Reload systemd to recognize uwsgi service
   command: systemctl daemon-reload
@@ -59,6 +63,7 @@
     group: www-data
     mode: '0644'
 
+# /etc/privacyidea/enckey is copied from /data/privacyidea in the admin2go VM.
 - name: Set PrivacyIDEA file permissions
   ansible.builtin.file:
     path: "{{ item.path }}"
@@ -72,3 +77,4 @@
     - { path: '/etc/privacyidea/private.pem', mode: '0600' }
     - { path: '/etc/privacyidea/public.pem', mode: '0644' }
   become: true
+  notify: restart uwsgi

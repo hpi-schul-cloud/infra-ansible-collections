@@ -20,8 +20,3 @@
     name: fail2ban
     state: restarted
     enabled: yes
-
-- name: reload nginx
-  service:
-    name: nginx
-    state: reloaded
