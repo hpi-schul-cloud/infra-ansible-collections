@@ -63,7 +63,7 @@
     group: www-data
     mode: '0644'
 
-# /etc/privacyidea/enckey is copied from /data/privacyidea in the admin2go VM.
+# /etc/privacyidea/enckey is copied from /data/privacyidea
 - name: Set PrivacyIDEA file permissions
   ansible.builtin.file:
     path: "{{ item.path }}"

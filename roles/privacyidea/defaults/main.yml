@@ -42,7 +42,7 @@ privacyidea_execute_data_import: false
 #admin_realm: "admin"
 #ucs_users_realm: "ucs_users"
 #service_realm: "service"
-#Based on the information retrieved from the Admin2go_dump file
+#Based on the information retrieved from the dump file
 #sql_resolver_ucs_domain_admins :Likely used for admin users, specifically those in the Domain Admins group
 #sql_resolver_ucs_users: Likely used for general users
 #sql_resolver_service: This resolver is likely used to map users stored in the users_service table (sql in dump)
