@@ -3,27 +3,23 @@
   template:
     src: privacyidea.ini.j2
     dest: /etc/uwsgi/apps-available/privacyidea.ini
-  notify: restart uWSGI
 
 - name: Enable uWSGI app for PrivacyIDEA
   file:
     src: /etc/uwsgi/apps-available/privacyidea.ini
     dest: /etc/uwsgi/apps-enabled/privacyidea.ini
     state: link
-  notify: restart uWSGI
 
 - name: Copy uWSGI service file
   template:
     src: uwsgi.service.j2
     dest: /etc/systemd/system/uwsgi.service
-  notify: restart uWSGI
 
 
 - name: Copy PrivacyIDEA WSGI script
   template:
     src: privacyideaapp.py.j2
     dest: /etc/privacyidea/privacyideaapp.py
-  notify: restart uWSGI
 
 - name: Reload systemd to recognize uwsgi service
   command: systemctl daemon-reload
@@ -35,7 +31,7 @@
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
 
-# Creating the new users_service table in MariaDB based on the structure from admin2go
+# Creat users_service table
 - name: Create users_service table
   mysql_query:
     login_user: "{{ privacyidea_mariadb_username }}"
@@ -54,7 +50,6 @@
     owner: www-data
     group: www-data
     mode: '0644'
-  notify: restart uWSGI
 
 - name: Copy User SQL resolver configuration file
   template:
@@ -63,7 +58,6 @@
     owner: www-data
     group: www-data
     mode: '0644'
-  notify: restart uWSGI
 
 - name: Set PrivacyIDEA file permissions
   ansible.builtin.file:
@@ -78,4 +72,3 @@
     - { path: '/etc/privacyidea/private.pem', mode: '0600' }
     - { path: '/etc/privacyidea/public.pem', mode: '0644' }
   become: true
-  notify: restart uWSGI

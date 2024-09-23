@@ -9,4 +9,6 @@
 - import_tasks: setup_nginx.yml
 - import_tasks: security.yml
 # Import Data is run only on spsh-dev and spsh-staging; for spshinfra-dev, no data is imported.
+# Import Data is run only when run_data_import is true
 - import_tasks: import_data.yml
+  when: privacyidea_execute_data_import | bool

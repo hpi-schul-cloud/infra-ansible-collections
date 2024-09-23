@@ -32,17 +32,16 @@ mariadb_user: "privacyidea_db"
 mysql_root_home: /root
 privacyidea_mariadb_username: "root"
 privacyidea_mariadb_password: ""
-# The values for the variables `privacyidea_pi_pepper` and `privacyidea_secret_key` are stored in a password vault.
 # These values are not automatically generated; instead, they are provided with the dump file from the production environment.
 privacyidea_pi_pepper: ""
 privacyidea_secret_key: ""
+privacyidea_execute_data_import: false
 # We will not create new realms as these will be imported from the dump file.
 # The existing realms will be utilized during the data migration process.
 # The following realms will be available after the import:
 #admin_realm: "admin"
 #ucs_users_realm: "ucs_users"
 #service_realm: "service"
-
 #Based on the information retrieved from the Admin2go_dump file
 #sql_resolver_ucs_domain_admins :Likely used for admin users, specifically those in the Domain Admins group
 #sql_resolver_ucs_users: Likely used for general users

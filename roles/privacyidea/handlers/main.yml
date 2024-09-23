@@ -1,6 +1,9 @@
 ---
 - name: restart nginx
-  service: name=nginx state=restarted
+  service:
+    name: nginx
+    state: restarted
+    enabled: yes
 
 - name: restart uWSGI
   systemd:
@@ -13,4 +16,12 @@
   service: name=sshd state=restarted
   
 - name: restart fail2ban
-  service: name=fail2ban state=restarted
+  service:
+    name: fail2ban
+    state: restarted
+    enabled: yes
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded

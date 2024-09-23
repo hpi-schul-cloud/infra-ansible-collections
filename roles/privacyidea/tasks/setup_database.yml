@@ -1,5 +1,5 @@
 ---
-- name: Copy .my.cnf file with root password credentials.
+- name: Copy MySQL root credentials to .mysql.cnf file
   template:
     src: root-my.cnf.j2
     dest: "{{ mysql_root_home }}/.my.cnf"

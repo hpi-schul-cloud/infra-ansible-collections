@@ -1,7 +1,7 @@
 
-#https://github.com/privacyidea/privacyidea/blob/master/deploy/pi.cfg
+# https://github.com/privacyidea/privacyidea/blob/master/deploy/pi.cfg
 import logging
-# The realm, where users are allowed to login as administrators,those realm are retrieved from the SUPERUSER_REALM and POLICY in Admin2go
+# The realm, where users are allowed to login as administrators,those realm are retrieved from the SUPERUSER_REALM and POLICY in Dumpf File
 SUPERUSER_REALM = ['admin','ucs_users','service']
 # Your database
 SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ mariadb_user }}:{{ privacyidea_db_user_password }}@localhost/{{ privacyidea_mariadb_name }}'
