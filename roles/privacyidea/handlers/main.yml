@@ -5,7 +5,7 @@
     state: restarted
     enabled: yes
 
-- name: restart uWSGI
+- name: restart uwsgi
   systemd:
     name: uwsgi
     enabled: yes

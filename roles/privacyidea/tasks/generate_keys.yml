@@ -4,7 +4,7 @@
   template:
     src: pi.cfg.j2
     dest: /etc/privacyidea/pi.cfg
-  notify: restart uWSGI
+  notify: restart uwsgi
 
 # Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, 
 # ensuring that the audit log entries are tamper-proof and can be verified.
