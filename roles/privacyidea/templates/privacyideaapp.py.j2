@@ -10,8 +10,8 @@ if  'spshinfra' in hostname or 'dev' in hostname:
     config_name = "development"
     debug_mode = True
 elif 'staging' in hostname:
-    config_name = "staging"
-    debug_mode = False
+    config_name = "testing"
+    debug_mode = True
 elif 'prod' in hostname:
     config_name = "production"
     debug_mode = False
