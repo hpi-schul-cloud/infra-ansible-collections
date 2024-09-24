@@ -1,0 +1,102 @@
+---
+- name: Create client folder
+  file:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}"
+    state: directory
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+
+- name: Get client private key from 1Password
+  set_fact:
+    client_key_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_key_secret_name, vault=tls_auth_clients_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
+
+- name: Create client private key file
+  copy:
+    content: "{{ client_key_content }}"
+    dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  when: tls_auth_1password_enabled and client_key_content | length > 0
+
+- name: Generate client private key
+  community.crypto.openssl_privatekey:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
+    size: "{{ tls_auth_client_key_size }}"
+    type: "{{ tls_auth_client_key_type }}"
+  when: not tls_auth_1password_enabled or client_key_content | length == 0
+
+- name: Upload client private key to 1Password
+  dbildungscloud.onepwd.document:
+    vault: "{{ tls_auth_clients_vault }}"
+    name: "{{ tls_auth_client_key_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled and client_key_content | length == 0
+
+- name: Get client certificate from 1Password
+  set_fact:
+    client_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_cert_secret_name, vault=tls_auth_clients_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
+
+- name: Create client certificate file
+  copy:
+    content: "{{ client_cert_content }}"
+    dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  when: tls_auth_1password_enabled and client_cert_content | length > 0
+
+- name: Generate client certificate signing request
+  community.crypto.openssl_csr:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_csr_filename }}"
+    common_name: "{{ tls_auth_client_cert_common_name }}"
+    privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
+  when: not tls_auth_1password_enabled or client_cert_content | length == 0
+
+- name: Generate client certificate
+  community.crypto.x509_certificate:
+    csr_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_csr_filename }}"
+    ownca_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
+    ownca_privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
+    provider: ownca
+    ownca_not_after: "{{ tls_auth_client_cert_not_after }}"
+  when: not tls_auth_1password_enabled or client_cert_content | length == 0
+
+- name: Upload client certificate to 1Password
+  dbildungscloud.onepwd.document:
+    vault: "{{ tls_auth_clients_vault }}"
+    name: "{{ tls_auth_client_cert_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled and client_cert_content | length == 0
+
+- name: Create client pkcs12 file
+  community.crypto.openssl_pkcs12:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_filename }}"
+    privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
+    certificate_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
+    friendly_name: "{{ tls_auth_client_cert_common_name }}"
+  when: not tls_auth_1password_enabled or client_cert_content | length == 0
+
+- name: Convert client pkcs12 file to PEM format
+  community.crypto.openssl_pkcs12:
+    action: parse
+    src: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_filename }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_pem_filename }}"
+  when: not tls_auth_1password_enabled or client_cert_content | length == 0
+
+- name: Upload client pkcs12 PEM file to 1Password
+  dbildungscloud.onepwd.document:
+    vault: "{{ tls_auth_clients_vault }}"
+    name: "{{ tls_auth_client_pkcs12_pem_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_pem_filename }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled and client_cert_content | length == 0

@@ -57,7 +57,7 @@
       user: "{{ item.name }}"
       state: present
       key: "{{ lookup('file', 'sshkeys/{{ item.name }}.pub') }}"
-      exclusive: False
+      exclusive: true
     vars:
       vm_permissions: "{{ item.permissions.vms | default({}) }}"
       allowed: "{{ (vm_permissions.allhosts | default(false)) or (inventory_hostname in (vm_permissions.hosts | default([]))) }}"

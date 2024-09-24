@@ -1,0 +1,7 @@
+---
+- name: Verify that required variables are set
+  assert:
+    that:
+      - tls_auth_purpose is defined
+      - tls_auth_certs_dir is defined
+      - not tls_auth_1password_enabled or (tls_auth_ca_vault | length != 0 and tls_auth_clients_vault | length != 0)

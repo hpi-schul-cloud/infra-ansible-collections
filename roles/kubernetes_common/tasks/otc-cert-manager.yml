@@ -13,7 +13,7 @@
         namespace: cert-manager
       spec:
         itemPath: "vaults/{{ vault }}/items/otcdns-credentials"
-  when: otcdns_wildcard_certificates | length > 0
+  when: otc_cert_manager_enabled
 
 - name: Add otcdns chart repo
   kubernetes.core.helm_repository:
@@ -31,7 +31,7 @@
     release_namespace: cert-manager
     values:
       "{{ otcdns_values }}"
-  when: otcdns_wildcard_certificates | length > 0
+  when: otc_cert_manager_enabled
 
 - name: Create wildcard certificates
   kubernetes.core.k8s:
@@ -52,4 +52,4 @@
           kind: "ClusterIssuer"
           name: "sc-cert-manager-clusterissuer-letsencrypt-otcdns"
   loop: "{{ otcdns_wildcard_certificates }}"
-  when: otcdns_wildcard_certificates | length > 0
+  when: otc_cert_manager_enabled
