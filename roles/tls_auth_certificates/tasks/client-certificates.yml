@@ -85,11 +85,18 @@
     friendly_name: "{{ tls_auth_client_cert_common_name }}"
   when: not tls_auth_1password_enabled or client_cert_content | length == 0
 
-- name: Upload client pkcs12 file to 1Password
+- name: Convert client pkcs12 file to PEM format
+  community.crypto.openssl_pkcs12:
+    action: parse
+    src: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_filename }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_pem_filename }}"
+  when: not tls_auth_1password_enabled or client_cert_content | length == 0
+
+- name: Upload client pkcs12 PEM file to 1Password
   dbildungscloud.onepwd.document:
     vault: "{{ tls_auth_clients_vault }}"
-    name: "{{ tls_auth_client_pkcs12_secret_name }}"
-    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_filename }}"
+    name: "{{ tls_auth_client_pkcs12_pem_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_p12_pem_filename }}"
     session_shorthand: "{{ op_session_shorthand }}"
     credentials: "{{ op_credentials }}"
   when: tls_auth_1password_enabled and client_cert_content | length == 0
