@@ -78,6 +78,8 @@
     credentials: "{{ op_credentials }}"
   when: tls_auth_1password_enabled and client_cert_content | length == 0
 
+# Non password protected PKCS12 files are not encrypted by Ansible and can't be used in Firefox
+# so we generate a password and upload it to the same 1Password item
 - name: Generate pkcs12 file passphrase
   set_fact:
     pkcs12_passphrase: "{{ lookup('password', '/dev/null length=8 chars=ascii_letters,digits') }}"
@@ -91,6 +93,8 @@
     friendly_name: "{{ tls_auth_client_cert_common_name }}"
     passphrase: "{{ pkcs12_passphrase | default('') }}"
 
+# The lookup plugin can't lookup the encrypted PKCS12 files because they aren't valid UTF-8
+# so these tasks are run only when a new certificate was generated
 - name: Upload client pkcs12 file to 1Password
   dbildungscloud.onepwd.document:
     vault: "{{ tls_auth_clients_vault }}"
