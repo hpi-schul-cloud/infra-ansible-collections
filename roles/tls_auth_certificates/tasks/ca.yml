@@ -19,6 +19,7 @@
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  no_log: true
   when: tls_auth_1password_enabled and ca_key_content | length > 0
 
 - name: Generate CA private key
