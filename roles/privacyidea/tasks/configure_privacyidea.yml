@@ -28,24 +28,15 @@
 - name: Reload systemd to recognize uwsgi service
   command: systemctl daemon-reload
   become: true
-
+# The 'pi-manage create_tables' command only creates new database tables if they do not already exist
+# It will not modify or overwrite any existing tables.
 - name: Create database tables
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage create_tables"
 
+# The 'pi-manage db stamp head' command ensures that the database schema is marked as up-to-date 
+# with the latest migration version without performing any actual migrations
 - name: Stamping the database to the current database schema
   command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage db stamp head -d {{ privacyidea_dir }}/virtualenv/lib/privacyidea/migrations/"
-
-# Creat users_service table
-- name: Create users_service table
-  mysql_query:
-    login_user: "{{ privacyidea_mariadb_username }}"
-    login_password: "{{ privacyidea_mariadb_password }}"
-    login_db: "{{ privacyidea_mariadb_name }}"
-    query: |
-      CREATE TABLE IF NOT EXISTS users_service (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(40) UNIQUE
-      )
       
 - name: Copy admin SQL resolver configuration file
   template:
