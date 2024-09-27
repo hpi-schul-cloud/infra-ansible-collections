@@ -6,16 +6,29 @@ DB_NAME="{{ privacyidea_mariadb_name }}"
 DB_PASSWORD="{{ privacyidea_db_user_password }}"
 DUMP_FILE="CRQ000002489570_dump.sql"
 
-# Import the SQL dump
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
-echo "SQL dump imported."
-
-# Verify the token count
+# Verify the token count before importing the SQL dump
+echo "Checking current token count"
 TOKEN_COUNT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
-if [ "$TOKEN_COUNT" -ne 37985 ]; then
-  echo "Error: Token count is $TOKEN_COUNT, but it should be 37985."
+if [ "$TOKEN_COUNT" -eq 37985 ]; then
+  echo "Token count is already correct: $TOKEN_COUNT. No need to import the dump file."
+  exit 0
+elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt 37985 ]; then
+  echo "Token count is $TOKEN_COUNT, which is less than 37985. Proceeding with SQL dump import..."
+  
+  # Import the SQL dump
+  mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
+  echo "SQL dump imported."
+  
+  # Verify the token count again after import
+  TOKEN_COUNT_AFTER_IMPORT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
+  if [ "$TOKEN_COUNT_AFTER_IMPORT" -ne 37985 ]; then
+    echo "Error: Token count is $TOKEN_COUNT_AFTER_IMPORT after import, but it should be 37985."
+  else
+    echo "Token count is correct after import: $TOKEN_COUNT_AFTER_IMPORT"
+  fi
 else
-  echo "Token count is correct: $TOKEN_COUNT"
+  echo "Error: Unexpected token count: $TOKEN_COUNT"
+  exit 1
 fi
 
 # Remove existing admin users
@@ -51,21 +64,19 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 "
 echo "Deleted ldap resolverconfig."
 
-# update existing service sqlresolver:
-sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create service  sqlresolver /etc/privacyidea/user_sql_resolver_config.ini
+# Update existing service sqlresolver
+sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create service sqlresolver /etc/privacyidea/user_sql_resolver_config.ini
 
 # Create two new sqlresolvers
 sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create domain_admins sqlresolver /etc/privacyidea/admin_sql_resolver_config.ini
 sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create domain_users sqlresolver /etc/privacyidea/user_sql_resolver_config.ini
 echo "Created domain_admins and domain_users sqlresolvers."
 
-
 # Determine the resolver_id of the domain_admins and domain_users resolvers and store them in a variable
-#Modify your SQL queries to  select just ID
 RESOLVER_ID_DOMAIN_USERS=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM resolver WHERE name = 'domain_users';" $DB_NAME)
 RESOLVER_ID_DOMAIN_ADMIN=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM resolver WHERE name = 'domain_admins';" $DB_NAME)
 
-#return the new resolver_id
+# Return the new resolver_id
 echo "The resolver ID for 'domain_users' is: $RESOLVER_ID_DOMAIN_USERS"
 echo "The resolver ID for 'domain_admin' is: $RESOLVER_ID_DOMAIN_ADMIN"
 
@@ -75,9 +86,9 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   DELETE FROM resolver WHERE id IN (6);
   DELETE FROM resolver WHERE id IN (9);
 "
-echo "Deleted ldapresolvers."
+echo "Deleted ldap resolvers."
 
-#Update resolver IDs and names
+# Update resolver IDs and names
 mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
      SET FOREIGN_KEY_CHECKS = 0;
      UPDATE resolver SET id = 6, name = 'ucs_users' WHERE name = 'domain_users';
@@ -88,7 +99,7 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 "
 echo "Updated resolver IDs and names."
 
-#Separate step to delete specific policy conditions
+# Separate step to delete specific policy conditions
 mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 0;
   DELETE FROM policycondition WHERE policy_id IN (SELECT id FROM policy WHERE name = 'no_student_token');
@@ -97,7 +108,7 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 "
 echo "Deleted 'no_student_token' policy."
 
-# Step 1: Insert the new 'self-service' policy
+# Insert the new 'self-service' policy
 echo "Inserting new 'self-service' policy..."
 mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 INSERT INTO policy (active, check_all_resolvers, name, scope, action, realm, adminrealm, adminuser, resolver, pinode, user, client, time, priority)
@@ -105,11 +116,11 @@ VALUES (1, 0, 'self-service', 'enrollment', 'verify_enrollment=totp', '', '', ''
 "
 echo "New 'self-service' policy added."
 
-# Step 2: Retrieve the new policy ID
+# Retrieve the new policy ID
 POLICY_ID=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM policy WHERE name = 'self-service';" $DB_NAME)
 echo "The new policy ID for 'self-service' is: $POLICY_ID"
 
-# Step 3: Insert the new condition for the policy in the 'policycondition' table
+# Insert the new condition for the policy in the 'policycondition' table
 echo "Inserting policy condition for the new policy..."
 mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 INSERT INTO policycondition (policy_id, section, \`Key\`, comparator, Value, active)
