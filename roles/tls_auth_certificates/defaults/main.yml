@@ -32,7 +32,7 @@ tls_auth_ca_crl_filename: ca.crl
 tls_auth_client_secret_base_name: "{{ tls_auth_purpose }}-{{ tls_auth_client }}"
 tls_auth_client_key_secret_name: "{{ tls_auth_client_secret_base_name }}-key"
 tls_auth_client_cert_secret_name: "{{ tls_auth_client_secret_base_name }}-cert"
-tls_auth_client_pkcs12_pem_secret_name: "{{ tls_auth_client_secret_base_name }}-pkcs12-pem"
+tls_auth_client_pkcs12_secret_name: "{{ tls_auth_client_secret_base_name }}-pkcs12"
 tls_auth_client_key_filename: "{{ tls_auth_client }}.key"
 tls_auth_client_key_size: 4096
 tls_auth_client_key_type: RSA
@@ -41,4 +41,3 @@ tls_auth_client_cert_filename: "{{ tls_auth_client }}.crt"
 tls_auth_client_cert_not_after: "+3650d"
 tls_auth_client_cert_common_name: "{{ tls_auth_purpose }}-{{ tls_auth_client }}"
 tls_auth_client_p12_filename: "{{ tls_auth_client }}.p12"
-tls_auth_client_p12_pem_filename: "{{ tls_auth_client }}.p12.pem"
