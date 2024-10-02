@@ -4,17 +4,18 @@
 DB_USER="{{ mariadb_user }}"
 DB_NAME="{{ privacyidea_mariadb_name }}"
 DB_PASSWORD="{{ privacyidea_db_user_password }}"
-DUMP_FILE="CRQ000002489570_dump.sql"
+DUMP_FILE="{{ dump_file }}"
+DESIRED_TOKEN_COUNT={{ desired_token_count | int is number}}
 
 # Verify the token count before importing the SQL dump
-# The token count must be exactly 37986
+# It is checked before starting the import if reimport is needed by checking the desired token count. 
 echo "Checking current token count"
 TOKEN_COUNT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
-if [ "$TOKEN_COUNT" -eq 37986 ]; then
+if [ "$TOKEN_COUNT" -eq $DESIRED_TOKEN_COUNT ]; then
   echo "Token count is already correct: $TOKEN_COUNT. No need to import the dump file."
   exit 0
-elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt 37986 ]; then
-  echo "Token count is $TOKEN_COUNT, which is less than 37986. Proceeding with SQL dump import..."
+elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt $DESIRED_TOKEN_COUNT ]; then
+  echo "Token count is $TOKEN_COUNT, which is less than $DESIRED_TOKEN_COUNT. Proceeding with SQL dump import..."
   
   # Import the SQL dump
   mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
@@ -22,8 +23,8 @@ elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt 37986 ]; then
   
   # Verify the token count again after import
   TOKEN_COUNT_AFTER_IMPORT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
-  if [ "$TOKEN_COUNT_AFTER_IMPORT" -ne 37986 ]; then
-    echo "Error: Token count is $TOKEN_COUNT_AFTER_IMPORT after import, but it should be 37986."
+  if [ "$TOKEN_COUNT_AFTER_IMPORT" -ne $DESIRED_TOKEN_COUNT ]; then
+    echo "Error: Token count is $TOKEN_COUNT_AFTER_IMPORT after import, but it should be $DESIRED_TOKEN_COUNT."
   else
     echo "Token count is correct after import: $TOKEN_COUNT_AFTER_IMPORT"
   fi

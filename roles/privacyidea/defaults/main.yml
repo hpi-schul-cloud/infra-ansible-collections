@@ -1,4 +1,8 @@
 ---
+server_name: ""
+uwsgi_config_mode: "production" # Valid options:development,testing,production
+uwsgi_debug_mode: "False" # Valid options:True, False
+
 privacyidea_version: "3.8.1"
 privacyidea_packages:
     - python3-venv
@@ -14,8 +18,7 @@ privacyidea_packages:
     - ufw
     - fail2ban
 privacyidea_dir: "/opt/privacyidea"
-privacyidea_server_name: ""
-privacyidea_mariadb_name: "privacyidea"
+
 # admin credentials
 privacyidea_admin_password: ""
 privacyidea_admin: "admin"
@@ -25,17 +28,23 @@ privacyidea_token_admin: "token-admin"
 # seed-import credentials
 privacyidea_seed_import_password: ""
 privacyidea_seed_import: "seed-import"
+privacyidea_admin_users: ["{{ privacyidea_admin }}", "{{ privacyidea_token_admin }}", "{{ privacyidea_seed_import }}"]
+
 # Mariadb user credentials:
 privacyidea_db_user_password: ""
 mariadb_user: "privacyidea_db"
 # The default root user installed by mysql - almost always root
 mysql_root_home: /root
+privacyidea_mariadb_name: "privacyidea"
 privacyidea_mariadb_username: "root"
 privacyidea_mariadb_password: ""
+
 # These values are not automatically generated; instead, they are provided with the dump file from the production environment.
 privacyidea_pi_pepper: ""
 privacyidea_secret_key: ""
 privacyidea_execute_data_import: false
+dump_file: "" #.sql format
+desired_token_count: 37986
 # We will not create new realms as these will be imported from the dump file.
 # The existing realms will be utilized during the data migration process.
 # The following realms will be available after the import:
