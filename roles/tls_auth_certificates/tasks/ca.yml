@@ -14,11 +14,14 @@
 
 - name: Create CA private key file
   copy:
-    content: "{{ ca_key_content }}"
+    # '|' because we need to have a newline at the end that gets removed by 1PW lookup
+    content: |
+      {{ ca_key_content }}
     dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
     mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  no_log: true
   when: tls_auth_1password_enabled and ca_key_content | length > 0
 
 - name: Generate CA private key
@@ -47,7 +50,8 @@
 
 - name: Create CA certificate file
   copy:
-    content: "{{ ca_cert_content }}"
+    content: |
+      {{ ca_cert_content }}
     dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"

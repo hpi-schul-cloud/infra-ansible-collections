@@ -33,7 +33,8 @@
 
 - name: Create CRL file
   copy:
-    content: "{{ tls_auth_ca_crl }}"
+    content: |
+      {{ tls_auth_ca_crl }}
     dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
