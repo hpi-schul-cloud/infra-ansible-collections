@@ -7,9 +7,17 @@
 # The existing admin users will be removed because they are imported from a dump file and will be overwritten. 
 # We will delete the current admin users from the database and manually recreate them afterward.
 
-- name: "Create PrivacyIDEA admin users"
-  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ item }} --password {{ 'vars[' + item + '_password]' }}"
+- name: Create PrivacyIDEA admin user 'admin'
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_admin }} --password {{ privacyidea_admin_password }}"
   become: true
   become_user: www-data
-  loop: "{{ privacyidea_admin_users }}"
 
+- name: Create PrivacyIDEA admin user 'token-admin'
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_token_admin }} --password {{ privacyidea_token_admin_password }}"
+  become: true
+  become_user: www-data
+
+- name: Create PrivacyIDEA admin user 'seed-import'
+  command: "{{ privacyidea_dir }}/virtualenv/bin/pi-manage admin add {{ privacyidea_seed_import }} --password {{ privacyidea_seed_import_password }}"
+  become: true
+  become_user: www-data

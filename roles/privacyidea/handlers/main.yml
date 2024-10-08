@@ -6,14 +6,16 @@
     enabled: yes
 
 - name: restart uwsgi
-  systemd:
+  service:
     name: uwsgi
-    enabled: yes
     state: restarted
+    enabled: yes
   become: true
 
 - name: restart sshd
-  service: name=sshd state=restarted
+  service: 
+    name: sshd
+    state: restarted
   
 - name: restart fail2ban
   service:
@@ -22,7 +24,7 @@
     enabled: yes
 
 - name: reload nginx
-  systemd:
+  service:
     name: nginx
     state: reloaded
   become: true
