@@ -1,0 +1,50 @@
+---
+    - name: Check if disk is already mounted
+      set_fact:
+        disk_mounted: "{{ ansible_mounts | selectattr('mount', 'equalto', mount_point) | list | length > 0 }}"
+
+    - name: Ensure the disk is unmounted
+      mount:
+        path: "{{ mount_point }}"
+        state: absent
+      when: not disk_mounted
+
+    - name: Create filesystem on the disk
+      filesystem:
+        fstype: "{{ filesystem }}"
+        dev: "{{ disk }}"
+      when: not disk_mounted
+
+    - name: Create mount point directory
+      file:
+        path: "{{ mount_point }}"
+        state: directory
+      when: not disk_mounted
+
+    - name: Mount the disk
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ disk }}"
+        fstype: "{{ filesystem }}"
+        state: mounted
+      when: not disk_mounted
+
+    - name: Ensure the mount is persistent across reboots
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ disk }}"
+        fstype: "{{ filesystem }}"
+        opts: defaults
+        state: present
+      when: not disk_mounted
+
+    - name: Info - disk is already mounted
+      debug:
+        msg: "The disk {{ disk }} is already mounted at {{ mount_point }}. Skipping formatting and mounting."
+      when: disk_mounted
+
+    - name: Change syslog extern directory read and write permissions for all users
+      ansible.builtin.file:
+        path: "{{ mount_point }}"
+        state: directory
+        mode: '02777'

@@ -1,0 +1,7 @@
+---
+  - import_tasks: syslog-extern.yml
+    tags: [ syslog ]
+  - import_tasks: syslog.yml
+    tags: [ syslog ]
+
+
