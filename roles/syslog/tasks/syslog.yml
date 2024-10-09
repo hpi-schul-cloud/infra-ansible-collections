@@ -19,17 +19,6 @@
       group: root
       mode: 0644
     notify: restart rsyslog
-  
-  - name: TLS-Keys for syslog
-    copy:
-      src: "{{ item }}"
-      dest: /etc/ssl/certs/
-      owner: root
-      group: root
-      mode: 0644
-    with_fileglob:
-      - "{{ certDir }}/syslog*pem"
-    notify: restart rsyslog
     
   - name: copy template rules
     copy:
