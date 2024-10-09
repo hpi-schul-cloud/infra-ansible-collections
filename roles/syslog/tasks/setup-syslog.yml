@@ -36,10 +36,3 @@
       owner: root
       group: root
       mode: 0644
-
-#  - name: Add /syslog-extern to backup
-#    lineinfile:
-#      path: /etc/duply/syslog01.schul-cloud.org/exclude
-#      insertbefore: "- \\*\\*"
-#      line: "+ /syslog-extern"
-
