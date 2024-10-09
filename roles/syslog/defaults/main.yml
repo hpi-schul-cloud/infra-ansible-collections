@@ -1,0 +1,4 @@
+rsyslogconfig: v2
+syslog_vm_2nd_disk: /dev/vdb  
+syslog_vm_2nd_disk_mount_point: /syslog-extern  
+syslog_vm_2nd_disk_filesystem: ext4  
