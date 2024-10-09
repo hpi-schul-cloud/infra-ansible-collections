@@ -1,17 +1,17 @@
 ---
 
-  - name: install rsyslog and dig
+  - name: Install rsyslog and dig
     apt:
       name: ["rsyslog", 'rsyslog-gnutls', 'dnsutils']
       state: present
 
-  - name: enable rsyslog
+  - name: Enable rsyslog
     service:
       name: rsyslog
       enabled: true
       state: started
    
-  - name: copy rsyslog.conf
+  - name: Copy rsyslog.conf
     copy:
       src: "{{rsyslogconfig}}/rsyslog.conf"
       dest: /etc/
@@ -20,7 +20,7 @@
       mode: 0644
     notify: restart rsyslog
     
-  - name: copy template rules
+  - name: Copy template rules
     copy:
       src: "{{rsyslogconfig}}/templates.conf"
       dest: /etc/rsyslog.d/
@@ -29,7 +29,7 @@
       mode: 0644
     notify: restart rsyslog
 
-  - name: logrotate all rsyslog stuff daily
+  - name: Logrotate all rsyslog stuff daily
     copy:
       src: syslog
       dest: /etc/logrotate.d/
@@ -37,7 +37,7 @@
       group: root
       mode: 0644
 
-#  - name: add /syslog-extern to backup
+#  - name: Add /syslog-extern to backup
 #    lineinfile:
 #      path: /etc/duply/syslog01.schul-cloud.org/exclude
 #      insertbefore: "- \\*\\*"
