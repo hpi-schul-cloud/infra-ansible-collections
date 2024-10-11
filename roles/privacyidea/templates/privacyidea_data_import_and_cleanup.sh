@@ -3,6 +3,7 @@
 
 DB_USER="{{ mariadb_user }}"
 DB_NAME="{{ privacyidea_mariadb_name }}"
+DB_HOST="{{ privacyidea_mariadb_host }}"
 DB_PASSWORD="{{ privacyidea_db_user_password }}"
 DUMP_FILE="{{ dump_file }}"
 DESIRED_TOKEN_COUNT={{ desired_token_count | int is number}}
@@ -10,7 +11,7 @@ DESIRED_TOKEN_COUNT={{ desired_token_count | int is number}}
 # Verify the token count before importing the SQL dump
 # It is checked before starting the import if reimport is needed by checking the desired token count. 
 echo "Checking current token count"
-TOKEN_COUNT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
+TOKEN_COUNT=$(mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
 if [ "$TOKEN_COUNT" -eq $DESIRED_TOKEN_COUNT ]; then
   echo "Token count is already correct: $TOKEN_COUNT. No need to import the dump file."
   exit 0
@@ -18,7 +19,7 @@ elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt $DESIRED_TOKEN_COUNT ]; th
   echo "Token count is $TOKEN_COUNT, which is less than $DESIRED_TOKEN_COUNT. Proceeding with SQL dump import..."
   
   # Import the SQL dump
-  mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
+  mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
   echo "SQL dump imported."
   
   # Verify the token count again after import
@@ -34,7 +35,7 @@ else
 fi
 
 # Remove existing admin users
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "DELETE FROM admin;"
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "DELETE FROM admin;"
 echo "Existing admin users deleted."
 
 # Create new admin users
@@ -44,7 +45,7 @@ sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage admin add seed-import
 echo "New admin users created."
 
 # Drop & Recreate users_service table
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 0;
   DROP TABLE IF EXISTS users_service;
   CREATE TABLE users_service (
@@ -60,7 +61,7 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 echo "users_service table created."
 
 # Remove existing resolverconfig
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 0;
   DELETE FROM resolverconfig;
 "
@@ -75,15 +76,15 @@ sudo -u www-data /opt/privacyidea/virtualenv/bin/pi-manage resolver create domai
 echo "Created domain_admins and domain_users sqlresolvers."
 
 # Determine the resolver_id of the domain_admins and domain_users resolvers and store them in a variable
-RESOLVER_ID_DOMAIN_USERS=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM resolver WHERE name = 'domain_users';" $DB_NAME)
-RESOLVER_ID_DOMAIN_ADMIN=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM resolver WHERE name = 'domain_admins';" $DB_NAME)
+RESOLVER_ID_DOMAIN_USERS=$(mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM resolver WHERE name = 'domain_users';" $DB_NAME)
+RESOLVER_ID_DOMAIN_ADMIN=$(mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM resolver WHERE name = 'domain_admins';" $DB_NAME)
 
 # Return the new resolver_id
 echo "The resolver ID for 'domain_users' is: $RESOLVER_ID_DOMAIN_USERS"
 echo "The resolver ID for 'domain_admin' is: $RESOLVER_ID_DOMAIN_ADMIN"
 
 # Remove ldap resolvers
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 0;
   DELETE FROM resolver WHERE id IN (6);
   DELETE FROM resolver WHERE id IN (9);
@@ -91,7 +92,7 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 echo "Deleted ldap resolvers."
 
 # Update resolver IDs and names
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
      SET FOREIGN_KEY_CHECKS = 0;
      UPDATE resolver SET id = 6, name = 'ucs_users' WHERE name = 'domain_users';
      UPDATE resolver SET id = 9, name = 'ucs_domain_admins' WHERE name = 'domain_admins';
@@ -102,7 +103,7 @@ mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 echo "Updated resolver IDs and names."
 
 # Separate step to delete specific policy conditions
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
   SET FOREIGN_KEY_CHECKS = 0;
   DELETE FROM policycondition WHERE policy_id IN (SELECT id FROM policy WHERE name = 'no_student_token');
   DELETE FROM policy WHERE name = 'no_student_token';
@@ -112,19 +113,19 @@ echo "Deleted 'no_student_token' policy."
 
 # Insert the new 'self-service' policy
 echo "Inserting new 'self-service' policy..."
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 INSERT INTO policy (active, check_all_resolvers, name, scope, action, realm, adminrealm, adminuser, resolver, pinode, user, client, time, priority)
 VALUES (1, 0, 'self-service', 'enrollment', 'verify_enrollment=totp', '', '', '', '', '', '', '', '', 5);
 "
 echo "New 'self-service' policy added."
 
 # Retrieve the new policy ID
-POLICY_ID=$(mysql -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM policy WHERE name = 'self-service';" $DB_NAME)
+POLICY_ID=$(mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -N -s -e "SELECT id FROM policy WHERE name = 'self-service';" $DB_NAME)
 echo "The new policy ID for 'self-service' is: $POLICY_ID"
 
 # Insert the new condition for the policy in the 'policycondition' table
 echo "Inserting policy condition for the new policy..."
-mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
 INSERT INTO policycondition (policy_id, section, \`Key\`, comparator, Value, active)
 VALUES ($POLICY_ID, 'HTTP Request header', 'SelfService', 'equals', 'true', 1);
 "

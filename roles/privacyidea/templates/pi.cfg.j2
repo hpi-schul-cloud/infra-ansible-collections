@@ -4,7 +4,7 @@ import logging
 # The realm, where users are allowed to login as administrators,those realm are retrieved from the SUPERUSER_REALM and POLICY in Dumpf File
 SUPERUSER_REALM = ['admin','ucs_users','service']
 # Your database
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ mariadb_user }}:{{ privacyidea_db_user_password }}@localhost/{{ privacyidea_mariadb_name }}'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ mariadb_user }}:{{ privacyidea_db_user_password }}@{{ privacyidea_mariadb_host }}/{{ privacyidea_mariadb_name }}'
 # This is the dummy base class
 #PI_AUDIT_MODULE = 'privacyidea.lib.auditmodules.base'
 # This is the default
