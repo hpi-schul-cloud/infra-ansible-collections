@@ -1,9 +1,9 @@
 ---
 server_name: ""
 
-# UWSGI
-config_name: "production" # Valid options:development,testing,production
-debug_mode: "False" # Valid options:True, False
+
+uwsgi_config_name: "production" # Valid options:development,testing,production
+uwsgi_debug_mode: "False" # Valid options:True, False
 
 privacyidea_version: "3.8.1"
 privacyidea_packages:
