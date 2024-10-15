@@ -28,3 +28,9 @@
     name: nginx
     state: reloaded
   become: true
+
+- name: Reload ha-cluster-exporter
+  ansible.builtin.service:
+    name: ha-cluster-exporter
+    enabled: true
+    state: reloaded
