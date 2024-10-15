@@ -6,10 +6,8 @@
     owner: www-data
     group: www-data
     mode: '0755'
-  when: is_main_node
 
 - name: Execute the privacyidea_data_import_and_cleanup.sh script
   shell: /etc/privacyidea/privacyidea_data_import_and_cleanup.sh
   args:
     executable: /bin/bash
-  when: is_main_node

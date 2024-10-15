@@ -18,6 +18,12 @@ privacyidea_packages:
     - mariadb-client
     - ufw
     - fail2ban
+    - golang
+    - apparmor-utils
+    - pcs
+    - pacemaker
+    - libxml2-utils
+
 privacyidea_dir: "/opt/privacyidea"
 
 # admin credentials
