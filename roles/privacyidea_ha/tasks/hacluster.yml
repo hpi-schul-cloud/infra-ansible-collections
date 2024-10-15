@@ -1,0 +1,118 @@
+---
+- name: Allow free comunication in private network
+  ufw:
+    rule: allow
+    from: "{{ internal_ip }}/{{ private_network_cidr }}"
+
+- name: Insert other nodes of cluster into /etc/hosts
+  vars: 
+      hostname: "{{ hostvars[item]['ansible_hostname'] }}"
+  blockinfile:
+    path: /etc/hosts
+    block: |
+      {{ hostvars[item]['internal_ip'] }} {{ hostname }}
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ hostname }}"
+  loop: "{{ groups[unique_ha_group] }}" 
+
+- name: Check if cloud-init is present
+  stat:
+    path: /etc/cloud/cloud.cfg.d
+  register: cloud_init_config_directory
+
+# - name: Make sure that cloud-init doesn't overwrite /etc/hosts
+#   copy:
+#     src: 99_proxy.cfg
+#     dest: /etc/cloud/cloud.cfg.d/99_proxy.cfg
+#     owner: root
+#     group: root
+#     mode: 0644
+#   when: cloud_init_config_directory.stat.exists
+
+- name: Create user for cluster (always changed)
+  user:
+    name: "hacluster"
+    state: 'present'
+    password: "{{ cluster_password | password_hash('sha512') }}"
+
+- name: Start PCS
+  service:
+    name: 'pcsd'
+    enabled: true
+    state: 'started'
+
+- name: Authorize hosts
+  pcs_auth:
+    node_name: "{{ hostvars[item]['ansible_hostname'] }}"
+    password: "{{ cluster_password }}"
+  loop: "{{ groups[unique_ha_group] }}"
+
+# After installation there is already a local cluster configured that has to be removed
+- name: Check for initial local cluster
+  pcs_cluster:
+    node_list: >-
+      {% for item in groups[unique_ha_group] %}
+      {{ hostvars[item]['ansible_hostname'] }}
+      {% endfor %}
+    cluster_name: "{{ cluster_name }}"
+  check_mode: true
+  failed_when: false
+  changed_when: false
+  register: cluster_state
+
+- name: Remove initial local cluster
+  pcs_cluster:
+    cluster_name: "{{ cluster_name }}"
+    state: absent
+  when: cluster_state.detected_node_list_set is defined and 
+        "127.0.0.1" in cluster_state.detected_node_list_set
+
+- name: Setup cluster
+  pcs_cluster:
+    node_list: >-
+      {% for item in groups[unique_ha_group] %}
+      {{ hostvars[item]['ansible_hostname'] }}
+      {% endfor %}
+    cluster_name: "{{ cluster_name }}"
+    allowed_node_changes: none
+  when: is_main_node
+
+- name: Start pacemaker and corosync
+  service:
+    name: "{{ item }}"
+    state: 'started'
+    enabled: True
+  loop:
+    - pacemaker
+    - corosync
+
+- name: Disable stonith
+  pcs_property:
+    name: stonith-enabled
+    value: false
+  when: is_main_node
+
+- name: Disable quorum (2 node cluster)
+  pcs_property:
+    name: no-quorum-policy
+    value: ignore
+  when: is_main_node and 
+        (groups[unique_ha_group] | length) == 2
+
+- name: Add floating IP resource
+  pcs_resource:
+    name: "floating-ip"
+    resource_type: 'ocf:heartbeat:IPaddr2'
+    options: >-
+      ip={{ floating_ip }} 
+      nic={{ ansible_default_ipv4.interface}} 
+      cidr_netmask=32 
+      op monitor interval=5s
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Prefer main node 
+  pcs_constraint_location:
+    resource: "{{ cluster_name }}_group"
+    node_name: "{{ ansible_hostname }}"
+    score: 10
+  when: is_main_node
