@@ -2,6 +2,11 @@
 # Generating and Renewal of the certificate for the main domain only happens on the main node
 # The certificate is then copied to all other nodes via SSH
 
+- name: Stop any running nginx
+  service:
+    name: nginx
+    state: 'stopped'
+
 - name: Generate SSH key for certificate sync
   openssh_keypair:
     path: /certificate_sync_key
@@ -112,9 +117,16 @@
       #!/bin/bash
       service ha-cluster-exporter reload
       {% if is_main_node %}
-      service squid reload
+      service nginx reload
       {% endif %}
 
 - name: Execute the post hook to close port and sync the certificate for the first time
   command: bash /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
   when: is_main_node
+
+- name: Start nginx again
+  service:
+    name: nginx
+    enabled: true
+    state: 'started'
+  ignore_errors: true   # The nginx migth not be updated yet

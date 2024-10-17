@@ -23,6 +23,7 @@ privacyidea_packages:
     - pcs
     - pacemaker
     - libxml2-utils
+    - resource-agents
 
 privacyidea_dir: "/opt/privacyidea"
 
