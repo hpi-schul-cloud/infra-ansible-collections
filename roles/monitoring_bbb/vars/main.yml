@@ -143,7 +143,7 @@ bbb_prometheus_turn_node_exporter_job:
   job_name: "{{ bbb_instance_name }}-turn-node-exporter"
   scheme: https
   metrics_path: /metrics
-  ionos_sd_configs: "{{ bbb_turn_node_datacenter_ionos_sd_configs }}"
+  ionos_sd_configs: "{{ bbb_turn_node_datacenter_ionos_sd_configs | from_yaml }}"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ [{'source_labels': ['__meta_ionos_server_name'], 'regex': 'turn-.*', 'action': 'keep'}] + bbb_prometheus_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
