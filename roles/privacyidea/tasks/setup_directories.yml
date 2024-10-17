@@ -1,0 +1,28 @@
+---
+- name: Create privacyIDEA directories
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: "{{ item.mode }}"
+  loop:
+    - { path: '/etc/privacyidea', mode: '0755' }
+    - { path: '/opt/privacyidea', mode: '0755' }
+    - { path: '/var/log/privacyidea', mode: '0755' }
+    - { path: '/var/log/uwsgi', mode: '0755' }
+  become: true
+
+- name: Create uWSGI and privacyidea log files
+  file:
+    path: "{{ item.path }}"
+    state: touch
+    owner: www-data
+    group: www-data
+    mode: '0664'
+  loop:
+    - { path: '/var/log/uwsgi/privacyidea.log' }
+    - { path: '/var/log/uwsgi/error.log' }
+    - { path: '/var/log/uwsgi/request.log' }
+    - { path: '/var/log/privacyidea/privacyidea.log' }
+  become: true

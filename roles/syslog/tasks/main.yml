@@ -1,0 +1,7 @@
+---
+  - import_tasks: mount-syslog-extern-drive.yml
+    tags: [ syslog ]
+  - import_tasks: setup-syslog.yml
+    tags: [ syslog ]
+
+

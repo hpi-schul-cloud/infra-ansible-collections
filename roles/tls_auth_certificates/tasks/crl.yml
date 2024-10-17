@@ -1,0 +1,76 @@
+---
+- name: Create revoked certificates list from 1Password
+  vars:
+    revoked_certificate_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_client_cert_secret_name, vault=tls_auth_clients_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  set_fact:
+    revoked_certificates: "{{ revoked_certificates | default([]) + [{'content': revoked_certificate_content, 'revocation_date': '+0s'}] }}"
+  when: tls_auth_1password_enabled and revoked_certificate_content | length > 0
+  loop: "{{ tls_auth_absent_clients }}"
+  loop_control:
+    loop_var: tls_auth_client
+
+- name: Find existing certificates
+  find:
+    paths: "{{ tls_auth_certs_dir }}"
+    file_type: directory
+  register: tls_auth_existing_certs
+
+- name: Create revoked certificates list from local files
+  vars:
+    tls_auth_client_name: "{{ tls_auth_certificate.path | basename }}"
+  set_fact:
+    revoked_certificates: "{{ revoked_certificates | default([]) + [{'path': tls_auth_certificate.path + '/' + tls_auth_client_name + '.crt', 'revocation_date': '+0s'}] }}"
+  when: not tls_auth_1password_enabled and tls_auth_client_name in tls_auth_absent_clients
+  loop: "{{ tls_auth_existing_certs.files }}"
+  loop_control:
+    loop_var: tls_auth_certificate
+    label: "{{ tls_auth_client_name }}"
+
+- name: Get CRL from 1Password
+  set_fact:
+    tls_auth_ca_crl: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_crl_secret_name, vault=tls_auth_ca_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
+
+- name: Create CRL file
+  copy:
+    content: |
+      {{ tls_auth_ca_crl }}
+    dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  when: tls_auth_1password_enabled and tls_auth_ca_crl | length > 0
+
+- name: Generate CRL
+  community.crypto.x509_crl:
+    crl_mode: update
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
+    privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    last_update: "+0s"
+    next_update: "+7d"
+    ignore_timestamps: true
+    issuer:
+      CN: "{{ tls_auth_ca_cert_common_name }}"
+    revoked_certificates: "{{ revoked_certificates | default([]) }}"
+
+- name: Upload CRL to 1Password
+  dbildungscloud.onepwd.document:
+    vault: "{{ tls_auth_ca_vault }}"
+    name: "{{ tls_auth_ca_crl_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled
+
+- name: Add CRL to cert 1Password item for usage in ingress-nginx
+  dbildungscloud.onepwd.item:
+    vault: "{{ tls_auth_ca_vault }}"
+    name: "{{ tls_auth_ca_cert_secret_name }}"
+    fields:
+      - name: "{{ tls_auth_ca_crl_filename | regex_replace('([\\.=\\\\])', '\\\\\\1') }}"
+        type: file
+        value: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_crl_filename }}"
+        overwrite: true
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled

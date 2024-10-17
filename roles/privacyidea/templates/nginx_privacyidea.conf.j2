@@ -1,0 +1,54 @@
+# Make sure that port 80 is open in the IONOS firewall for HTTP traffic.
+# This configuration is necessary to complete the initial SSL certificate setup using Certbot.
+
+#server {
+#    listen 80;
+#    server_name {{ server_name }};
+ 
+#    location /.well-known/acme-challenge/ {
+#        root /var/www/letsencrypt;
+#    }
+ 
+#    location /static {
+#        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
+#    }
+    #Redirect all other HTTP requests to HTTPS if  the SSL certificate is obtained
+    #This Block can be removed if no SSL is obtained
+    #location / {
+    #   return 301 https://$host$request_uri;
+    #}
+ 
+#    location / {
+#        include uwsgi_params;
+#        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
+#    }
+#}
+
+# After creating the SSL certificate, you can remove the block above that listens on port 80
+# and activate the block below that listens on port 443 for HTTPS traffic.
+# This ensures secure communication using the SSL certificate.
+# Note: Ensure that port 443 is open in the IONOS firewall for HTTPS traffic.
+
+log_format privacyidea '$remote_addr - $remote_user [$time_local] '
+                       '"$request" $status $body_bytes_sent '
+                       '"$http_referer" "$http_user_agent"';
+server {
+    listen 443 ssl;
+    server_name {{ server_name }};
+
+    ssl_certificate /etc/letsencrypt/live/{{ server_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_name }}/privkey.pem;
+
+    access_log /var/log/nginx/privacyidea.access.log privacyidea;
+    error_log /var/log/nginx/privacyidea.error.log;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
+
+    }
+
+    location /static {
+        alias /opt/privacyidea/virtualenv/lib/python3.10/site-packages/privacyidea/static;
+   }
+}

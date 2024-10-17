@@ -1,0 +1,89 @@
+---
+- name: Create certificates folder
+  file:
+    path: "{{ tls_auth_certs_dir }}"
+    state: directory
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+
+- name: Get CA private key from 1Password
+  set_fact:
+    ca_key_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_key_secret_name, vault=tls_auth_ca_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
+
+- name: Create CA private key file
+  copy:
+    # '|' because we need to have a newline at the end that gets removed by 1PW lookup
+    content: |
+      {{ ca_key_content }}
+    dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  no_log: true
+  when: tls_auth_1password_enabled and ca_key_content | length > 0
+
+- name: Generate CA private key
+  community.crypto.openssl_privatekey:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    size: "{{ tls_auth_ca_key_size }}"
+    type: "{{ tls_auth_ca_key_type }}"
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  when: not tls_auth_1password_enabled or ca_key_content | length == 0
+
+- name: Upload CA private key to 1Password
+  dbildungscloud.onepwd.document:
+    vault: "{{ tls_auth_ca_vault }}"
+    name: "{{ tls_auth_ca_key_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled and ca_key_content | length == 0
+
+- name: Get CA certificate from 1Password
+  set_fact:
+    ca_cert_content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=tls_auth_ca_cert_secret_name, vault=tls_auth_ca_vault, session_shorthand=op_session_shorthand, credentials=op_credentials, ignore_not_found=true) }}"
+  when: tls_auth_1password_enabled
+
+- name: Create CA certificate file
+  copy:
+    content: |
+      {{ ca_cert_content }}
+    dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
+    owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
+    group: "{{ tls_auth_file_permissions.group | default(omit) }}"
+    mode: "{{ tls_auth_file_permissions.mode | default(omit) }}"
+  when: tls_auth_1password_enabled and ca_cert_content | length > 0
+
+- name: Generate CA certificate signing request
+  community.crypto.openssl_csr:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_csr_filename }}"
+    common_name: "{{ tls_auth_ca_cert_common_name }}"
+    privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    basic_constraints: "{{ tls_auth_ca_key_basic_constraints }}"
+    basic_constraints_critical: true
+    key_usage: "{{ tls_auth_ca_key_usage }}"
+    key_usage_critical: true
+  when: not tls_auth_1password_enabled or ca_cert_content | length == 0
+
+- name: Generate CA certificate
+  community.crypto.x509_certificate:
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
+    csr_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_csr_filename }}"
+    privatekey_path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_key_filename }}"
+    provider: selfsigned
+    selfsigned_digest: "{{ tls_auth_ca_cert_digest }}"
+    selfsigned_not_after: "{{ tls_auth_ca_cert_not_after }}"
+  when: not tls_auth_1password_enabled or ca_cert_content | length == 0
+
+- name: Upload CA certificate to 1Password
+  dbildungscloud.onepwd.document:
+    vault: "{{ tls_auth_ca_vault }}"
+    name: "{{ tls_auth_ca_cert_secret_name }}"
+    path: "{{ tls_auth_certs_dir }}/{{ tls_auth_ca_cert_filename }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
+  when: tls_auth_1password_enabled and ca_cert_content | length == 0

@@ -1,0 +1,26 @@
+
+# https://github.com/privacyidea/privacyidea/blob/master/deploy/pi.cfg
+import logging
+# The realm, where users are allowed to login as administrators,those realm are retrieved from the SUPERUSER_REALM and POLICY in Dumpf File
+SUPERUSER_REALM = ['admin','ucs_users','service']
+# Your database
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{{ mariadb_user }}:{{ privacyidea_db_user_password }}@localhost/{{ privacyidea_mariadb_name }}'
+# This is the dummy base class
+#PI_AUDIT_MODULE = 'privacyidea.lib.auditmodules.base'
+# This is the default
+#PI_AUDIT_MODULE = 'privacyidea.lib.auditmodules.sqlaudit'
+# This is used to sign the audit log
+PI_AUDIT_KEY_PRIVATE = '/etc/privacyidea/private.pem'
+PI_AUDIT_KEY_PUBLIC = '/etc/privacyidea/public.pem'
+#PI_AUDIT_SQL_TRUNCATE = True
+# The Class for managing the SQL connection pool
+#PI_ENGINE_REGISTRY_CLASS = "shared"
+#PI_AUDIT_POOL_SIZE = 20
+PI_LOGLEVEL = 10
+PI_LOGFILE = '/var/log/privacyidea/privacyidea.log'
+#This is used to encrypt the token data and token passwords. The encryption key (enckey) is imported along with the dump file.
+PI_ENCFILE = '/etc/privacyidea/enckey'
+# This is used to encrypt the admin passwords
+PI_PEPPER = '{{ privacyidea_pi_pepper }}'
+SECRET_KEY = '{{ privacyidea_secret_key }}'
+PI_PREFERRED_LANGUAGE = ["de"]

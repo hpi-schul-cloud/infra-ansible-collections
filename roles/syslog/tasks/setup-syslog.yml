@@ -1,0 +1,38 @@
+---
+
+  - name: Install rsyslog and dig
+    apt:
+      name: ["rsyslog", 'rsyslog-gnutls', 'dnsutils']
+      state: present
+
+  - name: Enable rsyslog
+    service:
+      name: rsyslog
+      enabled: true
+      state: started
+   
+  - name: Copy rsyslog.conf
+    copy:
+      src: "{{rsyslogconfig}}/rsyslog.conf"
+      dest: /etc/
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart rsyslog
+    
+  - name: Copy template rules
+    copy:
+      src: "{{rsyslogconfig}}/templates.conf"
+      dest: /etc/rsyslog.d/
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart rsyslog
+
+  - name: Logrotate all rsyslog stuff daily
+    copy:
+      src: syslog
+      dest: /etc/logrotate.d/
+      owner: root
+      group: root
+      mode: 0644
