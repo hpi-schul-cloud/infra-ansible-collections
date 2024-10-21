@@ -1,0 +1,15 @@
+---
+# Add the Prometheus scrape config for  Galera nodes
+- name: Add Galera node scrape configs to Prometheus
+  set_fact:
+    prometheus_additional_scrape_configs: "{{ prometheus_additional_scrape_configs + galera_prometheus_scrape_config }}"
+  vars:
+    galera_prometheus_scrape_config:
+      - job_name: 'galera_node_exporter'
+        static_configs:
+          - targets:
+              - "{{ item.ip }}:{{ node_exporter_port }}"
+  loop: "{{ galera_nodes }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags: prometheus

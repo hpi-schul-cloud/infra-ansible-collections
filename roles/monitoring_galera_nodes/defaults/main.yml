@@ -1,0 +1,14 @@
+---
+node_exporter_version: "1.8.2"
+node_exporter_web_listen_address: "0.0.0.0:9100"
+node_exporter_port: 9100
+# Additional scrape configurations for Prometheus
+prometheus_additional_scrape_configs: []
+
+galera_nodes:
+  - name: privacyidea-mariadb-galera-0
+    ip: ""
+  - name: privacyidea-mariadb-galera-1
+    ip: ""
+  - name: privacyidea-mariadb-galera-2
+    ip: ""
