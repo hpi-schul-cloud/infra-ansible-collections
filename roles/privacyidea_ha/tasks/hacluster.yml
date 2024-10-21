@@ -98,6 +98,22 @@
   when: is_main_node and 
         (groups[unique_ha_group] | length) == 2
 
+- name: Create directories
+  ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+  loop:
+    - /usr/lib/ocf/resource.d/privacyidea/
+
+- name: Copy Galera Resource Agent
+  template:
+    src: remote-galera.j2
+    dest: /usr/lib/ocf/resource.d/privacyidea/remote-galera
+    owner: root
+    group: root
+    mode: '0755'    # ToDo the rights must be checked and limited
+
 - name: Add floating IP resource
   pcs_resource:
     name: "floating-ip"
@@ -116,31 +132,62 @@
     resource_type: 'ocf:heartbeat:nginx'
     options: >-
       configfile=/etc/nginx/nginx.conf
-      op monitor timeout=5s interval=5s
+      op monitor timeout=1s interval=1s 
+      meta failure-timeout=15m migration-threshold=2
       --group {{ cluster_name }}_group
   when: is_main_node
 
-- name: Add nginx resource
+- name: Add uwsgi resource
+  pcs_resource:
+    name: "uwsgi"
+    resource_type: 'systemd:uwsgi'
+    options: >-
+      meta failure-timeout=15m migration-threshold=2
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add galera resource
+  pcs_resource:
+    name: "galera"
+    resource_type: 'ocf:privacyidea:remote-galera'
+    options: >-
+      op monitor timeout=1s interval=1s on-fail=standby
+      meta failure-timeout=15m migration-threshold=2
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add colocation virtual ip is required for nginx
   pcs_constraint_colocation:
     resource1: "floating-ip"
-    # resource1_role: optional
     resource2: "nginx"
-    # resource2_role: optional
     score: "INFINITY"
-    # influence: optional
   when: is_main_node
-  # pcs constraint colocation add nginx with floating-ip score=INFINITY
 
-- name: Add nginx resource
+- name: Add colocation db connection should be available on virtual ip node
+  pcs_constraint_colocation:
+    resource1: "galera"
+    resource2: "floating-ip"
+    score: "INFINITY"
+  when: is_main_node
+
+- name: Add colocation galera should be available on uwsgi node
+  pcs_constraint_colocation:
+    resource1: "galera"
+    resource2: "uwsgi"
+    score: "INFINITY"
+  when: is_main_node
+
+- name: Add order ip and then nginx
   pcs_constraint_order:
     resource1: "floating-ip"
     resource2: "nginx"
-    #resource1_action: optional
-    #resource2_action: optional
-    #kind: optional
-    #symmetrical: optional
   when: is_main_node
-  #  pcs constraint order floating-ip then nginx
+
+- name: Add order nginx and then galera
+  pcs_constraint_order:
+    resource1: "nginx"
+    resource2: "galera"
+  when: is_main_node
 
 - name: Prefer main node 
   pcs_constraint_location:

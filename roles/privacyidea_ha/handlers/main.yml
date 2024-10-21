@@ -3,13 +3,13 @@
   service:
     name: nginx
     state: restarted
-    enabled: yes
+    enabled: no
 
 - name: restart uwsgi
   service:
     name: uwsgi
-    state: restarted
-    enabled: yes
+    state: stopped
+    enabled: no
   become: true
 
 - name: restart sshd
@@ -22,12 +22,6 @@
     name: fail2ban
     state: restarted
     enabled: yes
-
-- name: reload nginx
-  service:
-    name: nginx
-    state: reloaded
-  become: true
 
 - name: Reload ha-cluster-exporter
   ansible.builtin.service:
