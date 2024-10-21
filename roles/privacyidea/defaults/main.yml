@@ -40,11 +40,13 @@ mysql_root_home: /root
 privacyidea_mariadb_name: "privacyidea"
 privacyidea_mariadb_username: "root"
 privacyidea_mariadb_password: ""
+privacyidea_mariadb_host: "127.0.0.1"
 
 # These values are not automatically generated; instead, they are provided with the dump file from the production environment.
 privacyidea_pi_pepper: ""
 privacyidea_secret_key: ""
 privacyidea_execute_data_import: false
+
 dump_file: "" #.sql format
 desired_token_count: 37986
 # We will not create new realms as these will be imported from the dump file.
