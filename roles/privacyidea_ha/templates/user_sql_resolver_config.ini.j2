@@ -1,11 +1,11 @@
 {
     "Driver": "mysql+pymysql",
-    "Server": "{{ privacyidea_mariadb_host }}",
+    "Server":"{{ privacyidea_mariadb_host }}",
     "Database": "{{ privacyidea_mariadb_name }}",
     "User": "{{ mariadb_user }}",  
     "Password": "{{ privacyidea_db_user_password }}",
-    "Table": "admin",
+    "Table": "users_service",
     "Editable": "1",
-    "Map": "{\"userid\":\"username\",\"username\":\"username\",\"password\":\"password\"}",
+    "Map": "{\"userid\": \"id\", \"username\": \"username\"}",
     "Limit": 500
 }
