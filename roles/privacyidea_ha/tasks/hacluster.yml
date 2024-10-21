@@ -93,9 +93,9 @@
   template:
     src: remote-galera.j2
     dest: /usr/lib/ocf/resource.d/privacyidea/remote-galera
-    owner: root
+    owner: "hacluster"
     group: root
-    mode: '0755'    # ToDo the rights must be checked and limited
+    mode: '0700'
 
 - name: Add floating IP resource
   pcs_resource:
