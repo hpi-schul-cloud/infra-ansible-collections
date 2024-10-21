@@ -70,8 +70,6 @@ desired_token_count: 37986
 #sql_resolver_ucs_domain_admins: "ucs_domain_admins"
 
 lets_encrypt_email: devops@dbildungscloud.de
-# Squid refresh interval for basic auth credentials
-credential_refresh_interval: "1 minutes"
 cluster_name: "privacyidea_ha"
 certificate_sync_user: certificate-sync
 # Default in IONOS private LAN is 23

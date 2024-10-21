@@ -124,9 +124,3 @@
   command: bash /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
   when: is_main_node
 
-- name: Start nginx again
-  service:
-    name: nginx
-    enabled: true
-    state: 'started'
-  ignore_errors: true   # The nginx migth not be updated yet
