@@ -56,6 +56,14 @@
     group: www-data
     mode: '0644'
 
+- name: Copy NetKnight pem file
+  copy:
+    src: NetKnights.pem
+    dest: /etc/privacyidea/NetKnights.pem
+    owner: www-data
+    group: www-data
+    mode: 0644
+    
 # /etc/privacyidea/enckey is copied from /data/privacyidea
 - name: Set PrivacyIDEA file permissions
   ansible.builtin.file:

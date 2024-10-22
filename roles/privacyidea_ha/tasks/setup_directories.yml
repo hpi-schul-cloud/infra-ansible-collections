@@ -11,7 +11,7 @@
     - { path: '/opt/privacyidea', mode: '0755' }
     - { path: '/var/log/privacyidea', mode: '0755' }
     - { path: '/var/log/uwsgi', mode: '0755' }
-    - { path; '/usr/lib/ocf/resource.d/privacyidea/'', mode; '0755' }
+    - { path: '/usr/lib/ocf/resource.d/privacyidea/', mode: '0755' }
   become: true
 
 - name: Create uWSGI and privacyidea log files
