@@ -42,3 +42,8 @@
   failed_when: item.value | length < 2
   loop: "{{ groups | dict2items | selectattr('key', 'match', cluster_name ~ '_.*')}}"
 
+- name: Deactivate postfix (not used on this host)
+  service:
+    name: postfix
+    enabled: false
+    state: stopped

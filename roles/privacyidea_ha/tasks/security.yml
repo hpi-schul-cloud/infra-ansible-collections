@@ -3,18 +3,23 @@
   ufw:
     state: enabled
     policy: deny
+    comment: "General deny anything"
 
-- name: Allow SSH port
+- name: Allow required ports
   ufw:
     rule: allow
-    port: "22"
-    proto: tcp
-
-- name: Allow HTTPS through the firewall
-  ufw:
-    rule: allow
-    port: "443"
-    proto: tcp
+    port: '{{ item.port }}'
+    comment: '{{ item.name }}'
+    proto: '{{ item.protocol }}' 
+    from_ip: '{{ item.from | default("any")}}' 
+    to_ip: '{{ item.to | default("any")}}' 
+  loop:
+    - { protocol: tcp, port: 22,   name: "SSH" }
+    - { protocol: tcp, port: 443,  name: "HTTPS" }
+    - { protocol: tcp, port: 9664, name: "ha_cluster_exporter" }
+    - { protocol: udp, port: 5404, name: "Pacemaker", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: udp, port: 5405, name: "Pacemaker", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: udp, port: 5406, name: "Pacemaker", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
 
 # Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
 # In the night to Sunday

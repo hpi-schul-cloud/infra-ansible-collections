@@ -6,6 +6,7 @@
   service:
     name: nginx
     state: 'stopped'
+  when: is_main_node
 
 - name: Generate SSH key for certificate sync
   openssh_keypair:
@@ -52,7 +53,9 @@
   ufw:
     rule: allow
     port: 80
+    comment: "HTTP for letsEncrypt"
     proto: tcp
+  when: is_main_node
 
 - name: Get main and node specific certificate from Let's Encrypt
   tags: certbot
@@ -91,7 +94,7 @@
     mode: 0700
     content: |
       #!/bin/bash
-      ufw allow 80/tcp
+      ufw allow 80/tcp comment "PreHook cert renewal"
 
 - name: Create post hook to close the port and sync them
   copy:
@@ -99,7 +102,7 @@
     mode: 0700
     content: |
       #!/bin/bash
-      ufw deny 80/tcp
+      ufw deny 80/tcp comment "PostHook cert renewal"
       service ha-cluster-exporter reload
       {% if is_main_node %}
       {% for item in groups[unique_ha_group] %}
@@ -123,3 +126,4 @@
 - name: Execute the post hook to close port and sync the certificate for the first time
   command: bash /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
   when: is_main_node
+

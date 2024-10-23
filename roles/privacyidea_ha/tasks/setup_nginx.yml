@@ -23,14 +23,3 @@
     state: link
   become: true
   notify: reload nginx
-
-- name: Allow HTTPS traffic through firewall
-  ufw:
-    rule: allow
-    port: '443'
-    proto: tcp
-  become: true
-
-- name: Reload firewall rules
-  command: ufw reload
-  become: true

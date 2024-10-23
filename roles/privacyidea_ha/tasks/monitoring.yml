@@ -1,10 +1,4 @@
 ---
-- name: Allow port for metrics
-  ufw:
-    rule: allow
-    port: 9664
-    proto: tcp
-
 - name: Install ha-cluster-exporter (always changed)
   ansible.builtin.command:
     cmd: "go install github.com/ClusterLabs/ha_cluster_exporter@{{ ha_cluster_exporter_version }}"

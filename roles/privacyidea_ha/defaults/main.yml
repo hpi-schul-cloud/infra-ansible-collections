@@ -72,8 +72,8 @@ desired_token_count: 37986
 lets_encrypt_email: devops@dbildungscloud.de
 cluster_name: "privacyidea_ha"
 certificate_sync_user: certificate-sync
-# Default in IONOS private LAN is 23
-private_network_cidr: 23
+# Default in IONOS private LAN is 24
+private_network_cidr: 24
 # Path for the certificates on the backup nodes
 certificate_sync_target_directory: "/synced_certificates"
 # Exporter version, see https://github.com/ClusterLabs/ha_cluster_exporter

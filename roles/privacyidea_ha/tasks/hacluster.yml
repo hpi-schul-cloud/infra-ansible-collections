@@ -1,8 +1,9 @@
 ---
-- name: Allow free comunication in private network
-  ufw:
-    rule: allow
-    from: "{{ internal_ip }}/{{ private_network_cidr }}"
+# - name: Allow free comunication in private network
+#   ufw:
+#     rule: allow
+#     comment: "PrivacyIdea Sync Rule"
+#     from: "{{ internal_ip }}/{{ private_network_cidr }}"
 
 - name: Insert other nodes of cluster into /etc/hosts
   vars: 
