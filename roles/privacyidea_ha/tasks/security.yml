@@ -17,9 +17,12 @@
     - { protocol: tcp, port: 22,   name: "SSH" }
     - { protocol: tcp, port: 443,  name: "HTTPS" }
     - { protocol: tcp, port: 9664, name: "ha_cluster_exporter" }
-    - { protocol: udp, port: 5404, name: "Pacemaker", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
-    - { protocol: udp, port: 5405, name: "Pacemaker", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
-    - { protocol: udp, port: 5406, name: "Pacemaker", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: tcp, port: 2224, name: "Pacemaker pcsd", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: tcp, port: 3121, name: "Pacemaker_remoted", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    #- { protocol: tcp, port: 21064, name: "Pacemaker DLM", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    #- { protocol: udp, port: 5403, name: "Pacemaker quorum", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    #- { protocol: udp, port: 5404, name: "Pacemaker corosync multicast", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: udp, port: 5405, name: "Pacemaker corosync", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
 
 # Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
 # In the night to Sunday
