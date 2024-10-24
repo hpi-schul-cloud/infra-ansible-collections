@@ -47,4 +47,4 @@
       ansible.builtin.file:
         path: "{{ syslog_vm_2nd_disk_mount_point }}"
         state: directory
-        mode: 02777
+        mode: '02777'
