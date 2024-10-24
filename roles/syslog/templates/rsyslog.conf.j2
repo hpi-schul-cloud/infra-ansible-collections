@@ -94,12 +94,9 @@ input(
 # 10.13.20.0/24 frontend lan sc-prod-legacy
 # 10.9.12.0/24 frontend lan sc-staging-legacy
 #
-$AllowedSender UDP, 127.0.0.1, [::1]/128, *.schul-cloud.org, 10.0.0.0/24
-$AllowedSender TCP, 127.0.0.1, [::1]/128, *.schul-cloud.org, 10.0.0.0/24
-$AllowedSender UDP, 127.0.0.1, [::1]/128, *.schul-cloud.org, 10.9.12.0/24
-$AllowedSender TCP, 127.0.0.1, [::1]/128, *.schul-cloud.org, 10.9.12.0/24
-$AllowedSender UDP, 127.0.0.1, [::1]/128, *.schul-cloud.org, 10.13.20.0/24
-$AllowedSender TCP, 127.0.0.1, [::1]/128, *.schul-cloud.org, 10.13.20.0/24
+$AllowedSender UDP, 127.0.0.1, [::1]/128, {{ syslog_allowed_senders }}
+$AllowedSender TCP, 127.0.0.1, [::1]/128, {{ syslog_allowed_senders }}
+
 # Where to place auxiliary files
 $WorkDirectory /var/lib/rsyslog
 

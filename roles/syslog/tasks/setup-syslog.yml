@@ -12,18 +12,18 @@
       state: started
    
   - name: Copy rsyslog.conf
-    copy:
-      src: "{{rsyslogconfig}}/rsyslog.conf"
-      dest: /etc/
+    template:
+      src: "rsyslog.conf.j2"
+      dest: /etc/rsyslog.conf
       owner: root
       group: root
       mode: 0644
     notify: restart rsyslog
     
   - name: Copy template rules
-    copy:
-      src: "{{rsyslogconfig}}/templates.conf"
-      dest: /etc/rsyslog.d/
+    template:
+      src: "templates.conf.j2"
+      dest: /etc/rsyslog.d/templates.conf
       owner: root
       group: root
       mode: 0644
