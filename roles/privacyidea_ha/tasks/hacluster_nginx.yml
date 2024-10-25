@@ -1,0 +1,64 @@
+---
+# These jobs must be done after we got our certificates, but the virtual IP is needed before we can generate the certificates
+- name: Add nginx resource
+  pcs_resource:
+    name: "nginx"
+    resource_type: 'ocf:heartbeat:nginx'
+    options: >-
+      configfile=/etc/nginx/nginx.conf
+      op monitor timeout=1s interval=1s 
+      meta failure-timeout=15m migration-threshold=2
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add uwsgi resource
+  pcs_resource:
+    name: "uwsgi"
+    resource_type: 'systemd:uwsgi'
+    options: >-
+      meta failure-timeout=15m migration-threshold=2
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add galera resource
+  pcs_resource:
+    name: "galera"
+    resource_type: 'ocf:privacyidea:remote-galera'
+    options: >-
+      op monitor timeout=1s interval=1s on-fail=standby
+      meta failure-timeout=15m migration-threshold=2
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add colocation virtual ip is required for nginx
+  pcs_constraint_colocation:
+    resource1: "floating-ip"
+    resource2: "nginx"
+    score: "INFINITY"
+  when: is_main_node
+
+- name: Add colocation db connection should be available on virtual ip node
+  pcs_constraint_colocation:
+    resource1: "galera"
+    resource2: "floating-ip"
+    score: "INFINITY"
+  when: is_main_node
+
+- name: Add colocation galera should be available on uwsgi node
+  pcs_constraint_colocation:
+    resource1: "galera"
+    resource2: "uwsgi"
+    score: "INFINITY"
+  when: is_main_node
+
+- name: Add order ip and then nginx
+  pcs_constraint_order:
+    resource1: "floating-ip"
+    resource2: "nginx"
+  when: is_main_node
+
+- name: Add order nginx and then galera
+  pcs_constraint_order:
+    resource1: "nginx"
+    resource2: "galera"
+  when: is_main_node
