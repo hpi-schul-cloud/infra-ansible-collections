@@ -28,29 +28,29 @@ privacyidea_packages:
 privacyidea_dir: "/opt/privacyidea"
 
 # admin credentials
-privacyidea_admin_password: ""
+# privacyidea_admin_password: ""
 privacyidea_admin: "admin"
 # token-admin credentials
-privacyidea_token_admin_password: ""
+# privacyidea_token_admin_password: ""
 privacyidea_token_admin: "token-admin"
 # seed-import credentials
-privacyidea_seed_import_password: ""
+# privacyidea_seed_import_password: ""
 privacyidea_seed_import: "seed-import"
 privacyidea_admin_users: ["{{ privacyidea_admin }}", "{{ privacyidea_token_admin }}", "{{ privacyidea_seed_import }}"]
 
 # Mariadb user credentials:
-privacyidea_db_user_password: ""
+# privacyidea_db_user_password: ""
 mariadb_user: "privacyidea_db"
 # The default root user installed by mysql - almost always root
 mysql_root_home: /root
 privacyidea_mariadb_name: "privacyidea"
 privacyidea_mariadb_username: "root"
-privacyidea_mariadb_password: ""
+# privacyidea_mariadb_password: ""
 privacyidea_mariadb_host: "127.0.0.1"  # Only install local mariadb server if we use localhost as database 
 
 # These values are not automatically generated; instead, they are provided with the dump file from the production environment.
-privacyidea_pi_pepper: ""
-privacyidea_secret_key: ""
+#privacyidea_pi_pepper: ""
+#privacyidea_secret_key: ""
 privacyidea_execute_data_import: false
 dump_file: "" #.sql format
 desired_token_count: 37986
