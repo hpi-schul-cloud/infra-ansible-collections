@@ -30,7 +30,7 @@
     user: "{{ certificate_sync_user }}"
     key: "{{ lookup('file', '/tmp/certificate_sync_key_' ~ unique_ha_group ~ '.pub') }}"
     comment: "{{ certificate_sync_user }}"
-    exclusive: False
+    exclusive: True
   when: not is_main_node
 
 - name: Create directory for synced certificates
