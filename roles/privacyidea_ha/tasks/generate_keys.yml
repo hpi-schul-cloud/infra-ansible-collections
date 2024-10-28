@@ -16,35 +16,42 @@
   become: true
   when: is_main_node
 
-- name: Get auth private key 
-  ansible.builtin.fetch:
-    src: "/etc/privacyidea/private.pem"
-    dest: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.priv"
-    flat: true
-  when: is_main_node
+- name: Exchange AUDIT Keys
+  block:
+    - name: Get auth private key 
+      ansible.builtin.fetch:
+        src: "/etc/privacyidea/private.pem"
+        dest: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.priv"
+        flat: true
+      when: is_main_node
 
-- name: Get auth public key 
-  ansible.builtin.fetch:
-    src: "/etc/privacyidea/public.pem"
-    dest: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.pub"
-    flat: true
-  when: is_main_node
+    - name: Get auth public key 
+      ansible.builtin.fetch:
+        src: "/etc/privacyidea/public.pem"
+        dest: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.pub"
+        flat: true
+      when: is_main_node
 
-- name: Set up auth private key
-  ansible.builtin.copy:
-    dest: "/etc/privacyidea/private.pem"
-    src: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.priv"
-    group: www-data
-    owner: www-data
-    mode: '0600'
-  when: not is_main_node
+    - name: Set up auth private key
+      ansible.builtin.copy:
+        dest: "/etc/privacyidea/private.pem"
+        src: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.priv"
+        group: www-data
+        owner: www-data
+        mode: '0600'
+      when: not is_main_node
 
-- name: Set up auth public key
-  ansible.builtin.copy:
-    dest: "/etc/privacyidea/public.pem"
-    src: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.pub"
-    group: www-data
-    owner: www-data
-    mode: '0644'
-  when: not is_main_node
+    - name: Set up auth public key
+      ansible.builtin.copy:
+        dest: "/etc/privacyidea/public.pem"
+        src: "/tmp/certificate_sync_key_{{ unique_ha_group }}.auth.pub"
+        group: www-data
+        owner: www-data
+        mode: '0644'
+      when: not is_main_node
 
+    - name: Delete local copies
+      file: 
+        path: "/tmp/certificate_sync_key_*" 
+        state: absent
+      delegate_to: localhost
