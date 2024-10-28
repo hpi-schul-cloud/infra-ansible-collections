@@ -36,17 +36,17 @@
 #     enabled: no
 #   become: true
 
- - name: reload nginx
-   command:
-     cmd: /usr/bin/pcs resource nginx restart
-   become: true
+- name: reload nginx
+  command:
+    cmd: /usr/bin/pcs resource nginx restart
+  become: true
 
- - name: restart nginx
-   command:
-     cmd: /usr/bin/pcs resource nginx restart
-   become: true
+- name: restart nginx
+  command:
+    cmd: /usr/bin/pcs resource nginx restart
+  become: true
 
- - name: restart uwsgi
-   command:
-     cmd: /usr/bin/pcs resource uwsgi restart
-   become: true
+- name: restart uwsgi
+  command:
+    cmd: /usr/bin/pcs resource uwsgi restart
+  become: true
