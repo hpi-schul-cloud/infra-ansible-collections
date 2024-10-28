@@ -37,16 +37,16 @@
 #   become: true
 
  - name: reload nginx
-   ansible.builtin.command:
-    cmd: /usr/bin/pcs resource nginx restart
+   command:
+     cmd: /usr/bin/pcs resource nginx restart
    become: true
 
  - name: restart nginx
-   ansible.builtin.command:
-    cmd: /usr/bin/pcs resource nginx restart
+   command:
+     cmd: /usr/bin/pcs resource nginx restart
    become: true
 
  - name: restart uwsgi
-   ansible.builtin.command:
-    cmd: /usr/bin/pcs resource uwsgi restart
+   command:
+     cmd: /usr/bin/pcs resource uwsgi restart
    become: true
