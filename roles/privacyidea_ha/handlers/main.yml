@@ -19,15 +19,15 @@
 
 - name: reload nginx
   command:
-    cmd: /usr/sbin/pcs resource nginx restart
+    cmd: /usr/sbin/pcs resource restart nginx
   become: true
 
 - name: restart nginx
   command:
-    cmd: /usr/sbin/pcs resource nginx restart
+    cmd: /usr/sbin/pcs resource restart nginx
   become: true
 
 - name: restart uwsgi
   command:
-    cmd: /usr/sbin/pcs resource uwsgi restart
+    cmd: /usr/sbin/pcs resource restart uwsgi
   become: true
