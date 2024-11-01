@@ -14,7 +14,8 @@
 
 - name: Create client private key file
   copy:
-    content: "{{ client_key_content }}"
+    content: |
+      {{ client_key_content }}
     dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_key_filename }}"
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
@@ -45,7 +46,8 @@
 
 - name: Create client certificate file
   copy:
-    content: "{{ client_cert_content }}"
+    content: |
+      {{ client_cert_content }}
     dest: "{{ tls_auth_certs_dir }}/{{ tls_auth_client }}/{{ tls_auth_client_cert_filename }}"
     owner: "{{ tls_auth_file_permissions.owner | default(omit) }}"
     group: "{{ tls_auth_file_permissions.group | default(omit) }}"
@@ -112,4 +114,6 @@
       - name: passphrase
         type: password
         value: "{{ pkcs12_passphrase }}"
+    session_shorthand: "{{ op_session_shorthand }}"
+    credentials: "{{ op_credentials }}"
   when: tls_auth_1password_enabled and client_cert_content | length == 0

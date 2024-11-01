@@ -1,0 +1,106 @@
+module(load="mmutf8fix") 
+
+# Available: 
+#	hostname (kubernetes_host)
+#   app-name (kubernetes_container_name)
+#   procid   (kubernetes_pod_id)
+#   msgid    (kubernetes_namespace_name)
+#   msg      (log)
+template(name="byNamespace" type="string"
+	string="/syslog-extern/container/%msgid%/%app-name%.log"
+)
+
+template(name="byHostIp" type="string"
+	string="/syslog-extern/hostsByIp/%fromhost-ip%/%app-name%.log"
+)
+
+template(name="byHostName" type="string"
+	string="/syslog-extern/hosts/%fromhost%/%app-name%.log"
+)
+
+template(name="fullDebug" type="list") {
+     constant(value="Debug line with all properties:\nFROMHOST: '")
+     property(name="fromhost")
+     constant(value="', fromhost-ip: '")
+     property(name="fromhost-ip")
+     constant(value="', HOSTNAME: '")
+     property(name="hostname")
+     constant(value="', PRI: '")
+     property(name="pri")
+     constant(value=",\nsyslogtag '")
+     property(name="syslogtag")
+     constant(value="', programname: '")
+     property(name="programname")
+     constant(value="', APP-NAME: '")
+     property(name="app-name")
+     constant(value="', PROCID: '")
+     property(name="procid")
+     constant(value="', MSGID: '")
+     property(name="msgid")
+     constant(value="',\nTIMESTAMP: '")
+     property(name="timereported")
+     constant(value="', STRUCTURED-DATA: '")
+     property(name="structured-data")
+     constant(value="',\nmsg: '")
+     property(name="msg")
+     constant(value="'\nescaped msg: '")
+     property(name="msg" controlcharacters="drop")
+     constant(value="'\ninputname: ")
+     property(name="inputname")
+     constant(value=" rawmsg: '")
+     property(name="rawmsg")
+     constant(value="'\n$!:")
+     property(name="$!")
+     constant(value="\n$.:")
+     property(name="$.")
+     constant(value="\n$/:")
+     property(name="$/")
+     constant(value="\n\n")
+}
+
+template(name="SchulCloudFormat" type="list") {
+    property(name="timestamp" dateFormat="rfc3339")
+    constant(value=" ")
+    property(name="procid")
+    property(name="msg")
+    constant(value="\n")
+}
+
+# Messages marked with facility "local5". These are marked having Kubernetes as source.
+if ( $syslogfacility-text == "local5" )
+then {
+	action(type="mmutf8fix" mode="controlcharacters")
+    action(
+        type = "omfile"
+        dirCreateMode = "0755"
+        fileCreateMode = "0644"
+        dynaFile = "byNamespace"
+		template = "SchulCloudFormat"
+    )
+	stop
+}
+
+if ( $hostname != $$myhostname )
+then {
+    action(
+        type = "omfile"
+        dirCreateMode = "0755"
+        fileCreateMode = "0644"
+        dynaFile = "byHostIp"
+		template = "SchulCloudFormat"
+    )
+    action(
+        type = "omfile"
+        dirCreateMode = "0755"
+        fileCreateMode = "0644"
+        dynaFile = "byHostName"
+		template = "SchulCloudFormat"
+    )
+	stop
+}
+
+# Debug: Log everything
+# *.* action(type="omfile" file="/syslog-extern/debugFmtAll.log" template="fullDebug")
+
+# Debug: Messages marked with facility "local5".
+#local5.* action(type="omfile" file="/syslog-extern/debugFmtLocal5.log" template="fullDebug")

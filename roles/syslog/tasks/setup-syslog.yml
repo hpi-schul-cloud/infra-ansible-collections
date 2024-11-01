@@ -1,0 +1,45 @@
+---
+
+  - name: Install rsyslog and dig
+    apt:
+      name: ["rsyslog", 'rsyslog-gnutls', 'dnsutils']
+      state: present
+
+  - name: Enable rsyslog
+    service:
+      name: rsyslog
+      enabled: true
+      state: started
+
+  - name: Remove line from file
+    ansible.builtin.lineinfile:
+      path: /etc/rsyslog.d/50-default.conf
+      regexp: '.*-/var/log/syslog$'
+      state: absent
+    notify: restart rsyslog
+   
+  - name: Copy rsyslog.conf
+    template:
+      src: "rsyslog.conf.j2"
+      dest: /etc/rsyslog.conf
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart rsyslog
+    
+  - name: Copy template rules
+    template:
+      src: "templates.conf.j2"
+      dest: /etc/rsyslog.d/templates.conf
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart rsyslog
+
+  - name: Logrotate all rsyslog stuff daily
+    copy:
+      src: rsyslog
+      dest: /etc/logrotate.d/
+      owner: root
+      group: root
+      mode: 0644

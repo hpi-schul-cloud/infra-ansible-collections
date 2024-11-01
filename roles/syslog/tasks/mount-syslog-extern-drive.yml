@@ -1,0 +1,50 @@
+---
+    - name: Check if disk is already mounted
+      set_fact:
+        disk_mounted: "{{ ansible_mounts | selectattr('mount', 'equalto', syslog_vm_2nd_disk_mount_point) | list | length > 0 }}"
+
+    - name: Ensure the disk is unmounted
+      mount:
+        path: "{{ syslog_vm_2nd_disk_mount_point }}"
+        state: absent
+      when: not disk_mounted
+
+    - name: Create filesystem on the disk
+      filesystem:
+        fstype: "{{ syslog_vm_2nd_disk_filesystem }}"
+        dev: "{{ syslog_vm_2nd_disk }}"
+      when: not disk_mounted
+
+    - name: Create mount point directory
+      file:
+        path: "{{ syslog_vm_2nd_disk_mount_point }}"
+        state: directory
+      when: not disk_mounted
+
+    - name: Mount the disk
+      mount:
+        path: "{{ syslog_vm_2nd_disk_mount_point }}"
+        src: "{{ syslog_vm_2nd_disk }}"
+        fstype: "{{ syslog_vm_2nd_disk_filesystem }}"
+        state: mounted
+      when: not disk_mounted
+
+    - name: Ensure the mount is persistent across reboots
+      mount:
+        path: "{{ syslog_vm_2nd_disk_mount_point }}"
+        src: "{{ syslog_vm_2nd_disk }}"
+        fstype: "{{ syslog_vm_2nd_disk_filesystem }}"
+        opts: defaults
+        state: present
+      when: not disk_mounted
+
+    - name: Info - disk is already mounted
+      debug:
+        msg: "The disk {{ syslog_vm_2nd_disk }} is already mounted at {{ syslog_vm_2nd_disk_mount_point }}. Skipping formatting and mounting."
+      when: disk_mounted
+
+    - name: Change syslog extern directory read and write permissions for all users
+      ansible.builtin.file:
+        path: "{{ syslog_vm_2nd_disk_mount_point }}"
+        state: directory
+        mode: '02777'
