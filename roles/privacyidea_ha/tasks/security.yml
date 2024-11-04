@@ -29,7 +29,7 @@
 - name: Reboot weekly if necessary
   cron:
     name: "Weekly reboot for updates"
-    weekday: "0"
+    weekday: "{{ 0 if is_main_node else 4 }}"
     hour: "0"
     minute: "21"
     job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"
