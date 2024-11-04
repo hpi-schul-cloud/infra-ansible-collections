@@ -136,12 +136,6 @@ VALUES ($POLICY_ID, 'HTTP Request header', 'SelfService', 'equals', 'true', 1);
 "
 echo "Policy condition added."
 
-
-
-
-
-
-
 # Create periodic tasks for various counting operations
 # Create event handlers for various events
 mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
