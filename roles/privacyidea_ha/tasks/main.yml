@@ -13,5 +13,6 @@
 - import_tasks: monitoring.yml
 - import_tasks: hacluster_nginx.yml
 - import_tasks: import_data.yml
+- import_tasks: cron_tasks.yml
   when: is_main_node and ( privacyidea_execute_data_import | bool )
 
