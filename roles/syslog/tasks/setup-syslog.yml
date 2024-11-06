@@ -10,20 +10,27 @@
       name: rsyslog
       enabled: true
       state: started
+
+  - name: Remove line from file
+    ansible.builtin.lineinfile:
+      path: /etc/rsyslog.d/50-default.conf
+      regexp: '.*-/var/log/syslog$'
+      state: absent
+    notify: restart rsyslog
    
   - name: Copy rsyslog.conf
-    copy:
-      src: "{{rsyslogconfig}}/rsyslog.conf"
-      dest: /etc/
+    template:
+      src: "rsyslog.conf.j2"
+      dest: /etc/rsyslog.conf
       owner: root
       group: root
       mode: 0644
     notify: restart rsyslog
     
   - name: Copy template rules
-    copy:
-      src: "{{rsyslogconfig}}/templates.conf"
-      dest: /etc/rsyslog.d/
+    template:
+      src: "templates.conf.j2"
+      dest: /etc/rsyslog.d/templates.conf
       owner: root
       group: root
       mode: 0644
@@ -31,7 +38,7 @@
 
   - name: Logrotate all rsyslog stuff daily
     copy:
-      src: syslog
+      src: rsyslog
       dest: /etc/logrotate.d/
       owner: root
       group: root

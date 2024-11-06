@@ -1,4 +1,4 @@
-rsyslogconfig: v2
 syslog_vm_2nd_disk: /dev/vdb  
 syslog_vm_2nd_disk_mount_point: /syslog-extern  
 syslog_vm_2nd_disk_filesystem: ext4  
+# syslog_allowed_senders: "" overwrite this to set syslog ip ranges ( ip/mask, ip/mask, ... ) 
