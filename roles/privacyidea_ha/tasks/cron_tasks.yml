@@ -1,8 +1,0 @@
----
-- name: Ensure PrivacyIDEA cron job is set up
-  cron:
-    name: "PrivacyIDEA periodic tasks"
-    minute: "*/5"
-    job: "/opt/privacyidea/virtualenv/bin/privacyidea-cron run_scheduled"
-    user: www-data
-    state: present
