@@ -62,35 +62,3 @@
     resource1: "nginx"
     resource2: "galera"
   when: is_main_node
-
-#creates a shortcut from where cron looks for jobs(/etc/privacyidea/cron) to where we actually keep our PrivacyIDEA cron job(/etc/cron.d/privacyidea)
-- name: Create Symlink for Cron Job
-  pcs_resource:
-      name: "privacyidea_cron_symlink"
-      resource_type: 'ocf:heartbeat:symlink'
-      options: >-
-        target=/etc/privacyidea/cron
-        link=/etc/cron.d/privacyidea
-        backup_suffix=.disabled
-        op monitor interval=10
-        --group {{ cluster_name }}_group
-
-
-- name: Add Order Constraint for Symlink before Cron
-  pcs_constraint_order:
-    resource1: "privacyidea_cron_symlink"
-    resource2: "uwsgi"
-
-- name: Add Colocation Constraint for Symlink on PrivacyIDEA
-  pcs_constraint_colocation:
-    resource1: "privacyidea_cron_symlink"
-    resource2: "uwsgi"
-    score: "INFINITY"
-
-- name: Create the cron job script file
-  copy:
-    dest: /etc/privacyidea/cron
-    content: |
-      #!/bin/bash
-      # Script to run scheduled tasks for PrivacyIDEA
-      */5 * * * * /opt/privacyidea/virtualenv/bin/privacyidea-cron run_scheduled

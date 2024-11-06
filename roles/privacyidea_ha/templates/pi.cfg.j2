@@ -16,7 +16,8 @@ PI_AUDIT_KEY_PUBLIC = '/etc/privacyidea/public.pem'
 # The Class for managing the SQL connection pool
 #PI_ENGINE_REGISTRY_CLASS = "shared"
 #PI_AUDIT_POOL_SIZE = 20
-PI_LOGLEVEL = 10
+# Using 30 as suggest to not influence performance
+PI_LOGLEVEL = 30
 PI_LOGFILE = '/var/log/privacyidea/privacyidea.log'
 #This is used to encrypt the token data and token passwords. The encryption key (enckey) is imported along with the dump file.
 PI_ENCFILE = '/etc/privacyidea/enckey'

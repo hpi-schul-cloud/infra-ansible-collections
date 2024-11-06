@@ -1,7 +1,6 @@
 bettermarks_proxy_enabled_instances:
   - apm
   - school
-  - translations
   - apps
   - events
   - csp-report
@@ -10,14 +9,12 @@ bettermarks_subdomains:
   school: school
   apps: apps
   events: events
-  translations: translations
   csp-report: csp-report
 bettermarks_proxy_subdomains:
   apm: apm
   school: school
   apps: apps
   events: events
-  translations: translations
   csp-report: csp-report
 bettermarks_domain: bettermarks.com
 proxy_identification_header: "x-schulcloud-proxy"

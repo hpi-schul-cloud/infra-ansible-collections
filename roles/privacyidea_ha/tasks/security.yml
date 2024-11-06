@@ -19,9 +19,6 @@
     - { protocol: tcp, port: 9664, name: "ha_cluster_exporter" }
     - { protocol: tcp, port: 2224, name: "Pacemaker pcsd", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
     - { protocol: tcp, port: 3121, name: "Pacemaker_remoted", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
-    #- { protocol: tcp, port: 21064, name: "Pacemaker DLM", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
-    #- { protocol: udp, port: 5403, name: "Pacemaker quorum", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
-    #- { protocol: udp, port: 5404, name: "Pacemaker corosync multicast", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
     - { protocol: udp, port: 5405, name: "Pacemaker corosync", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
 
 # Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
@@ -29,7 +26,7 @@
 - name: Reboot weekly if necessary
   cron:
     name: "Weekly reboot for updates"
-    weekday: "0"
+    weekday: "{{ 0 if is_main_node else 4 }}"
     hour: "0"
     minute: "21"
     job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"
