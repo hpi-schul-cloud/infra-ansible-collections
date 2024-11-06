@@ -69,7 +69,7 @@ desired_token_count: 37986
 #sql_resolver_ucs_users: "ucs_users"
 #sql_resolver_ucs_domain_admins: "ucs_domain_admins"
 
-lets_encrypt_email: devops@dbildungscloud.de
+lets_encrypt_email:  devops@dbildungsplattorm.de
 cluster_name: "privacyidea_ha"
 certificate_sync_user: certificate-sync
 # Default in IONOS private LAN is 24

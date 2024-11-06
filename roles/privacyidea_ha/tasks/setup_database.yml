@@ -6,23 +6,3 @@
     owner: root
     group: root
     mode: 0600
-
-# DONE in GALERA Setup
-# - name: Create MariaDB database 
-#   mysql_db:
-#     name: "{{ privacyidea_mariadb_name }}"
-#     state: present
-#     login_user: "{{ privacyidea_mariadb_username }}"
-#     login_password: "{{ privacyidea_mariadb_password }}"
-#   when: is_main_node
-
-# - name: Create database user and grant privileges
-#   mysql_user:
-#     name: "{{ mariadb_user }}"
-#     password: "{{ privacyidea_db_user_password }}"
-#     priv: '{{ privacyidea_mariadb_name }}.*:ALL'
-#     host: "%"
-#     state: present
-#     login_user: "{{ privacyidea_mariadb_username }}"    
-#     login_password: "{{ privacyidea_mariadb_password }}"
-#   when: is_main_node
