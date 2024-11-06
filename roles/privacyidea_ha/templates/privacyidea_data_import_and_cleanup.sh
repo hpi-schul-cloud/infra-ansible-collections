@@ -6,7 +6,7 @@ DB_NAME="{{ privacyidea_mariadb_name }}"
 DB_HOST="{{ privacyidea_mariadb_host }}"
 DB_PASSWORD="{{ privacyidea_db_user_password }}"
 DUMP_FILE="{{ dump_file }}"
-DESIRED_TOKEN_COUNT={{ desired_token_count | int is number}}
+DESIRED_TOKEN_COUNT={{ desired_token_count | int }} 
 
 # Verify the token count before importing the SQL dump
 # It is checked before starting the import if reimport is needed by checking the desired token count. 
@@ -19,8 +19,13 @@ elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt $DESIRED_TOKEN_COUNT ]; th
   echo "Token count is $TOKEN_COUNT, which is less than $DESIRED_TOKEN_COUNT. Proceeding with SQL dump import..."
   
   # Import the SQL dump
-  mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
-  echo "SQL dump imported."
+  if [ -f  /var/backups/$DUMP_FILE ]; then
+    mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME < /var/backups/$DUMP_FILE
+    echo "SQL dump imported."
+  else
+    echo No Backupfile found
+    exit 1
+  fi
   
   # Verify the token count again after import
   TOKEN_COUNT_AFTER_IMPORT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")

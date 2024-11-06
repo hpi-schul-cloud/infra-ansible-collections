@@ -1,9 +1,9 @@
 ---
 server_name: ""
 
-
-uwsgi_config_name: "production" # Valid options:development,testing,production
-uwsgi_debug_mode: "False" # Valid options:True, False
+# UWSGI
+config_name: "production" # Valid options:development,testing,production
+debug_mode: "False" # Valid options:True, False
 
 privacyidea_version: "3.8.1"
 privacyidea_packages:
@@ -15,38 +15,43 @@ privacyidea_packages:
     - uwsgi-plugin-python3
     - certbot
     - python3-certbot-nginx
-    - mariadb-server
     - mariadb-client
     - ufw
     - fail2ban
+    - golang
+    - apparmor-utils
+    - pcs
+    - pacemaker
+    - libxml2-utils
+    - resource-agents
+
 privacyidea_dir: "/opt/privacyidea"
 
 # admin credentials
-privacyidea_admin_password: ""
+# privacyidea_admin_password: ""
 privacyidea_admin: "admin"
 # token-admin credentials
-privacyidea_token_admin_password: ""
+# privacyidea_token_admin_password: ""
 privacyidea_token_admin: "token-admin"
 # seed-import credentials
-privacyidea_seed_import_password: ""
+# privacyidea_seed_import_password: ""
 privacyidea_seed_import: "seed-import"
 privacyidea_admin_users: ["{{ privacyidea_admin }}", "{{ privacyidea_token_admin }}", "{{ privacyidea_seed_import }}"]
 
 # Mariadb user credentials:
-privacyidea_db_user_password: ""
+# privacyidea_db_user_password: ""
 mariadb_user: "privacyidea_db"
 # The default root user installed by mysql - almost always root
 mysql_root_home: /root
 privacyidea_mariadb_name: "privacyidea"
 privacyidea_mariadb_username: "root"
-privacyidea_mariadb_password: ""
-privacyidea_mariadb_host: "127.0.0.1"
+# privacyidea_mariadb_password: ""
+privacyidea_mariadb_host: "127.0.0.1"  # Only install local mariadb server if we use localhost as database 
 
 # These values are not automatically generated; instead, they are provided with the dump file from the production environment.
-privacyidea_pi_pepper: ""
-privacyidea_secret_key: ""
+#privacyidea_pi_pepper: ""
+#privacyidea_secret_key: ""
 privacyidea_execute_data_import: false
-
 dump_file: "" #.sql format
 desired_token_count: 37986
 # We will not create new realms as these will be imported from the dump file.
@@ -63,3 +68,13 @@ desired_token_count: 37986
 #sql_resolver_service: "service"
 #sql_resolver_ucs_users: "ucs_users"
 #sql_resolver_ucs_domain_admins: "ucs_domain_admins"
+
+lets_encrypt_email:  devops@dbildungsplattorm.de
+cluster_name: "privacyidea_ha"
+certificate_sync_user: certificate-sync
+# Default in IONOS private LAN is 24
+private_network_cidr: 24
+# Path for the certificates on the backup nodes
+certificate_sync_target_directory: "/synced_certificates"
+# Exporter version, see https://github.com/ClusterLabs/ha_cluster_exporter
+ha_cluster_exporter_version: 1.3.3

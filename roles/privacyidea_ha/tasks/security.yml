@@ -1,0 +1,53 @@
+---
+- name: Enable ufw (deny all)
+  ufw:
+    state: enabled
+    policy: deny
+    comment: "General deny anything"
+
+- name: Allow required ports
+  ufw:
+    rule: allow
+    port: '{{ item.port }}'
+    comment: '{{ item.name }}'
+    proto: '{{ item.protocol }}' 
+    from_ip: '{{ item.from | default("any")}}' 
+    to_ip: '{{ item.to | default("any")}}' 
+  loop:
+    - { protocol: tcp, port: 22,   name: "SSH" }
+    - { protocol: tcp, port: 443,  name: "HTTPS" }
+    - { protocol: tcp, port: 9664, name: "ha_cluster_exporter" }
+    - { protocol: tcp, port: 2224, name: "Pacemaker pcsd", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: tcp, port: 3121, name: "Pacemaker_remoted", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+    - { protocol: udp, port: 5405, name: "Pacemaker corosync", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
+
+# Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
+# In the night to Sunday
+- name: Reboot weekly if necessary
+  cron:
+    name: "Weekly reboot for updates"
+    weekday: "{{ 0 if is_main_node else 4 }}"
+    hour: "0"
+    minute: "21"
+    job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"
+
+- name: Copy PrivacyIDEA Fail2Ban filter
+  template:
+    src: auth-fail2ban.conf.j2
+    dest: /etc/fail2ban/filter.d/auth-fail2ban.conf
+  notify: restart fail2ban
+
+- name: Copy PrivacyIDEA Fail2Ban jail configuration
+  template:
+    src: privacyidea-jail.conf.j2
+    dest: /etc/fail2ban/jail.d/privacyidea-jail.conf
+  notify: restart fail2ban
+
+- name: copy ssh-jail for fail2ban
+  template:
+    src: sshd.local.j2
+    dest: /etc/fail2ban/jail.d/sshd.local
+    owner: www-data
+    group: www-data
+    mode: 0744
+  notify: restart fail2ban

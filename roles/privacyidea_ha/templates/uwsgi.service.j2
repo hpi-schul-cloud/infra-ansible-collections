@@ -1,0 +1,18 @@
+[Unit]
+Description=uWSGI Service
+After=syslog.target
+
+[Service]
+ExecStart=/usr/bin/uwsgi --ini /etc/uwsgi/apps-available/privacyidea.ini
+ExecStartPre=+/bin/mkdir -p /run/uwsgi/app/privacyidea
+ExecStartPre=+/bin/chown www-data:www-data /run/uwsgi/app/privacyidea
+
+Restart=always
+KillSignal=SIGQUIT
+Type=notify
+NotifyAccess=all
+User=www-data
+Group=www-data
+
+[Install]
+WantedBy=multi-user.target
