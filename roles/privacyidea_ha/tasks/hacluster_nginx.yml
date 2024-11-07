@@ -74,29 +74,46 @@
 
 - name: Create Cron Job file
   copy:
-    dest: /etc/cron.d/privacyidea
+    dest: /etc/cron.d/www-data
     content: |
-      */5 * * * * root /etc/privacyidea/privacyidea_cron
+      */5 * * * * /etc/privacyidea/privacyidea_cron
     mode: '0644'
+
+- name: Check if privacyidea_cron_symlink resource exists
+  become: true
+  command: pcs resource show privacyidea_cron_symlink
+  register: resource_exists
+  ignore_errors: true
+  changed_when: false
 
 - name: Create Symlink for Cron Job
   pcs_resource:
     name: "privacyidea_cron_symlink"
     resource_type: 'ocf:heartbeat:symlink'
     options: >-
-      target=/etc/cron.d/privacyidea
+      target=/etc/cron.d/www-data
       link=/etc/privacyidea/cron
       backup_suffix=.disabled
       op monitor interval=10
       --group {{ cluster_name }}_group
+  when: resource_exists.rc != 0
 
 - name: Add Order Constraint for Symlink before uWSGI
   pcs_constraint_order:
     resource1: "privacyidea_cron_symlink"
     resource2: "uwsgi"
+  when: 
+    - is_main_node
+    - resource_exists.rc == 0
+  become: true
+  
 
 - name: Add Colocation Constraint for Symlink on PrivacyIDEA
   pcs_constraint_colocation:
     resource1: "privacyidea_cron_symlink"
     resource2: "uwsgi"
     score: "INFINITY"
+  when: 
+    - is_main_node
+    - resource_exists.rc == 0
+  become: true
