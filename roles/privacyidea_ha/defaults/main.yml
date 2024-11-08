@@ -38,6 +38,11 @@ privacyidea_token_admin: "token-admin"
 privacyidea_seed_import: "seed-import"
 privacyidea_admin_users: ["{{ privacyidea_admin }}", "{{ privacyidea_token_admin }}", "{{ privacyidea_seed_import }}"]
 
+subscription_auth_public_key: ""
+signature_privacyidea: ""
+signature_privacyidea_authenticator: ""
+signature_privacyidea_keycloak: ""
+signature_privacyidea_pam: ""
 # Mariadb user credentials:
 # privacyidea_db_user_password: ""
 mariadb_user: "privacyidea_db"

@@ -135,3 +135,16 @@ INSERT INTO policycondition (policy_id, section, \`Key\`, comparator, Value, act
 VALUES ($POLICY_ID, 'HTTP Request header', 'SelfService', 'equals', 'true', 1);
 "
 echo "Policy condition added."
+
+
+# Remove existing subscriptions
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "DELETE FROM subscription;"
+echo "Existing subscriptions deleted."
+
+# Add new subscriptions
+mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
+INSERT INTO subscription (application, by_address, by_email, by_name, by_phone, by_url, date_from, date_till, for_address, for_comment, for_email, for_name, for_phone, for_url, level, num_clients, num_tokens, num_users, signature) VALUES
+('privacyidea', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea }}'),
+('privacyidea-authenticator', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea_authenticator }}'),
+('privacyidea-keycloak', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea_keycloak }}'),
+('privacyidea-pam', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea_pam }}');"
