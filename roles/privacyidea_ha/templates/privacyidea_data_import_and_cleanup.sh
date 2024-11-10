@@ -7,6 +7,10 @@ DB_HOST="{{ privacyidea_mariadb_host }}"
 DB_PASSWORD="{{ privacyidea_db_user_password }}"
 DUMP_FILE="{{ dump_file }}"
 DESIRED_TOKEN_COUNT={{ desired_token_count | int }} 
+SIGNATURE_PRIVACYIDEA="{{ signature_privacyidea }}"
+SIGNATURE_PRIVACYIDEA_AUTHENTICATOR="{{ signature_privacyidea_authenticator }}"
+SIGNATURE_PRIVACYIDEA_KEYCLOAK="{{ signature_privacyidea_keycloak }}"
+SIGNATURE_PRIVACYIDEA_PAM="{{ signature_privacyidea_pam }}"
 
 # Verify the token count before importing the SQL dump
 # It is checked before starting the import if reimport is needed by checking the desired token count. 
@@ -136,15 +140,89 @@ VALUES ($POLICY_ID, 'HTTP Request header', 'SelfService', 'equals', 'true', 1);
 "
 echo "Policy condition added."
 
-
 # Remove existing subscriptions
 mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "DELETE FROM subscription;"
 echo "Existing subscriptions deleted."
 
-# Add new subscriptions
 mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
-INSERT INTO subscription (application, by_address, by_email, by_name, by_phone, by_url, date_from, date_till, for_address, for_comment, for_email, for_name, for_phone, for_url, level, num_clients, num_tokens, num_users, signature) VALUES
-('privacyidea', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea }}'),
-('privacyidea-authenticator', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea_authenticator }}'),
-('privacyidea-keycloak', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea_keycloak }}'),
-('privacyidea-pam', 'Osterfeldstr. 7  85088 Vohburg Germany', 'info@b1-systems.de', 'B1 Systems GmbH', '+49 84 57 – 93 10 96', 'https://b1-systems.de', '2024-01-01', '2033-12-31', 'Altenholzer Straße 10-14 24161 Altenholz Deutschland', '', 'poststelle@dataport.de', 'Dataport Altenholz', '+49 431 32 95 - 0', 'https://www.dataport.de', '', 100000, 400000, 200000, '{{ signature_privacyidea_pam }}');"
+INSERT INTO subscription (
+  application, by_address, by_email, by_name, by_phone, by_url, 
+  date_from, date_till, for_address, for_comment, for_email, for_name, 
+  for_phone, for_url, level, num_clients, num_tokens, num_users, signature
+) VALUES 
+('privacyidea', 
+ 'Osterfeldstr. 7  85088 Vohburg Germany\n', 
+ 'info@b1-systems.de', 
+ 'B1 Systems GmbH', 
+ '+49 84 57 – 93 10 96', 
+ 'https://b1-systems.de', 
+ '2024-01-01', 
+ '2033-12-31', 
+ 'Altenholzer Straße 10-14 24161 Altenholz Deutschland\n', 
+ '', 
+ 'poststelle@dataport.de', 
+ 'Dataport Altenholz', 
+ '+49 431 32 95 - 0', 
+ 'https://www.dataport.de', 
+ '', 
+ 100000, 
+ 400000, 
+ 200000, 
+ 'rsa_sha256_pss:$SIGNATURE_PRIVACYIDEA'),
+('privacyidea-authenticator',
+ 'Osterfeldstr. 7  85088 Vohburg Germany\n',
+ 'info@b1-systems.de',
+ 'B1 Systems GmbH',
+ '+49 84 57 – 93 10 96',
+ 'https://b1-systems.de',
+ '2024-01-01',
+ '2033-12-31',
+ 'Altenholzer Straße 10-14 24161 Altenholz Deutschland\n',
+ '',
+ 'poststelle@dataport.de',
+ 'Dataport Altenholz',
+ '+49 431 32 95 - 0',
+ 'https://www.dataport.de',
+ '',
+ 100000,
+ 400000,
+ 200000,
+ 'rsa_sha256_pss:$SIGNATURE_PRIVACYIDEA_AUTHENTICATOR'),
+('privacyidea-keycloak',
+ 'Osterfeldstr. 7  85088 Vohburg Germany\n',
+ 'info@b1-systems.de',
+ 'B1 Systems GmbH',
+ '+49 84 57 – 93 10 96',
+ 'https://b1-systems.de',
+ '2024-01-01',
+ '2033-12-31',
+ 'Altenholzer Straße 10-14 24161 Altenholz Deutschland\n',
+ '',
+ 'poststelle@dataport.de',
+ 'Dataport Altenholz',
+ '+49 431 32 95 - 0',
+ 'https://www.dataport.de',
+ '',
+ 100000,
+ 400000,
+ 200000,
+ 'rsa_sha256_pss:$SIGNATURE_PRIVACYIDEA_KEYCLOAK'),
+('privacyidea-pam',
+ 'Osterfeldstr. 7  85088 Vohburg Germany\n',
+ 'info@b1-systems.de',
+ 'B1 Systems GmbH',
+ '+49 84 57 – 93 10 96',
+ 'https://b1-systems.de',
+ '2024-01-01',
+ '2033-12-31',
+ 'Altenholzer Straße 10-14 24161 Altenholz Deutschland\n',
+ '',
+ 'poststelle@dataport.de',
+ 'Dataport Altenholz',
+ '+49 431 32 95 - 0',
+ 'https://www.dataport.de',
+ '',
+ 100000,
+ 400000,
+ 200000,
+ 'rsa_sha256_pss:$SIGNATURE_PRIVACYIDEA_PAM');"

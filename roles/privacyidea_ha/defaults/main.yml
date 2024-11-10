@@ -38,7 +38,9 @@ privacyidea_token_admin: "token-admin"
 privacyidea_seed_import: "seed-import"
 privacyidea_admin_users: ["{{ privacyidea_admin }}", "{{ privacyidea_token_admin }}", "{{ privacyidea_seed_import }}"]
 
+# The public key used to verify subscription signatures
 subscription_auth_public_key: ""
+# The signature for the 'privacyidea', 'privacyidea-authenticator', 'privacyidea-keycloak', 'privacyidea-pam'   application subscription
 signature_privacyidea: ""
 signature_privacyidea_authenticator: ""
 signature_privacyidea_keycloak: ""
