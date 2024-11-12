@@ -87,22 +87,23 @@
       target=/etc/privacyidea/privacyidea_cron
       link=/etc/cron.d/privacyidea_cron
       backup_suffix=.disabled
-      op monitor interval=10
+      op monitor interval=10s timeout=20s
       op start timeout=60s interval=0s
       op stop timeout=60s interval=0s
+      meta failure-timeout=15m migration-threshold=2
       --group {{ cluster_name }}_group
   when: 
     - resource_exists.rc != 0
     - is_main_node
 
-- name: Add Order Constraint for Symlink before uWSGI
+- name: Add Order Constraint for Symlink after uWSGI
   pcs_constraint_order:
-    resource1: "privacyidea_cron_symlink"
-    resource2: "uwsgi"
+    resource1: "uwsgi"
+    resource2: "privacyidea_cron_symlink"
   when: is_main_node
   become: true
-  
-- name: Add Colocation Constraint for Symlink on PrivacyIDEA
+
+- name: Add Colocation Constraint for Symlink with uWSGI
   pcs_constraint_colocation:
     resource1: "privacyidea_cron_symlink"
     resource2: "uwsgi"
