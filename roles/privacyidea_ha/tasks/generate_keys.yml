@@ -16,6 +16,14 @@
   become: true
   when: is_main_node
 
+- name: Create public key file for subscription signature validation
+  copy:
+    dest: /etc/privacyidea/B1.pem
+    content: "{{ subscription_auth_public_key }}"
+    mode: '0644'
+    owner: www-data
+    group: www-data
+
 - name: Exchange AUDIT Keys
   block:
     - name: Get auth private key 
