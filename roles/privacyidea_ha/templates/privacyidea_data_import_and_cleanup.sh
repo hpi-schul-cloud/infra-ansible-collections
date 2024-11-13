@@ -139,145 +139,115 @@ echo "Policy condition added."
 # Create periodic tasks for various counting operations
 # Create event handlers for various events
 mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -e "
-INSERT INTO periodictask (name, active, \`interval\`, nodes, taskmodule, ordering, last_update, retry_if_failed) VALUES
-('Count Successful Authentications', 1, '*/5 * * * *', 'localnode', 'EventCounter', 1, NOW(), 1),
-('Count Failed Authentications', 1, '*/5 * * * *', 'localnode', 'EventCounter', 2, NOW(), 1),
-('Count Token Initializations', 1, '*/5 * * * *', 'localnode', 'EventCounter', 3, NOW(), 1),
-('Count Token Assignments', 1, '*/5 * * * *', 'localnode', 'EventCounter', 4, NOW(), 1),
-('Count Token Unassignments', 1, '*/5 * * * *', 'localnode', 'EventCounter', 5, NOW(), 1),
-('Count New Users', 1, '*/5 * * * *', 'localnode', 'EventCounter', 6, NOW(), 1),
-('Update Token Statistics', 1, '*/5 * * * *', 'localnode', 'SimpleStats', 9, NOW(), 1);
+INSERT INTO periodictask (name, active,\`interval\`, nodes, taskmodule, ordering, last_update, retry_if_failed) VALUES
+    ('Count Successful Authentications', 1, '*/5 * * * *', 'localnode', 'EventCounter', 1, NOW(), 1),
+    ('Count Failed Authentications', 1, '*/5 * * * *', 'localnode', 'EventCounter', 2, NOW(), 1),
+    ('Count Token Initializations', 1, '*/5 * * * *', 'localnode', 'EventCounter', 3, NOW(), 1),
+    ('Count Token Assignments', 1, '*/5 * * * *', 'localnode', 'EventCounter', 4, NOW(), 1),
+    ('Count Token Unassignments', 1, '*/5 * * * *', 'localnode', 'EventCounter', 5, NOW(), 1),
+    ('Count New Users', 1, '*/5 * * * *', 'localnode', 'EventCounter', 6, NOW(), 1),
+    ('Update Token Statistics', 1, '*/5 * * * *', 'localnode', 'SimpleStats', 7, NOW(), 1);
 
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'event_counter', 'successful_auth_counter' FROM periodictask WHERE name = 'Count Successful Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'stats_key', 'successful_auth_counter' FROM periodictask WHERE name = 'Count Successful Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Successful Authentications';
 
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'event_counter', 'successful_auth_counter' FROM periodictask WHERE name = 'Count Successful Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'event_counter', 'failed_auth_counter' FROM periodictask WHERE name = 'Count Failed Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'stats_key', 'failed_auth_counter' FROM periodictask WHERE name = 'Count Failed Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Failed Authentications';
 
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'stats_key', 'successful_auth_counter' FROM periodictask WHERE name = 'Count Successful Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'event_counter', 'token_init_counter' FROM periodictask WHERE name = 'Count Token Initializations';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'stats_key', 'token_init_counter' FROM periodictask WHERE name = 'Count Token Initializations';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Token Initializations';
 
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Successful Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'event_counter', 'token_assign_counter' FROM periodictask WHERE name = 'Count Token Assignments';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'stats_key', 'token_assign_counter' FROM periodictask WHERE name = 'Count Token Assignments';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Token Assignments';
 
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'event_counter', 'token_unassign_counter' FROM periodictask WHERE name = 'Count Token Unassignments';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'stats_key', 'token_unassign_counter' FROM periodictask WHERE name = 'Count Token Unassignments';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Token Unassignments';
 
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'event_counter', 'failed_auth_counter' FROM periodictask WHERE name = 'Count Failed Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'event_counter', 'new_users_counter' FROM periodictask WHERE name = 'Count New Users';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'stats_key', 'new_users_counter' FROM periodictask WHERE name = 'Count New Users';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count New Users';
 
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'stats_key', 'failed_auth_counter' FROM periodictask WHERE name = 'Count Failed Authentications';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'total_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'hardware_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'software_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'assigned_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
+INSERT INTO periodictaskoption (periodictask_id, \`Key\`, value)
+    SELECT id, 'unassigned_hardware_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
 
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Failed Authentications';
-
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'event_counter', 'token_init_counter' FROM periodictask WHERE name = 'Count Token Initializations';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'stats_key', 'token_init_counter' FROM periodictask WHERE name = 'Count Token Initializations';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Token Initializations';
-
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'event_counter', 'token_assign_counter' FROM periodictask WHERE name = 'Count Token Assignments';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'stats_key', 'token_assign_counter' FROM periodictask WHERE name = 'Count Token Assignments';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Token Assignments';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'event_counter', 'token_unassign_counter' FROM periodictask WHERE name = 'Count Token Unassignments';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'stats_key', 'token_unassign_counter' FROM periodictask WHERE name = 'Count Token Unassignments';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count Token Unassignments';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)  
-SELECT id, 'event_counter', 'new_users_counter' FROM periodictask WHERE name = 'Count New Users';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'stats_key', 'new_users_counter' FROM periodictask WHERE name = 'Count New Users';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'reset_event_counter', 'True' FROM periodictask WHERE name = 'Count New Users';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'total_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'hardware_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'software_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'assigned_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
-
-INSERT INTO periodictaskoption (periodictask_id, \`key\`, value)
-SELECT id, 'unassigned_hardware_tokens', 'True' FROM periodictask WHERE name = 'Update Token Statistics';
-
-
-INSERT INTO eventhandler (name, active, ordering, position, event, handlermodule, action)
-VALUES ('Successful Authentication', 1, 1, 'post', 'validate_check', 'Counter', 'increase_counter');
-
-INSERT INTO eventhandler (name, active, ordering, position, event, handlermodule, action)
-VALUES ('Failed Authentication', 1, 2, 'post', 'validate_check', 'Counter', 'increase_counter');
-
-INSERT INTO eventhandler (name, active, ordering, position, event, handlermodule, action)
-VALUES ('Token Initialization', 1, 3, 'post', 'token_init', 'Counter', 'increase_counter');
-
-INSERT INTO eventhandler (name, active, ordering, position, event, handlermodule, action)
-VALUES ('Token Assignment', 1, 4, 'post', 'token_assign', 'Counter', 'increase_counter');
-
-INSERT INTO eventhandler (name, active, ordering, position, event, handlermodule, action)
-VALUES ('New User Created', 1, 5, 'post', 'user_add', 'Counter', 'increase_counter');
+INSERT INTO eventhandler (name, active, ordering, position, event, handlermodule, action) VALUES
+    ('Successful Authentication', 1, 1, 'post', 'validate_check', 'Counter', 'increase_counter'),
+    ('Failed Authentication', 1, 2, 'post', 'validate_check', 'Counter', 'increase_counter'),
+    ('Token Initialization', 1, 3, 'post', 'token_init', 'Counter', 'increase_counter'),
+    ('Token Assignment', 1, 4, 'post', 'token_assign', 'Counter', 'increase_counter'),
+    ('New User Created', 1, 5, 'post', 'user_add', 'Counter', 'increase_counter'),
+    ('Token Unassignment', 1, 6, 'post', 'token_unassign', 'Counter', 'increase_counter'),
+    ('Update Token Statistics', 1, 7, 'post', 'update_statistics', 'SimpleStats', 'update_statistics');
 
 INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
-SELECT id, 'counter_name', 'successful_auth_counter', 'string', 'Counter name for successful authentications'
-FROM eventhandler
-WHERE name = 'Successful Authentication';
-
+    SELECT id, 'counter_name', 'successful_auth_counter', 'string', 'Counter name for successful authentications' FROM eventhandler WHERE name = 'Successful Authentication';
 INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
-SELECT id, 'counter_name', 'failed_auth_counter', 'string', 'Counter name for failed authentications'
-FROM eventhandler
-WHERE name = 'Failed Authentication';
-
+    SELECT id, 'counter_name', 'failed_auth_counter', 'string', 'Counter name for failed authentications' FROM eventhandler WHERE name = 'Failed Authentication';
 INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
-SELECT id, 'counter_name', 'token_init_counter', 'string', 'Counter name for token initializations'
-FROM eventhandler
-WHERE name = 'Token Initialization';
-
+    SELECT id, 'counter_name', 'token_init_counter', 'string', 'Counter name for token initializations' FROM eventhandler WHERE name = 'Token Initialization';
 INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
-SELECT id, 'counter_name', 'token_assign_counter', 'string', 'Counter name for Token Assignment'
-FROM eventhandler
-WHERE name = 'Token Assignment';
-
+    SELECT id, 'counter_name', 'token_assign_counter', 'string', 'Counter name for Token Assignment' FROM eventhandler WHERE name = 'Token Assignment';
 INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
-SELECT id, 'counter_name', 'new_users_counter', 'string', 'Counter name for New User Created'
-FROM eventhandler
-WHERE name = 'New User Created';
-# Set conditions for each event handler
-INSERT INTO eventhandlercondition (eventhandler_id, \`Key\`, Value, comparator)
-SELECT eventhandler_id, 'result_value', 'True', '='
-FROM eventhandleroption
-WHERE Value = 'successful_auth_counter';
+    SELECT id, 'counter_name', 'new_users_counter', 'string', 'Counter name for New User Created' FROM eventhandler WHERE name = 'New User Created';
+INSERT INTO eventhandleroption (eventhandler_id,\`Key\`, Value, Type, Description)
+    SELECT id, 'counter_name', 'token_unassign_counter', 'string', 'Counter name for token unassignments' FROM eventhandler WHERE name = 'Token Unassignment';
 
 INSERT INTO eventhandlercondition (eventhandler_id, \`Key\`, Value, comparator)
-SELECT eventhandler_id, 'result_value', 'False', '='
-FROM eventhandleroption
-WHERE Value = 'failed_auth_counter';
-
+    SELECT eventhandler_id, 'result_value', 'True', '=' FROM eventhandleroption WHERE Value = 'successful_auth_counter';
 INSERT INTO eventhandlercondition (eventhandler_id, \`Key\`, Value, comparator)
-SELECT eventhandler_id, 'tokentype', 'hotp', '='
-FROM eventhandleroption
-WHERE Value = 'token_init_counter';
-
+    SELECT eventhandler_id, 'result_value', 'False', '=' FROM eventhandleroption WHERE Value = 'failed_auth_counter';
 INSERT INTO eventhandlercondition (eventhandler_id, \`Key\`, Value, comparator)
-SELECT eventhandler_id, 'token_has_owner', 'True', '='
-FROM eventhandleroption
-WHERE Value = 'token_assign_counter';"
+    SELECT eventhandler_id, 'tokentype', 'hotp', '=' FROM eventhandleroption WHERE Value = 'token_init_counter';
+INSERT INTO eventhandlercondition (eventhandler_id, \`Key\`, Value, comparator)
+    SELECT eventhandler_id, 'token_has_owner', 'True', '=' FROM eventhandleroption WHERE Value = 'token_assign_counter';
+INSERT INTO eventhandlercondition (eventhandler_id, \`Key\`, Value, comparator)
+    SELECT eventhandler_id, 'token_has_owner', 'False', '=' FROM eventhandleroption WHERE Value = 'token_unassign_counter';
+
+INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
+    SELECT id, 'total_tokens', 'True', 'boolean', 'Include total number of tokens' FROM eventhandler WHERE name = 'Update Token Statistics';
+INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
+    SELECT id, 'hardware_tokens', 'True', 'boolean', 'Include number of hardware tokens' FROM eventhandler WHERE name = 'Update Token Statistics';
+INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
+    SELECT id, 'software_tokens', 'True', 'boolean', 'Include number of software tokens' FROM eventhandler WHERE name = 'Update Token Statistics';
+INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
+    SELECT id, 'assigned_tokens', 'True', 'boolean', 'Include number of assigned tokens' FROM eventhandler WHERE name = 'Update Token Statistics';
+INSERT INTO eventhandleroption (eventhandler_id, \`Key\`, Value, Type, Description)
+    SELECT id, 'unassigned_hardware_tokens', 'True', 'boolean', 'Include number of unassigned hardware tokens' FROM eventhandler WHERE name = 'Update Token Statistics';
+
+ALTER TABLE pidea_audit MODIFY COLUMN info VARCHAR(1000);
+ALTER TABLE pidea_audit MODIFY COLUMN action VARCHAR(100);
+ALTER TABLE pidea_audit MODIFY COLUMN action_detail VARCHAR(100);
+ALTER TABLE pidea_audit MODIFY COLUMN policies VARCHAR(1000);
+
+"

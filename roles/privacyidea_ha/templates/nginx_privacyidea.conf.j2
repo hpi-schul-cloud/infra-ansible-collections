@@ -19,7 +19,7 @@
 #    #}
  
 #    location / {
-#        include uwsgi_params;
+#        include /etc/nginx/uwsgi_params;
 #        uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
 #    }
 #}
@@ -45,7 +45,7 @@ server {
     access_log /var/log/nginx/privacyidea.access.log privacyidea;
     error_log /var/log/nginx/privacyidea.error.log;
     location / {
-        include uwsgi_params;
+        include /etc/nginx/uwsgi_params;
         uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;
     }
     location /static {
