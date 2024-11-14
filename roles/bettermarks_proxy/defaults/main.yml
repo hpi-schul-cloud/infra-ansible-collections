@@ -4,18 +4,21 @@ bettermarks_proxy_enabled_instances:
   - apps
   - events
   - csp-report
+  - helpdesk
 bettermarks_subdomains:
   apm: apm
   school: school
   apps: apps
   events: events
   csp-report: csp-report
+  helpdesk: helpdesk
 bettermarks_proxy_subdomains:
   apm: apm
   school: school
   apps: apps
   events: events
   csp-report: csp-report
+  helpdesk: helpdesk
 bettermarks_domain: bettermarks.com
 proxy_identification_header: "x-schulcloud-proxy"
 bettermarks_proxy_ingress_enabled: false
