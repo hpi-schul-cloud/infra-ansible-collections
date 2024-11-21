@@ -9,28 +9,6 @@
       tags:
         - awx
 
-# Normally this PVC is created by the awx-postgres statefulset, but this prevents resizing so we create it beforehand
-# The name must be the name that the statefulset uses to create its PVC
-    - name: Create AWX Postgres PVC
-      kubernetes.core.k8s:
-        state: "present"
-        kubeconfig: "{{ kubeconfig }}"
-        proxy: "{{ proxy_url | default(omit, true) }}"
-        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
-        definition:
-          apiVersion: v1
-          kind: PersistentVolumeClaim
-          metadata:
-            name: postgres-13
-            namespace: "{{ awx_namespace }}"
-          spec:
-            accessModes:
-              - "{{ awx_postgres_storage_access_mode }}"
-            storageClassName: "{{ awx_postgres_storage_class }}"
-            resources: "{{ awx_postgres_storage_requirements }}"
-      tags:
-        - awx
-
     - name: Install awx
       kubernetes.core.k8s:
         state: "present"
