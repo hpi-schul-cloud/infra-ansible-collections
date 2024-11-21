@@ -1,0 +1,20 @@
+[uwsgi]
+plugin = python3,logfile
+virtualenv = /opt/privacyidea/virtualenv
+chdir = /etc/privacyidea
+module = custom_exporter:application
+processes = 2 
+master = true
+vacuum = true
+harakiri = 60
+max-requests = 2000
+uid = www-data
+gid = www-data
+
+# Socket configuration
+socket = /run/uwsgi/app/privacyidea-exporter/socket
+chmod-socket = 660
+
+# Logging
+logto = /var/log/uwsgi/privacyidea-exporter.log
+

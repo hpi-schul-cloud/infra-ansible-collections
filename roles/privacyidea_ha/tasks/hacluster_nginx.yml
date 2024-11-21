@@ -71,13 +71,6 @@
       */5 * * * * www-data /opt/privacyidea/virtualenv/bin/privacyidea-cron run_scheduled
     mode: '0644'
 
-- name: Check if privacyidea_cron_symlink resource exists
-  become: true
-  command: pcs resource config privacyidea_cron_symlink
-  register: resource_exists
-  ignore_errors: true
-  changed_when: false
-
 - name: Create Symlink for Cron Job
   pcs_resource:
     name: "privacyidea_cron_symlink"
@@ -91,9 +84,7 @@
       op stop timeout=60s interval=0s
       meta failure-timeout=15m migration-threshold=2
       --group {{ cluster_name }}_group
-  when: 
-    - resource_exists.rc != 0
-    - is_main_node
+  when: is_main_node
 
 - name: Add Order Constraint for Symlink after uWSGI
   pcs_constraint_order:
@@ -109,3 +100,32 @@
     score: "INFINITY"
   when: is_main_node
   become: true
+
+- name: Add custom exporter resource
+  pcs_resource:
+     name: "custom-exporter"
+     resource_type: 'systemd:privacyidea-exporter'
+     options: >
+       op monitor timeout=1s interval=1s 
+       meta failure-timeout=15m migration-threshold=2
+       --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add colocation for custom exporter with uwsgi
+  pcs_constraint_colocation:
+    resource1: "custom-exporter"
+    resource2: "uwsgi"
+    score: "INFINITY"
+  when: is_main_node
+
+- name: Add order for galera and then custom-exporter
+  pcs_constraint_order:
+    resource1: "galera"
+    resource2: "custom-exporter"
+  when: is_main_node
+
+#- name: Start custom exporter PCS resource
+#  pcs_resource:
+#    name: "custom-exporter"
+#    state: started
+#  when: is_main_node

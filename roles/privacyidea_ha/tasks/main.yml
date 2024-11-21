@@ -2,10 +2,10 @@
 - import_tasks: prepare.yml
 - import_tasks: setup_directories.yml
 - import_tasks: install_privacyidea.yml
-- import_tasks: setup_database.yml
 - import_tasks: generate_keys.yml
 - import_tasks: configure_privacyidea.yml
 - import_tasks: create_admin.yml
+- import_tasks: privacyidea_exporter.yml
 - import_tasks: setup_nginx.yml
 - import_tasks: security.yml
 - import_tasks: hacluster.yml

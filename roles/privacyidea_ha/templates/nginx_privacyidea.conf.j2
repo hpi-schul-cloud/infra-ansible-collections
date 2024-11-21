@@ -44,6 +44,12 @@ server {
     {% endif %}
     access_log /var/log/nginx/privacyidea.access.log privacyidea;
     error_log /var/log/nginx/privacyidea.error.log;
+
+    location /metrics {
+        include /etc/nginx/uwsgi_params;
+        uwsgi_pass unix:/run/uwsgi/app/privacyidea-exporter/socket;
+    }
+    
     location / {
         include /etc/nginx/uwsgi_params;
         uwsgi_pass unix:/run/uwsgi/app/privacyidea/privacyidea.socket;

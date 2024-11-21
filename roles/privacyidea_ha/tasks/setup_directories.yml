@@ -12,6 +12,8 @@
     - { path: '/var/log/privacyidea', mode: '0755' }
     - { path: '/var/log/uwsgi', mode: '0755' }
     - { path: '/usr/lib/ocf/resource.d/privacyidea/', mode: '0755' }
+    - { path: '/run/uwsgi/app/privacyidea-exporter/', mode: '0775' }
+    
   become: true
 
 - name: Create uWSGI and privacyidea log files
@@ -26,4 +28,5 @@
     - { path: '/var/log/uwsgi/error.log' }
     - { path: '/var/log/uwsgi/request.log' }
     - { path: '/var/log/privacyidea/privacyidea.log' }
+    - { path: '/var/log/uwsgi/privacyidea-exporter.log' }
   become: true

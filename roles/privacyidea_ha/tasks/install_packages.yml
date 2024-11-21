@@ -5,3 +5,7 @@
     state: present
     update_cache: yes
 
+- name: Install prometheus_client in PrivacyIDEA
+  ansible.builtin.command:
+  cmd: sudo -H /opt/privacyidea/virtualenv/bin/pip install prometheus_client
+  become: true

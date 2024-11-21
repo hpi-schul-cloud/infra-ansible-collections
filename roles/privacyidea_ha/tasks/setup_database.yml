@@ -1,8 +1,0 @@
----
-- name: Copy MySQL root credentials to .mysql.cnf file
-  template:
-    src: privacyidea-mysql-root.cnf.j2
-    dest: "{{ mysql_root_home }}/.my.cnf"
-    owner: root
-    group: root
-    mode: 0600
