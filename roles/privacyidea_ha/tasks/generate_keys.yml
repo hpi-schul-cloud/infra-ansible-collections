@@ -63,3 +63,4 @@
         path: "/tmp/certificate_sync_key_*" 
         state: absent
       delegate_to: localhost
+      ignore_errors: true
