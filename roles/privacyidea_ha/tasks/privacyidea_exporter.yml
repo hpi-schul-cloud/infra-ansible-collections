@@ -1,5 +1,11 @@
 
 ---
+- name: Generate hashed passwords for exporter
+  set_fact:
+    exporter_username_hash: "{{ exporter_username | password_hash('bcrypt') }}"
+    exporter_password_hash: "{{ exporter_password | password_hash('bcrypt') }}"
+  no_log: true  
+
 - name: Deploy custom exporter script
   template:  
     src: custom_exporter.py.j2 

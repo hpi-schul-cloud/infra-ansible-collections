@@ -9,12 +9,10 @@ from flask import Flask, Response, request
 import sqlalchemy
 from sqlalchemy.pool import QueuePool
 from functools import wraps
+import bcrypt
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-# Get the hostname
-hostname = socket.gethostname()
 
 config_name =  "{{ config_name }}"
 debug_mode = {{ debug_mode }}
@@ -23,13 +21,16 @@ debug_mode = {{ debug_mode }}
 application = create_app(config_name=config_name, config_file="/etc/privacyidea/pi.cfg")
 application.debug = debug_mode
 
-# Get credentials from environment variables
-EXPORTER_USERNAME = os.environ.get('EXPORTER_USERNAME')
-EXPORTER_PASSWORD = os.environ.get('EXPORTER_PASSWORD')
 
 def check_auth(username, password):
     """Check if a username/password combination is valid."""
-    return username == EXPORTER_USERNAME and password == EXPORTER_PASSWORD
+    hashed_username = os.environ.get('EXPORTER_USERNAME_HASH').encode('utf-8')
+    hashed_password = os.environ.get('EXPORTER_PASSWORD_HASH').encode('utf-8')
+
+    return (bcrypt.checkpw(username.encode('utf-8'), hashed_username) and
+            bcrypt.checkpw(password.encode('utf-8'), hashed_password))
+    
+    
 
 def authenticate():
     """Sends a 401 response that enables basic auth"""

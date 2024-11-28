@@ -5,10 +5,11 @@ After=network.target
 [Service]
 ExecStart=/usr/bin/uwsgi --ini /etc/uwsgi/apps-enabled/privacyidea-exporter.ini
 Restart=always
+KillSignal=SIGQUIT
 User=www-data
 Group=www-data
-Environment=EXPORTER_USERNAME={{ exporter_username }}
-Environment=EXPORTER_PASSWORD={{ exporter_password }}
+Environment=EXPORTER_USERNAME_HASH={{ exporter_username_hash }}
+Environment=EXPORTER_PASSWORD_HASH={{ exporter_password_hash }}
 
 [Install]
 WantedBy=multi-user.target
