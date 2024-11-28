@@ -12,6 +12,12 @@ DESIRED_TOKEN_COUNT={{ desired_token_count | int }}
 # It is checked before starting the import if reimport is needed by checking the desired token count. 
 echo "Checking current token count"
 TOKEN_COUNT=$(mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
+if [ $? -ne 0 ]; then
+  TOKEN_COUNT=0
+  echo  Create Database and make sure we can access
+  mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD -sse "CREATE DATABASE $DB_NAME;"
+fi
+
 if [ "$TOKEN_COUNT" -eq $DESIRED_TOKEN_COUNT ]; then
   echo "Token count is already correct: $TOKEN_COUNT. No need to import the dump file."
   exit 0
@@ -28,7 +34,7 @@ elif [ "$TOKEN_COUNT" -eq 0 ] || [ "$TOKEN_COUNT" -lt $DESIRED_TOKEN_COUNT ]; th
   fi
   
   # Verify the token count again after import
-  TOKEN_COUNT_AFTER_IMPORT=$(mysql -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
+  TOKEN_COUNT_AFTER_IMPORT=$(mysql -h $DB_HOST -u $DB_USER -p$DB_PASSWORD $DB_NAME -sse "SELECT COUNT(*) FROM token;")
   if [ "$TOKEN_COUNT_AFTER_IMPORT" -ne $DESIRED_TOKEN_COUNT ]; then
     echo "Error: Token count is $TOKEN_COUNT_AFTER_IMPORT after import, but it should be $DESIRED_TOKEN_COUNT."
   else
