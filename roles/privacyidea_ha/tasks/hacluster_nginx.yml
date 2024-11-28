@@ -123,9 +123,3 @@
     resource1: "galera"
     resource2: "custom-exporter"
   when: is_main_node
-
-#- name: Start custom exporter PCS resource
-#  pcs_resource:
-#    name: "custom-exporter"
-#    state: started
-#  when: is_main_node
