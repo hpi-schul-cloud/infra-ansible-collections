@@ -21,7 +21,6 @@ debug_mode = {{ debug_mode }}
 application = create_app(config_name=config_name, config_file="/etc/privacyidea/pi.cfg")
 application.debug = debug_mode
 
-
 def check_auth(username, password):
     """Check if a username/password combination is valid."""
     hashed_username = os.environ.get('EXPORTER_USERNAME_HASH').encode('utf-8')
@@ -30,8 +29,6 @@ def check_auth(username, password):
     return (bcrypt.checkpw(username.encode('utf-8'), hashed_username) and
             bcrypt.checkpw(password.encode('utf-8'), hashed_password))
     
-    
-
 def authenticate():
     """Sends a 401 response that enables basic auth"""
     return Response(
