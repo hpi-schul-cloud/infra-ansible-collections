@@ -21,7 +21,6 @@ debug_mode = {{ debug_mode }}
 application = create_app(config_name=config_name, config_file="/etc/privacyidea/pi.cfg")
 application.debug = debug_mode
 
-
 def check_auth(username, password):
     """Check if a username/password combination is valid."""
     hashed_username = os.environ.get('EXPORTER_USERNAME_HASH').encode('utf-8')
@@ -30,8 +29,6 @@ def check_auth(username, password):
     return (bcrypt.checkpw(username.encode('utf-8'), hashed_username) and
             bcrypt.checkpw(password.encode('utf-8'), hashed_password))
     
-    
-
 def authenticate():
     """Sends a 401 response that enables basic auth"""
     return Response(
@@ -68,10 +65,19 @@ class PrivacyIDEAExporter:
         self.software_tokens = Gauge('privacyidea_software_tokens', 'Number of software tokens')
         self.unassigned_hardware_tokens = Gauge('privacyidea_unassigned_hardware_tokens', 'Number of unassigned hardware tokens')
         self.assigned_tokens = Gauge('privacyidea_assigned_tokens', 'Number of assigned tokens')
+        self.total_users = Gauge('privacyidea_total_users', 'Total number of users in the system')
+        self.total_unassigned_tokens = Gauge('privacyidea_total_unassigned_tokens', 'Total number of unassigned tokens in the system')
+        
+
+
+        #  These metrics represent specific user and token-related activities within the system.
+        # They are collected at 5-minute intervals, as defined by the associated periodic tasks and event handlers
+
         self.new_users = Gauge('privacyidea_new_users', 'Number of new users')
         self.token_init = Gauge('privacyidea_token_init', 'Number of token initializations')
         self.token_assign = Gauge('privacyidea_token_assign', 'Number of token assignments')
         self.token_unassign = Gauge('privacyidea_token_unassign', 'Number of token unassignments')
+        
 
         # Create a connection pool
         self.engine = sqlalchemy.create_engine(
@@ -92,6 +98,23 @@ class PrivacyIDEAExporter:
         result = connection.execute(sqlalchemy.text(query), {"key": stats_key})
         return result.scalar() or 0
 
+    def fetch_total_users(self, connection):
+        """Fetch total number of users from the database."""
+        query = "SELECT COUNT(*) AS total_users FROM users_service"
+        result = connection.execute(sqlalchemy.text(query))
+        return result.scalar() or 0
+
+    def fetch_total_unassigned_tokens(self, connection):
+        """Fetch total number of unassigned_tokens from the database."""
+        query = (
+             "SELECT COUNT(*) AS unassigned_tokens FROM token t "
+                "LEFT JOIN tokenowner towner ON t.id = towner.token_id "
+                "WHERE towner.token_id IS NULL"
+         )
+        result = connection.execute(sqlalchemy.text(query))
+        return result.scalar() or 0
+
+    
     def collect_metrics(self):
         with self.app.app_context():
             try:
@@ -108,6 +131,9 @@ class PrivacyIDEAExporter:
                     self.token_init.set(self.fetch_latest_stat(connection, 'token_init_counter'))
                     self.token_assign.set(self.fetch_latest_stat(connection, 'token_assign_counter'))
                     self.token_unassign.set(self.fetch_latest_stat(connection, 'token_unassign_counter'))
+                    
+                    self.total_users.set(self.fetch_total_users(connection))
+                    self.total_unassigned_tokens.set(self.fetch_total_unassigned_tokens(connection))
 
                 logging.info("Metrics collected successfully")
             except Exception as e:

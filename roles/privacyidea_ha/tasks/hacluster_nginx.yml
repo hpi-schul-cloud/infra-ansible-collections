@@ -117,15 +117,3 @@
     resource2: "uwsgi"
     score: "INFINITY"
   when: is_main_node
-
-- name: Add order for galera and then custom-exporter
-  pcs_constraint_order:
-    resource1: "galera"
-    resource2: "custom-exporter"
-  when: is_main_node
-
-#- name: Start custom exporter PCS resource
-#  pcs_resource:
-#    name: "custom-exporter"
-#    state: started
-#  when: is_main_node
