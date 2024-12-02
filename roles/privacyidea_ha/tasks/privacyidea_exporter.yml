@@ -1,0 +1,41 @@
+
+---
+- name: Generate hashed passwords for exporter
+  set_fact:
+    exporter_username_hash: "{{ exporter_username | password_hash('bcrypt') }}"
+    exporter_password_hash: "{{ exporter_password | password_hash('bcrypt') }}"
+  no_log: true  
+
+- name: Deploy custom exporter script
+  template:  
+    src: custom_exporter.py.j2 
+    dest: /etc/privacyidea/custom_exporter.py
+    owner: www-data
+    group: www-data
+    mode: '0775'
+
+- name: Create uWSGI configuration for custom exporter
+  template:
+    src: privacyidea-exporter.ini.j2
+    dest: /etc/uwsgi/apps-available/privacyidea-exporter.ini
+    owner: www-data
+    group: www-data
+    mode: '0644'
+
+- name: Link uWSGI config for custom exporter
+  file:
+    src: /etc/uwsgi/apps-available/privacyidea-exporter.ini
+    dest: /etc/uwsgi/apps-enabled/privacyidea-exporter.ini
+    state: link
+  
+- name: Deploy custom exporter Systemd service
+  template:
+    src: privacyidea-exporter.service.j2
+    dest: /etc/systemd/system/privacyidea-exporter.service
+    owner: www-data
+    group: www-data
+    mode: '0644'
+
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: true

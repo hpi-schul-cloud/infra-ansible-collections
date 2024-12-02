@@ -5,3 +5,11 @@
     state: present
     update_cache: yes
 
+- name: Install prometheus_client in PrivacyIDEA 
+  pip:
+    name: 
+      - prometheus_client
+      - bcrypt
+    virtualenv: "{{ privacyidea_dir }}/virtualenv"
+  become: true
+  

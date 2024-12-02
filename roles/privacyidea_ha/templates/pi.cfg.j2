@@ -25,3 +25,5 @@ PI_ENCFILE = '/etc/privacyidea/enckey'
 PI_PEPPER = '{{ privacyidea_pi_pepper }}'
 SECRET_KEY = '{{ privacyidea_secret_key }}'
 PI_PREFERRED_LANGUAGE = ["de"]
+PI_AUDIT_SQL_TRUNCATE = True
+PI_AUDIT_SQL_COLUMN_LENGTH = {"info": 1000, "action": 100, "action_detail": 100, "policies": 1000}

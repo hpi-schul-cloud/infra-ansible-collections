@@ -1,0 +1,143 @@
+import os
+import sys
+import socket
+import time
+import logging
+from prometheus_client import start_http_server, Gauge, Counter, generate_latest
+from privacyidea.app import create_app
+from flask import Flask, Response, request
+import sqlalchemy
+from sqlalchemy.pool import QueuePool
+from functools import wraps
+import bcrypt
+
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+config_name =  "{{ config_name }}"
+debug_mode = {{ debug_mode }}
+
+# Create the PrivacyIDEA application
+application = create_app(config_name=config_name, config_file="/etc/privacyidea/pi.cfg")
+application.debug = debug_mode
+
+def check_auth(username, password):
+    """Check if a username/password combination is valid."""
+    hashed_username = os.environ.get('EXPORTER_USERNAME_HASH').encode('utf-8')
+    hashed_password = os.environ.get('EXPORTER_PASSWORD_HASH').encode('utf-8')
+
+    return (bcrypt.checkpw(username.encode('utf-8'), hashed_username) and
+            bcrypt.checkpw(password.encode('utf-8'), hashed_password))
+    
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+        'Could not verify your access level for that URL.\n'
+        'You have to login with proper credentials', 401,
+        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+def requires_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
+
+# Define the /metrics endpoint function outside the PrivacyIDEAExporter class
+@requires_auth
+def metrics():
+    exporter.collect_metrics()
+    return Response(generate_latest(), mimetype="text/plain")
+
+class PrivacyIDEAExporter:
+    def __init__(self, app, port=9101):
+        self.app = app
+        self.port = port
+        self.flask_app = Flask(__name__)
+
+        # Define Prometheus metrics
+        self.auth_success = Gauge('privacyidea_auth_success_total', 'Total successful authentications')
+        self.auth_failure = Gauge('privacyidea_auth_failure_total', 'Total failed authentications')
+        self.tokens_total = Gauge('privacyidea_tokens_total', 'Total number of tokens')
+        self.hardware_tokens = Gauge('privacyidea_hardware_tokens', 'Number of hardware tokens')
+        self.software_tokens = Gauge('privacyidea_software_tokens', 'Number of software tokens')
+        self.unassigned_hardware_tokens = Gauge('privacyidea_unassigned_hardware_tokens', 'Number of unassigned hardware tokens')
+        self.assigned_tokens = Gauge('privacyidea_assigned_tokens', 'Number of assigned tokens')
+        self.total_users = Gauge('privacyidea_total_users', 'Total number of users in the system')
+        self.total_unassigned_tokens = Gauge('privacyidea_total_unassigned_tokens', 'Total number of unassigned tokens in the system')
+        
+
+
+        #  These metrics represent specific user and token-related activities within the system.
+        # They are collected at 5-minute intervals, as defined by the associated periodic tasks and event handlers
+
+        self.new_users = Gauge('privacyidea_new_users', 'Number of new users')
+        self.token_init = Gauge('privacyidea_token_init', 'Number of token initializations')
+        self.token_assign = Gauge('privacyidea_token_assign', 'Number of token assignments')
+        self.token_unassign = Gauge('privacyidea_token_unassign', 'Number of token unassignments')
+        
+
+        # Create a connection pool
+        self.engine = sqlalchemy.create_engine(
+            application.config['SQLALCHEMY_DATABASE_URI'],
+            poolclass=QueuePool,
+            pool_size=5,
+            max_overflow=10
+        )
+
+    def fetch_latest_stat(self, connection, stats_key):
+        query = """
+        SELECT stats_value 
+        FROM monitoringstats 
+        WHERE stats_key = :key 
+        ORDER BY timestamp DESC 
+        LIMIT 1
+        """
+        result = connection.execute(sqlalchemy.text(query), {"key": stats_key})
+        return result.scalar() or 0
+
+    def fetch_total_users(self, connection):
+        """Fetch total number of users from the database."""
+        query = "SELECT COUNT(*) AS total_users FROM users_service"
+        result = connection.execute(sqlalchemy.text(query))
+        return result.scalar() or 0
+
+    def fetch_total_unassigned_tokens(self, connection):
+        """Fetch total number of unassigned_tokens from the database."""
+        query = (
+             "SELECT COUNT(*) AS unassigned_tokens FROM token t "
+                "LEFT JOIN tokenowner towner ON t.id = towner.token_id "
+                "WHERE towner.token_id IS NULL"
+         )
+        result = connection.execute(sqlalchemy.text(query))
+        return result.scalar() or 0
+
+    
+    def collect_metrics(self):
+        with self.app.app_context():
+            try:
+                with self.engine.connect() as connection:
+                    # Fetch and set metrics
+                    self.tokens_total.set(self.fetch_latest_stat(connection, 'total_tokens'))
+                    self.hardware_tokens.set(self.fetch_latest_stat(connection, 'hardware_tokens'))
+                    self.software_tokens.set(self.fetch_latest_stat(connection, 'software_tokens'))
+                    self.unassigned_hardware_tokens.set(self.fetch_latest_stat(connection, 'unassigned_hardware_tokens'))
+                    self.assigned_tokens.set(self.fetch_latest_stat(connection, 'assigned_tokens'))
+                    self.auth_success.set(self.fetch_latest_stat(connection, 'successful_auth_counter'))
+                    self.auth_failure.set(self.fetch_latest_stat(connection, 'failed_auth_counter'))
+                    self.new_users.set(self.fetch_latest_stat(connection, 'new_users_counter'))
+                    self.token_init.set(self.fetch_latest_stat(connection, 'token_init_counter'))
+                    self.token_assign.set(self.fetch_latest_stat(connection, 'token_assign_counter'))
+                    self.token_unassign.set(self.fetch_latest_stat(connection, 'token_unassign_counter'))
+                    
+                    self.total_users.set(self.fetch_total_users(connection))
+                    self.total_unassigned_tokens.set(self.fetch_total_unassigned_tokens(connection))
+
+                logging.info("Metrics collected successfully")
+            except Exception as e:
+                logging.error(f"Error fetching metrics: {e}", exc_info=True)
+
+exporter = PrivacyIDEAExporter(application)
+application.add_url_rule('/metrics', 'metrics', metrics)

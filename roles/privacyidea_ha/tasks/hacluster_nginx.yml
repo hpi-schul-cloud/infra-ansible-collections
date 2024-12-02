@@ -62,3 +62,58 @@
     resource1: "nginx"
     resource2: "galera"
   when: is_main_node
+
+- name: Create the PrivacyIDEA cronjob
+  copy:
+    dest: /etc/privacyidea/privacyidea_cron
+    content: |
+      # Script to run scheduled tasks for PrivacyIDEA
+      */5 * * * * www-data /opt/privacyidea/virtualenv/bin/privacyidea-cron run_scheduled
+    mode: '0644'
+
+- name: Create Symlink for Cron Job
+  pcs_resource:
+    name: "privacyidea_cron_symlink"
+    resource_type: 'ocf:heartbeat:symlink'
+    options: >-
+      target=/etc/privacyidea/privacyidea_cron
+      link=/etc/cron.d/privacyidea_cron
+      backup_suffix=.disabled
+      op monitor interval=10s timeout=20s
+      op start timeout=60s interval=0s
+      op stop timeout=60s interval=0s
+      meta failure-timeout=15m migration-threshold=2
+      --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add Order Constraint for Symlink after uWSGI
+  pcs_constraint_order:
+    resource1: "uwsgi"
+    resource2: "privacyidea_cron_symlink"
+  when: is_main_node
+  become: true
+
+- name: Add Colocation Constraint for Symlink with uWSGI
+  pcs_constraint_colocation:
+    resource1: "privacyidea_cron_symlink"
+    resource2: "uwsgi"
+    score: "INFINITY"
+  when: is_main_node
+  become: true
+
+- name: Add custom exporter resource
+  pcs_resource:
+     name: "custom-exporter"
+     resource_type: 'systemd:privacyidea-exporter'
+     options: >
+       op monitor timeout=1s interval=1s 
+       meta failure-timeout=15m migration-threshold=2
+       --group {{ cluster_name }}_group
+  when: is_main_node
+
+- name: Add colocation for custom exporter with uwsgi
+  pcs_constraint_colocation:
+    resource1: "custom-exporter"
+    resource2: "uwsgi"
+    score: "INFINITY"
+  when: is_main_node
