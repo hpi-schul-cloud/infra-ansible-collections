@@ -1,4 +1,10 @@
 awx_namespace: awx
+awx_operator_chart_version: 2.19.1
+# AWX-Operator Helm chart and application version have always been the same for now
+awx_operator_version: "{{ awx_operator_chart_version }}"
+awx_operator_values: {}
+# Set to true during migration to automatically update/delete existing resources created with Kustomize
+awx_operator_migrate_to_helm: false
 awx_admin_email: name@local
 awx_admin_password_secret_name: awx-admin-password
 awx_secret_key_secret:
@@ -15,9 +21,12 @@ awx_postgres_resource_requirements:
     cpu: 1000m
     memory: 4Gi
 awx_postgres_storage_access_mode: ReadWriteOnce
+awx_postgres_pvc_name: postgres-15-awx-postgres-15-0
 awx_postgres_storage_requirements:
-    requests:
-      storage: 8Gi
+  requests:
+    storage: 8Gi
+# Needed to set the correct permission on the Postgres volume
+awx_postgres_data_volume_init: true
 awx_web_resource_requirements:
   requests:
     cpu: 1000m
@@ -39,6 +48,22 @@ awx_ee_resource_requirements:
   limits:
     cpu: 1000m
     memory: 2Gi
-awx_projects_persistence: true
-awx_projects_storage_access_mode: ReadWriteOnce
-awx_projects_storage_size: 8Gi
+# Not needed for our use cases, causes issues during deployments with non RWM PVCs
+awx_projects_persistence: false
+awx_spec:
+  admin_email: "{{ awx_admin_email }}"
+  admin_password_secret: "{{ awx_admin_password_secret_name }}"
+  secret_key_secret: "{{ awx_secret_key_secret | default(omit, true) }}"
+  ingress_type: "{{ awx_ingress_type }}"
+  ingress_annotations: "{{ awx_ingress_annotations }}"
+  ingress_tls_secret: "{{ awx_ingress_tls_secret_name }}"
+  hostname: "{{ awx_hostname }}"
+  postgres_configuration_secret: "{{ awx_postgres_configuration_secret | default(omit, true) }}"
+  postgres_storage_requirements: "{{ awx_postgres_storage_requirements }}"
+  postgres_storage_class: "{{ awx_postgres_storage_class }}"
+  postgres_resource_requirements: "{{ awx_postgres_resource_requirements }}"
+  postgres_data_volume_init: "{{ awx_postgres_data_volume_init }}"
+  web_resource_requirements: "{{ awx_web_resource_requirements }}"
+  task_resource_requirements: "{{ awx_task_resource_requirements }}"
+  ee_resource_requirements: "{{ awx_ee_resource_requirements }}"
+  projects_persistence: "{{ awx_projects_persistence }}"
