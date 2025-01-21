@@ -1,119 +1,20 @@
 ---
     - name: Install packages
       apt:
-        name: "{{ item }}"
+        name:
+          - libspeex1
+          - libspeexdsp1
+          - libodbc2
+          - libtiff5
+          - libpq5
+          - liblua5.1-0
+          - libsndfile1
+          - libavformat58
+          - libldns3
+          - libswscale5
+          - libshout3
+          - python3-lxml
         update_cache: true
-      loop:
-        - [git, gnupg2, wget, lsb-release, python3-lxml]
-        - [build-essential, cmake, automake, autoconf, 'libtool-bin', pkg-config]
-        - [libssl-dev, zlib1g-dev, libdb-dev, unixodbc-dev, libncurses5-dev, libexpat1-dev, libgdbm-dev, bison, erlang-dev, libtpl-dev, libtiff5-dev, uuid-dev]
-        - [libpcre3-dev, libedit-dev, libsqlite3-dev, libcurl4-openssl-dev, nasm]
-        - [libogg-dev, libspeex-dev, libspeexdsp-dev]
-        - libldns-dev
-        - python3-dev
-        - [libavformat-dev, libswscale-dev, libavresample-dev]
-        - liblua5.2-dev
-        - libopus-dev
-        - libpq-dev
-        - [libsndfile1-dev, libflac-dev, libogg-dev, libvorbis-dev]
-        - [libshout3-dev, libmpg123-dev, libmp3lame-dev]
-
-    - name: Checkout repos
-      git:
-        repo: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        version: "{{ item.version }}"
-        force: true
-      loop:
-        - {src: https://github.com/signalwire/freeswitch, dest: /usr/src/freeswitch, version: v1.10.9}
-        - {src: https://github.com/signalwire/libks, dest: /usr/src/libs/libks, version: v1.8.2}
-        - {src: https://github.com/freeswitch/sofia-sip, dest: /usr/src/libs/sofia-sip, version: v1.13.12}
-        - {src: https://github.com/freeswitch/spandsp, dest: /usr/src/libs/spandsp, version: d540fdf411fd474b39f528b0adcc38be1d324436}
-        - {src: https://github.com/signalwire/signalwire-c, dest: /usr/src/libs/signalwire-c, version: 1.3.0}
-
-    - name: Run cmake for libks
-      command:
-        chdir: /usr/src/libs/libks
-        cmd: cmake . -DCMAKE_INSTALL_PREFIX=/usr -DWITH_LIBBACKTRACE=1
-
-    - name: Run make for libks
-      make:
-        chdir: /usr/src/libs/libks
-        target: install
-
-    - name: Run scripts for sofia-sip
-      command:
-        chdir: /usr/src/libs/sofia-sip
-        cmd: "{{ item }}"
-      loop:
-        - ./bootstrap.sh
-        - ./configure CFLAGS="-g -ggdb" --with-pic --with-glib=no --without-doxygen --disable-stun --prefix=/usr
-
-    - name: Run make for sofia-sip
-      make:
-        chdir: /usr/src/libs/sofia-sip
-        target: install
-        params:
-          NUM_THREADS: 4
-
-    - name: Run scripts for spandsp
-      command:
-        chdir: /usr/src/libs/spandsp
-        cmd: "{{ item }}"
-      loop:
-        - ./bootstrap.sh
-        - ./configure CFLAGS="-g -ggdb" --with-pic --prefix=/usr
-
-    - name: Run make for spandsp
-      make:
-        chdir: /usr/src/libs/spandsp
-        target: install
-        params:
-          NUM_THREADS: 4
-
-    - name: Run scripts for signalwire-c
-      command:
-        chdir: /usr/src/libs/signalwire-c
-        cmd: cmake . -DCMAKE_INSTALL_PREFIX=/usr
-      environment:
-        PKG_CONFIG_PATH: /usr/lib/pkgconfig
-
-    - name: Run make for signalwire-c
-      make:
-        chdir: /usr/src/libs/signalwire-c
-        target: install
-
-    - name: Enable modules
-      lineinfile:
-        path: /usr/src/freeswitch/build/modules.conf.in
-        regexp: "#{{ item }}"
-        line: "{{ item }}"
-      loop: "{{ freeswitch_enabled_modules }}"
-
-    - name: Disable modules
-      lineinfile:
-        path: /usr/src/freeswitch/build/modules.conf.in
-        regexp: "{{ item }}"
-        line: "#{{ item }}"
-      loop: "{{ freeswitch_disabled_modules }}"
-
-    - name: Run scripts for Freeswitch
-      command:
-        chdir: /usr/src/freeswitch
-        cmd: "{{ item }}"
-      loop:
-        - ./bootstrap.sh -j
-        - ./configure
-
-    - name: Run make for Freeswitch
-      make:
-        chdir: /usr/src/freeswitch
-        target: "{{ item }}"
-        params:
-          NUM_THREADS: "{{ ansible_processor_vcpus }}"
-      loop:
-        - install
-        - sounds-install
 
     - name: Create freeswitch group
       group:
@@ -127,6 +28,20 @@
         comment: FreeSWITCH open source softswitch
         groups: freeswitch
 
+    - name: Download freeswitch binaries
+      get_url:
+        url: "{{ freeswitch_binaries_download_url }}"
+        dest: /tmp/freeswitch.tar.gz
+        checksum: "{{ freeswitch_binaries_checksum | default(omit) }}"
+        headers: "{{ freeswitch_binaries_additional_headers | default(omit) }}"
+      register: download
+      notify: Restart freeswitch
+
+    - name: Extract binary
+      command:
+        cmd: "tar -xzf /tmp/freeswitch.tar.gz -C /usr/local/freeswitch"
+      when: download.changed
+
     - name: Set freeswitch user ownerships
       file:
         path: "{{ item.path }}"
@@ -137,25 +52,41 @@
       loop:
         - {path: /usr/local/freeswitch/, mode: ug=rwX,o=}
         - {path: /usr/local/freeswitch/bin/*, mode: u=rwx,g=rx}
+      when: download.changed
 
     - name: Set freeswitch capabilities
       capabilities:
         capability: cap_net_bind_service,cap_sys_nice=+ep
         path: /usr/local/freeswitch/bin/freeswitch
 
+    - name: Enable Freeswitch modules
+      xml:
+        path: "/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml"
+        xpath: /configuration/modules/load[@module="{{ item | split('/') | last }}"]
+      loop: "{{ freeswitch_enabled_modules }}"
+      notify: Restart freeswitch
+
+    - name: Disable Freeswitch signalwire module
+      xml:
+        path: "/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml"
+        xpath: /configuration/modules/load[@module="{{ item | split('/') | last }}"]
+        state: absent
+      loop: "{{ freeswitch_disabled_modules }}"
+      notify: Restart freeswitch
+
     - name: Create freeswitch systemd file
       copy:
         src: freeswitch.service
         dest: /etc/systemd/system/freeswitch.service
       register: freeswitch_systemd
+      notify: Restart freeswitch
 
     - name: Systemctl daemon reload
       systemd:
         daemon_reload: true
       when: freeswitch_systemd.changed
 
-    - name: Start and enable Freeswitch
+    - name: Enable Freeswitch
       systemd:
         name: freeswitch
-        state: started
         enabled: true
