@@ -31,7 +31,7 @@
     - name: Download freeswitch binaries
       get_url:
         url: "{{ freeswitch_binaries_download_url }}"
-        dest: /tmp/freeswitch.tar.gz
+        dest: /usr/local/freeswitch.tar.gz
         checksum: "{{ freeswitch_binaries_checksum | default(omit) }}"
         headers: "{{ freeswitch_binaries_additional_headers | default(omit) }}"
       register: download
@@ -39,7 +39,7 @@
 
     - name: Extract binary
       command:
-        cmd: "tar -xzf /tmp/freeswitch.tar.gz -C /usr/local/freeswitch"
+        cmd: "tar -xzf /usr/local/freeswitch.tar.gz -C /usr/local/freeswitch"
       when: download.changed
 
     - name: Set freeswitch user ownerships
