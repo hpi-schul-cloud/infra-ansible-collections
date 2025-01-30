@@ -1,0 +1,19 @@
+---
+# Namespace cloudprober will be installed Installed in
+cloudprober_namespace: monitoring
+
+# Name of secret used for Cloudprober access tokens and other "secret" stuff
+cloudprober_secret: "Cloudprober_Secrets"
+
+# Name of config map where cloudprober will look for configuration content must be valid: See https://cloudprober.org/docs/config/latest/overview/
+cloudprober_configmap: "Cloudprober_Config"
+
+# Version tag for helm chart used
+cloudprober_chart_version: 1.13.21
+
+# values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
+cloudprober_values:
+  configMap:
+    name: {{ cloudprober_configmap }}
+    create: false
+  envFromSecret: {{ cloudprober_secret }}
