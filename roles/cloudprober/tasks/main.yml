@@ -7,7 +7,7 @@
     proxy: "{{ proxy_url | default(omit, true) }}"
     proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     api_version: v1
-    name: {{ cloudprober_namespace }}
+    name: "{{ cloudprober_namespace }}"
     kind: Namespace
   tags: cloudprober
 
@@ -22,7 +22,7 @@
       apiVersion: v1
       kind: ConfigMap
       metadata:
-        name: {{ cloudprober_configmap }}        
+        name: "{{ cloudprober_configmap }}"
         namespace: "{{ cloudprober_namespace }}"
       data:
         cloudprober.cfg: |-
@@ -47,8 +47,8 @@
       apiVersion: onepassword.com/v1
       kind: OnePasswordItem
       metadata:
-        name: {{ cloudprober_secret }}
-        namespace: {{ cloudprober_namespace }}
+        name: "{{ cloudprober_secret }}"
+        namespace: "{{ cloudprober_namespace }}"
       spec:
         itemPath: "vaults/{{ vault }}/items/cloudprober"
   tags: cloudprober
@@ -57,7 +57,7 @@
 - name: Add Cloudprober chart repo
   kubernetes.core.helm_repository:
     name: cloudprober
-    repo_url: "https://github.com/cloudprober/helm-charts/tree/main/cloudprober"
+    repo_url: "https://helm.cloudprober.org"
   check_mode: false
   changed_when: false
   tags: cloudprober

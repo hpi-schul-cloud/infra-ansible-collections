@@ -1,6 +1,6 @@
 ---
 # Namespace cloudprober will be installed Installed in
-cloudprober_namespace: monitoring
+cloudprober_namespace: "monitoring"
 
 # Name of secret used for Cloudprober access tokens and other "secret" stuff
 cloudprober_secret: "Cloudprober_Secrets"
@@ -14,6 +14,6 @@ cloudprober_chart_version: 1.13.21
 # values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
 cloudprober_values:
   configMap:
-    name: {{ cloudprober_configmap }}
+    name: "{{ cloudprober_configmap }}"
     create: false
-  envFromSecret: {{ cloudprober_secret }}
+  envFromSecret: "{{ cloudprober_secret }}"
