@@ -42,6 +42,7 @@
                 pods: "fluentbit.*"
               }
             }
+            use_datagram_socket: false
           }
   tags: cloudprober
         
