@@ -27,10 +27,20 @@
       data:
         cloudprober.cfg: |-
           probe {
-            name: "Pinger"
-            type: Ping
+            name: "HTTP_Probe"
+            type: HTTP
             targets {
-              host_names: "{{ fluentbit_target_host , vmagent_ingress_host }}"
+              host_names: "{{ fluentbit_target_host }}, {{ vmagent_ingress_host }}"
+            }
+          }
+          probe {
+            name: "Fluentbit pods"
+            type: PING
+            targets {
+              k8s {
+                namespace: "kube-system"
+                pods: "fluentbit.*"
+              }
             }
           }
   tags: cloudprober
