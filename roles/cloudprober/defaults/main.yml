@@ -19,4 +19,7 @@ cloudprober_values:
   envFromSecret: "{{ cloudprober_secret }}"
   securityContext:
     capabilities:
-    add: ["NET_RAW"]
+      add: ["NET_RAW"]
+    # sysctls:
+    #   - name: net.ipv4.ping_group_range
+    #     value: "0 5000"

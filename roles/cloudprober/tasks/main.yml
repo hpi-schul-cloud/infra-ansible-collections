@@ -39,11 +39,21 @@
             targets {
               k8s {
                 namespace: "kube-system"
-                pods: "fluentbit.*"
+                pods: "fluent.*"
               }
             }
             use_datagram_socket: false
           }
+          probe {
+            name: "Ingress_Probe"
+            type: HTTP
+            targets {
+              k8s {
+                namespace: "infra-dbildungscloud-01"
+                ingresses: ".*"
+              }
+            }
+          }          
   tags: cloudprober
         
         
