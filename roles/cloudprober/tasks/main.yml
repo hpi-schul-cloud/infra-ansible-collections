@@ -35,7 +35,6 @@
               metrics_prefix: "cloudprober_"
             }
           }
-
           probe {
             name: "HTTP_Probe"
             type: HTTP
@@ -52,7 +51,9 @@
                 pods: "fluent.*"
               }
             }
-            use_datagram_socket: false
+            ping_probe {
+              use_datagram_socket: false
+            }
           }
           probe {
             name: "coredns pods"
@@ -145,6 +146,3 @@
     values:
       "{{ cloudprober_values }}"
   tags: cloudprober
-
-
-# add scraper config 
