@@ -104,6 +104,16 @@
               }
             }
           }          
+          probe {
+            name: "Services"
+            type: TCP
+            targets {
+              k8s {
+                namespace: "infra-dbildungscloud-01"
+                services: ".*"
+              }
+            }
+          }
   tags: cloudprober
         
         
