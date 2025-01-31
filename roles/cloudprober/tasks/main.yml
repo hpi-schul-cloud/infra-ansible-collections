@@ -45,6 +45,45 @@
             use_datagram_socket: false
           }
           probe {
+            name: "coredns pods"
+            type: PING
+            targets {
+              k8s {
+                namespace: "kube-system"
+                pods: "coredns.*"
+              }
+            }
+            ping_probe {
+              use_datagram_socket: false
+            }
+          }
+          probe {
+            name: "csi pods"
+            type: PING
+            targets {
+              k8s {
+                namespace: "kube-system"
+                pods: "csi.*"
+              }
+            }
+            ping_probe {
+              use_datagram_socket: false
+            }
+          }
+          probe {
+            name: "PING_Monitoring"
+            type: PING
+            targets {
+              k8s {
+                namespace: "monitoring"
+                pods: ".*"
+              }
+            }
+            ping_probe {
+              use_datagram_socket: false
+            }
+          }
+          probe {
             name: "Ingress_Probe"
             type: HTTP
             targets {
