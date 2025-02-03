@@ -116,7 +116,7 @@
           }
           probe {
             name: "K8S_Api"
-            type: HTTPS
+            type: HTTP
             targets {
               k8s {
                 namespace: "default"
