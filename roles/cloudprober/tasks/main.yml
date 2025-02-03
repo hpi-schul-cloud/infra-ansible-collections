@@ -114,6 +114,26 @@
               }
             }
           }
+          probe {
+            name: "K8S_Api"
+            type: HTTPS
+            targets {
+              k8s {
+                namespace: "default"
+                services: "kubernetes"
+              }
+            }
+          }
+          probe {
+            name: "K8S_Controlplane"
+            type: TCP
+            targets {
+              k8s {
+                namespace: "default"
+                endpoints: "kubernetes"
+              }
+            }
+          }
   tags: cloudprober
         
         
