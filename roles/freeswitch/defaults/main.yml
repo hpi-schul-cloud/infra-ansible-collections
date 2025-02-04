@@ -2,3 +2,8 @@
 freeswitch_enabled_modules: []
 freeswitch_disabled_modules:
   - applications/mod_signalwire
+# Expects a tar.gz file:
+#   freeswitch_binaries_download_url
+# Optional:
+#   freeswitch_binaries_additional_headers
+#   freeswitch_binaries_checksum
