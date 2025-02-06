@@ -13,6 +13,8 @@ cloudprober_chart_version: 1.13.21
 
 # values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
 cloudprober_values:
+  # extraArgs:
+  #   - "--debug_log"
   configMap:
     name: "{{ cloudprober_configmap }}"
     create: false

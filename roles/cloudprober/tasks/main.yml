@@ -36,11 +36,111 @@
             }
           }
           probe {
-            name: "HTTP_Probe"
+            name: "Loki_Probe"
             type: HTTP
             targets {
-              host_names: "{{ fluentbit_target_host }}, {{ vmagent_ingress_host }}"
+              host_names: "{{ fluentbit_target_host }}"
             }
+            http_probe {
+              header {
+                key: "Authorization"
+                value: "Basic \{\{env "loki_secret"\}\}"
+              }
+              latency_breakdown: ALL_STAGES
+            }
+            validator {
+              name: "status_code_200"
+              http_validator {
+                success_status_codes: "200"
+              }
+            }
+            interval_msec: 2000
+            timeout_msec:  1000      
+          }          
+          probe {
+            name: "vmagent_probe"
+            type: HTTP
+            targets {
+              host_names: "{{ vmagent_ingress_host }}"
+            }
+            http_probe {
+              relative_url: "/health"
+              latency_breakdown: ALL_STAGES
+              header {
+                key: "Authorization"
+                value: "Basic \{\{env "mvagent_secret"\}\}"
+              }
+            }
+            validator {
+              name: "data-integrity"
+              integrity_validator {
+                pattern_string: "OK"
+              }
+            }
+          }
+          probe {
+            name: "K8S_Api"
+            type: HTTP
+            http_probe {
+              protocol: HTTPS
+              relative_url: "/readyz"
+              latency_breakdown: ALL_STAGES
+              tls_config {
+                disable_cert_validation: true
+              }         
+            }
+            validator {
+              name: "status_code_200"
+              http_validator {
+                success_status_codes: "200"
+              }
+            }    
+            targets {
+              k8s {
+                namespace: "default"
+                services: "kubernetes"
+              }
+            }
+            interval_msec: 5000
+            timeout_msec:  1000
+          }       
+          probe {
+            name: "K8S_ControlPlane"
+            type: HTTP
+            http_probe {
+              protocol: HTTPS
+              relative_url: "/readyz"
+              latency_breakdown: ALL_STAGES
+              tls_config {
+                disable_cert_validation: true
+              }         
+            }
+            validator {
+              name: "status_code_200"
+              http_validator {
+                success_status_codes: "200"
+              }
+            }    
+            targets {
+              k8s {
+                namespace: "default"
+                endpoints: "kubernetes"
+              }
+            }
+            interval_msec: 5000
+            timeout_msec:  1000
+          } 
+          probe {
+            name: "coredns pods"
+            type: DNS
+            targets {
+              k8s {
+                namespace: "kube-system"
+                pods: "coredns.*"
+              }
+            }
+            interval_msec: 2000
+            timeout_msec:  1000
           }
           probe {
             name: "Fluentbit pods"
@@ -54,88 +154,10 @@
             ping_probe {
               use_datagram_socket: false
             }
-          }
-          probe {
-            name: "coredns pods"
-            type: PING
-            targets {
-              k8s {
-                namespace: "kube-system"
-                pods: "coredns.*"
-              }
-            }
-            ping_probe {
-              use_datagram_socket: false
-            }
-          }
-          probe {
-            name: "csi pods"
-            type: PING
-            targets {
-              k8s {
-                namespace: "kube-system"
-                pods: "csi.*"
-              }
-            }
-            ping_probe {
-              use_datagram_socket: false
-            }
-          }
-          probe {
-            name: "PING_Monitoring"
-            type: PING
-            targets {
-              k8s {
-                namespace: "monitoring"
-                pods: ".*"
-              }
-            }
-            ping_probe {
-              use_datagram_socket: false
-            }
-          }
-          probe {
-            name: "Ingress_Probe"
-            type: HTTP
-            targets {
-              k8s {
-                namespace: "infra-dbildungscloud-01"
-                ingresses: ".*"
-              }
-            }
+            interval_msec: 2000
+            timeout_msec:  1000
           }          
-          probe {
-            name: "Services"
-            type: TCP
-            targets {
-              k8s {
-                namespace: "infra-dbildungscloud-01"
-                services: ".*"
-              }
-            }
-          }
-          probe {
-            name: "K8S_Api"
-            type: HTTP
-            targets {
-              k8s {
-                namespace: "default"
-                services: "kubernetes"
-              }
-            }
-          }
-          probe {
-            name: "K8S_Controlplane"
-            type: TCP
-            targets {
-              k8s {
-                namespace: "default"
-                endpoints: "kubernetes"
-              }
-            }
-          }
-  tags: cloudprober
-        
+        tags: cloudprober 
         
 # Create Secret to store tokens and access data required
 - name: Create Cloudprober secret
