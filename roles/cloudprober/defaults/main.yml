@@ -172,3 +172,12 @@ cloudprober_values:
       interval_msec: 2000
       timeout_msec:  1000
     }
+    probe {
+      name: "Internet"
+      type: HTTP
+      targets {
+        host_names: "www.google.com"
+      }
+      interval_msec: 5000  # 5s
+      timeout_msec: 1000   # 1s
+    }
