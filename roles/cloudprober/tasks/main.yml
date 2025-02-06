@@ -44,8 +44,8 @@
             http_probe {
               header {
                 key: "Authorization"
-                value: "Basic \{\{env "loki_secret"\}\}"
-              }
+                value: "Basic {{'{{env "loki_secret"}}'}}"  # loki_secret stored in 1Password cloudprober as password with content: echo -n "<user>:<password>" | base64 -w 0 | base64
+               }
               latency_breakdown: ALL_STAGES
             }
             validator {
@@ -68,7 +68,7 @@
               latency_breakdown: ALL_STAGES
               header {
                 key: "Authorization"
-                value: "Basic \{\{env "mvagent_secret"\}\}"
+                value: "Basic {{'{{env "vmagent_secret"}}'}}" # vmagent_secret stored in 1Password cloudprober as password with content: echo -n "<user>:<password>" | base64 -w 0 | base64
               }
             }
             validator {
