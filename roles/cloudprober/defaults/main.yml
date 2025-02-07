@@ -158,6 +158,29 @@ cloudprober_values:
       timeout_msec:  1000
     }
     probe {
+      name: "FluentbitHealth"
+      type: HTTP
+      targets {
+        k8s {
+          namespace: "kube-system"
+          pods: "fluent-.*"
+        }
+      }
+      http_probe {
+        protocol: HTTP
+        port: 2020
+        relative_url: "/api/v1/health"
+      }
+      validator {
+        name: "status_code_200"
+        http_validator {
+          success_status_codes: "200"
+        }
+      }    
+      interval_msec: 2000
+      timeout_msec:  1000
+    }
+    probe {
       name: "Fluentbit pods"
       type: PING
       targets {
@@ -177,6 +200,17 @@ cloudprober_values:
       type: HTTP
       targets {
         host_names: "www.google.com"
+      }
+      interval_msec: 5000  # 5s
+      timeout_msec: 1000   # 1s
+    }
+    probe {
+      name: "Services"
+      type: TCP
+      targets {
+        k8s {
+          services: ".*-svc"
+        }
       }
       interval_msec: 5000  # 5s
       timeout_msec: 1000   # 1s
