@@ -215,3 +215,25 @@ cloudprober_values:
       interval_msec: 5000  # 5s
       timeout_msec: 1000   # 1s
     }
+    {% if MongoDB_Hosts is defined  %}
+    probe {
+      name: "MongoDB"
+      type: TCP
+      targets {
+        host_names: "{{ MongDB_Hosts }}"
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
+    {% if Postgres_Hosts is defined  %}
+    probe {
+      name: "Postgres"
+      type: TCP
+      targets {
+        host_names: "{{ Postgres_Hosts }}"
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
