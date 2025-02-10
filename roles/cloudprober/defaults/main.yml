@@ -220,7 +220,7 @@ cloudprober_values:
       name: "MongoDB"
       type: TCP
       targets {
-        host_names: "{{ MongDB_Hosts }}"
+        host_names: "{{ MongoDB_Hosts }}"
       }
       interval_msec: 15000  # 15s
       timeout_msec: 1000   # 1s
