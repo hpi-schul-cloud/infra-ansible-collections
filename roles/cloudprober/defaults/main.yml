@@ -1,0 +1,273 @@
+---
+# Namespace cloudprober will be installed Installed in
+cloudprober_namespace: "monitoring"
+
+# Name of secret used for Cloudprober access tokens and other "secret" stuff
+cloudprober_secret: "cloudprobersecrets"
+
+# Name of config map where cloudprober will look for configuration content must be valid: See https://cloudprober.org/docs/config/latest/overview/
+cloudprober_configmap: "cloudprober"
+
+# Version tag for helm chart used
+cloudprober_chart_version: 1.13.21
+
+# default port for LDAP probe
+LDAP_PORT: 636
+
+#default port for mongodb
+MongoDB_PORT: 27017
+
+#default port for postgresSQL
+Postges_Port: 5432
+
+# values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
+cloudprober_values:
+  # extraArgs:
+  #   - "--debug_log"
+  configMap:
+    name: "{{ cloudprober_configmap }}"
+    create: true
+  envFromSecret: "{{ cloudprober_secret }}"
+  securityContext:
+    capabilities:
+      add: ["NET_RAW"]
+    # sysctls:
+    #   - name: net.ipv4.ping_group_range
+    #     value: "0 5000"
+  config: |
+    surfacer {
+    type: PROMETHEUS
+
+      prometheus_surfacer {
+        # Following option adds a prefix to exported metrics, for example,
+        # "total" metric is exported as "cloudprober_total".
+        metrics_prefix: "cloudprober_"
+      }
+    }
+    {% if Loki_Host is defined %}
+    probe {
+      name: "Loki_Probe"
+      type: HTTP
+      targets {
+        host_names: "{{ Loki_Host }}"
+      }
+      http_probe {
+        header {
+          key: "Authorization"
+          value: "Basic {{'{{env "loki_secret"}}'}}"  # loki_secret stored in 1Password cloudprober as password with content: echo -n "<user>:<password>" | base64 
+          }
+        latency_breakdown: ALL_STAGES
+      }
+      validator {
+        name: "status_code_200"
+        http_validator {
+          success_status_codes: "200"
+        }
+      }
+      interval_msec: 2000
+      timeout_msec:  1000      
+    }          
+    {% endif %}
+    {% if vmagent_host is defined %}
+    probe {
+      name: "vmagent_probe"
+      type: HTTP
+      targets {
+        host_names: "{{ vmagent_host }}"
+      }
+      http_probe {
+        relative_url: "/health"
+        latency_breakdown: ALL_STAGES
+        header {
+          key: "Authorization"
+          value: "Basic {{'{{env "vmagent_secret"}}'}}" # vmagent_secret stored in 1Password cloudprober as password with content: echo -n "<user>:<password>" | base64 
+        }
+      }
+      validator {
+        name: "data-integrity"
+        integrity_validator {
+          pattern_string: "OK"
+        }
+      }
+    }
+    {% endif %}
+
+    probe {
+      name: "K8S_Api"
+      type: HTTP
+      http_probe {
+        protocol: HTTPS
+        relative_url: "/readyz"
+        latency_breakdown: ALL_STAGES
+        tls_config {
+          disable_cert_validation: true
+        }         
+      }
+      validator {
+        name: "status_code_200"
+        http_validator {
+          success_status_codes: "200"
+        }
+      }    
+      targets {
+        k8s {
+          namespace: "default"
+          services: "kubernetes"
+        }
+      }
+      interval_msec: 5000
+      timeout_msec:  1000
+    }       
+    probe {
+      name: "K8S_ControlPlane"
+      type: HTTP
+      http_probe {
+        protocol: HTTPS
+        relative_url: "/readyz"
+        latency_breakdown: ALL_STAGES
+        tls_config {
+          disable_cert_validation: true
+        }         
+      }
+      validator {
+        name: "status_code_200"
+        http_validator {
+          success_status_codes: "200"
+        }
+      }    
+      targets {
+        k8s {
+          namespace: "default"
+          endpoints: "kubernetes"
+        }
+      }
+      interval_msec: 5000
+      timeout_msec:  1000
+    } 
+    probe {
+      name: "Nodepool"
+      type: PING
+      targets {
+        k8s {
+          namespace: "monitoring"
+          endpoints: "system-prometheus-node-exporter"
+        }
+      }
+      ping_probe {
+        use_datagram_socket: false
+      }
+      interval_msec: 2000
+      timeout_msec:  1000
+    } 
+    probe {
+      name: "coredns pods"
+      type: DNS
+      targets {
+        k8s {
+          namespace: "kube-system"
+          pods: "coredns.*"
+        }
+      }
+      interval_msec: 2000
+      timeout_msec:  1000
+    }
+    probe {
+      name: "FluentbitHealth"
+      type: HTTP
+      targets {
+        k8s {
+          namespace: "kube-system"
+          pods: "fluent-.*"
+        }
+      }
+      http_probe {
+        protocol: HTTP
+        port: 2020
+        relative_url: "/api/v1/health"
+      }
+      validator {
+        name: "status_code_200"
+        http_validator {
+          success_status_codes: "200"
+        }
+      }    
+      interval_msec: 2000
+      timeout_msec:  1000
+    }
+    probe {
+      name: "Fluentbit pods"
+      type: PING
+      targets {
+        k8s {
+          namespace: "kube-system"
+          pods: "fluent.*"
+        }
+      }
+      ping_probe {
+        use_datagram_socket: false
+      }
+      interval_msec: 2000
+      timeout_msec:  1000
+    }
+    probe {
+      name: "Internet"
+      type: HTTP
+      targets {
+        host_names: "www.google.com"
+      }
+      interval_msec: 5000  # 5s
+      timeout_msec: 1000   # 1s
+    }
+    probe {
+      name: "Services"
+      type: TCP
+      targets {
+        k8s {
+          services: ".*-svc"
+        }
+      }
+      interval_msec: 5000  # 5s
+      timeout_msec: 1000   # 1s
+    }
+    {% if MongoDB_Hosts is defined  %}
+    probe {
+      name: "MongoDB"
+      type: TCP
+      targets {
+        host_names: "{{ MongoDB_Hosts }}"
+      }
+      tcp_probe {
+        port: {{ MongoDB_Port }}
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
+    {% if Postgres_Hosts is defined  %}
+    probe {
+      name: "Postgres"
+      type: TCP
+      targets {
+        host_names: "{{ Postgres_Hosts }}"
+      }
+      tcp_probe {
+        port: {{ Postges_Port }}
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
+    {% if LDAP_Hosts is defined  %}
+    probe {
+      name: "LDAP"
+      type: TCP
+      targets {
+        host_names: "{{ LDAP_Hosts }}"
+      }
+      tcp_probe {
+        port: {{ LDAP_PORT }}
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
