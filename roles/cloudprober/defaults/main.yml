@@ -11,6 +11,15 @@ cloudprober_configmap: "cloudprober"
 # Version tag for helm chart used
 cloudprober_chart_version: 1.13.21
 
+# default port for LDAP probe
+LDAP_PORT: 636
+
+#default port for mongodb
+MongoDB_PORT: 27017
+
+#default port for postgresSQL
+Postges_Port: 5432
+
 # values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
 cloudprober_values:
   # extraArgs:
@@ -228,7 +237,7 @@ cloudprober_values:
         host_names: "{{ MongoDB_Hosts }}"
       }
       tcp_probe {
-        port: 27017
+        port: {{ MongoDB_Port }}
       }
       interval_msec: 15000  # 15s
       timeout_msec: 1000   # 1s
@@ -242,7 +251,7 @@ cloudprober_values:
         host_names: "{{ Postgres_Hosts }}"
       }
       tcp_probe {
-        port: 5432
+        port: {{ Postges_Port }}
       }
       interval_msec: 15000  # 15s
       timeout_msec: 1000   # 1s
