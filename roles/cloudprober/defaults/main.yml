@@ -20,6 +20,9 @@ MongoDB_PORT: 27017
 #default port for postgresSQL
 Postges_Port: 5432
 
+# default Internet Host to test connectivity (Should be highly available)
+Internet_Host: "www.google.com"
+
 # values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
 cloudprober_values:
   # extraArgs:
