@@ -35,12 +35,12 @@ cloudprober_values:
         metrics_prefix: "cloudprober_"
       }
     }
-    {% if fluentbit_target_host is defined %}
+    {% if Loki_Host is defined %}
     probe {
       name: "Loki_Probe"
       type: HTTP
       targets {
-        host_names: "{{ fluentbit_target_host }}"
+        host_names: "{{ Loki_Host }}"
       }
       http_probe {
         header {
@@ -59,12 +59,12 @@ cloudprober_values:
       timeout_msec:  1000      
     }          
     {% endif %}
-    {% if vmagent_ingress_host is defined %}
+    {% if vmagent_host is defined %}
     probe {
       name: "vmagent_probe"
       type: HTTP
       targets {
-        host_names: "{{ vmagent_ingress_host }}"
+        host_names: "{{ vmagent_host }}"
       }
       http_probe {
         relative_url: "/health"
