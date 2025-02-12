@@ -248,3 +248,17 @@ cloudprober_values:
       timeout_msec: 1000   # 1s
     }
     {% endif %}
+    {% if LDAP_Hosts is defined  %}
+    probe {
+      name: "LDAP"
+      type: TCP
+      targets {
+        host_names: "{{ LDAP_Hosts }}"
+      }
+      tcp_probe {
+        port: {{ LDAP_PORT }}
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
