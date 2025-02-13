@@ -71,12 +71,12 @@ cloudprober_values:
       timeout_msec:  1000      
     }          
     {% endif %}
-    {% if vmagent_host is defined %}
+    {% if Vmagent_host is defined %}
     probe {
       name: "vmagent_probe"
       type: HTTP
       targets {
-        host_names: "{{ vmagent_host }}"
+        host_names: "{{ Vmagent_host }}"
       }
       http_probe {
         relative_url: "/health"
