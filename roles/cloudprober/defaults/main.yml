@@ -20,6 +20,9 @@ MongoDB_PORT: 27017
 #default port for postgresSQL
 Postges_Port: 5432
 
+# default Internet Host to test connectivity (Should be highly available)
+Internet_Host: "www.google.com"
+
 # values.yaml used see https://github.com/cloudprober/helm-charts/blob/main/cloudprober/values.yaml for values
 cloudprober_values:
   # extraArgs:
@@ -68,12 +71,12 @@ cloudprober_values:
       timeout_msec:  1000      
     }          
     {% endif %}
-    {% if vmagent_host is defined %}
+    {% if Vmagent_host is defined %}
     probe {
       name: "vmagent_probe"
       type: HTTP
       targets {
-        host_names: "{{ vmagent_host }}"
+        host_names: "{{ Vmagent_host }}"
       }
       http_probe {
         relative_url: "/health"
@@ -209,11 +212,12 @@ cloudprober_values:
       interval_msec: 2000
       timeout_msec:  1000
     }
+    {% if Internet_Host is defined %}
     probe {
       name: "Internet"
       type: HTTP
       targets {
-        host_names: "www.google.com"
+        host_names: "{{ Internet_Host }}"
       }
       interval_msec: 5000  # 5s
       timeout_msec: 1000   # 1s
@@ -229,6 +233,7 @@ cloudprober_values:
       interval_msec: 5000  # 5s
       timeout_msec: 1000   # 1s
     }
+    {% endif %}
     {% if MongoDB_Hosts is defined  %}
     probe {
       name: "MongoDB"
