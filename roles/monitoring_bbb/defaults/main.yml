@@ -11,6 +11,8 @@ scalelite_host: "{{ bbb_domain_name }}"
 bbb_ebbba_exporters: true
 # True if the coturn exporter is enabled on port 9642 /metrics
 bbb_turn_server_exporter_enabled: true
+# False if cAdvisor is enabled on the Scalelite server on port 9300 /metrics
+scalelite_cadvisor_enabled: false
 # Name of the Kubernetes secret containing the basic auth credentials for the exporters
 bbb_node_exporter_basic_auth_secret_name: "{{ bbb_instance_name }}-node-exporter-basic-auth"
 # Name of the Kubernetes secret containing the IONOS credentials
