@@ -1,4 +1,30 @@
 # Setup Cloudprober
+
+# Create OnePassword Item to store required info
+- name: Loki Data
+  set_fact:
+    loki_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='loki', field='password', credentials=op_credentials) }}"
+    loki_user: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='loki', field='username', credentials=op_credentials) }}"
+
+- name: Vmagent Data
+  set_fact:
+    vmagent_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='loki', field='password', credentials=op_credentials) }}"
+    vmagent_user: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='loki', field='username', credentials=op_credentials) }}"
+
+- name: Create cloudprober 1Password item
+  dbildungscloud.onepwd.item:
+    vault: "{{ vault }}"
+    category: "password"
+    name: "cloudprober"
+    fields:
+      - name: loki_secret
+        type: password
+        value: "{{ loki_user ':' loki_password | base64 }}"
+        overwrite: False
+      - name: vmagent_secret
+        type: password
+        value: "{{ vmagent_user ':' vmagent_password | base64}}"
+
 # Create Namespace
 - name: Create monitoring namespace
   kubernetes.core.k8s:
