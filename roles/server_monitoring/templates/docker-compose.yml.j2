@@ -46,9 +46,9 @@ services:
     healthcheck:
       {{ server_monitoring_nginx_healthcheck | to_nice_yaml | indent(6) }}
 {% endif %}
-    depends_on:
-      - cadvisor
-      - node-exporter
+    deploy:
+      resources:
+        {{ server_monitoring_nginx_resources | to_nice_yaml | indent(8) }}
 {% endif %}
 
   node-exporter:
@@ -72,6 +72,13 @@ services:
 {% if server_monitoring_node_exporter_textfile_collector_enabled %}
       - {{ server_monitoring_node_exporter_textfile_directory }}:{{ server_monitoring_node_exporter_textfile_directory }}
 {% endif %}
+{% if server_monitoring_node_exporter_healthcheck is defined %}
+    healthcheck:
+      {{ server_monitoring_node_exporter_healthcheck | to_nice_yaml | indent(6) }}
+{% endif %}
+    deploy:
+      resources:
+        {{ server_monitoring_node_exporter_resources | to_nice_yaml | indent(8) }}
 
 {% if server_monitoring_cadvisor_enabled %}
   cadvisor:
@@ -87,6 +94,9 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
+    deploy:
+      resources:
+        {{ server_monitoring_cadvisor_resources | to_nice_yaml | indent(8) }}
 {% endif %}
 
 {% if server_monitoring_extra_docker_services is defined %}

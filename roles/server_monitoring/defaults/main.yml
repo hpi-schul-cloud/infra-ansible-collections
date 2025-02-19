@@ -40,6 +40,13 @@ server_monitoring_nginx_healthcheck:
 server_monitoring_nginx_worker_processes: auto
 server_monitoring_nginx_logs_folder: /var/log/nginx
 server_monitoring_nginx_listener_ip: 0.0.0.0
+server_monitoring_nginx_resources:
+  limits:
+    cpus: '0.1'
+    memory: '50M'
+  reservations:
+    cpus: '0.01'
+    memory: '6M'
 
 server_monitoring_node_exporter_image: prom/node-exporter:v1.9.0
 server_monitoring_node_exporter_public_port: 9100
@@ -49,13 +56,30 @@ server_monitoring_node_exporter_group_id: 65534
 server_monitoring_node_exporter_textfile_directory: /node-exporter-textfiles/
 server_monitoring_node_exporter_extra_commands: []
 server_monitoring_node_exporter_textfile_collector_enabled: false
+server_monitoring_node_exporter_resources:
+  limits:
+    cpus: '0.1'
+    memory: '50M'
+  reservations:
+    cpus: '0.01'
+    memory: '6M'
+server_monitoring_node_exporter_healthcheck:
+  test: ["CMD", "wget", "-q", "http://127.0.0.1:{{ server_monitoring_node_exporter_private_port }}", "-O", "/tmp/health"]
+  interval: 10s
+  timeout: 10s
+  retries: 3
 
 server_monitoring_cadvisor_enabled: true
 server_monitoring_cadvisor_image: gcr.io/cadvisor/cadvisor:v0.49.2
 server_monitoring_cadvisor_public_port: 9300
 server_monitoring_cadvisor_private_port: 9299
-server_monitoring_cadvisor_extra_commands:
-  - -docker_only
+server_monitoring_cadvisor_resources:
+  limits:
+    cpus: '0.1'
+    memory: '100M'
+  reservations:
+    cpus: '0.05'
+    memory: '6M'
 
 # List of other metrics endpoints to put behind NGINX
 # Optional host field can be used for Docker-compose containers
