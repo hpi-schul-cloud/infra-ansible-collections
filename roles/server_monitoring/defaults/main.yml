@@ -1,0 +1,71 @@
+---
+# Variables from https://github.com/geerlingguy/ansible-role-docker?tab=readme-ov-file#role-variables
+docker_daemon_options:
+  ipv6: false
+docker_ce_version: 5:25.0.2-1~ubuntu.20.04~focal
+docker_packages:
+  - docker-ce={{ docker_ce_version }}
+  - docker-ce-cli={{ docker_ce_version }}
+  - docker-ce-rootless-extras={{ docker_ce_version }}
+
+server_monitoring_docker_compose_version: 1.25.5
+server_monitoring_docker_python_sdk_version: 5.0.3
+server_monitoring_docker_volumes_folder: /docker_volumes
+server_monitoring_folder: /server_monitoring
+server_monitoring_folder_permissions: "0700"
+server_monitoring_folder_owner: root
+server_monitoring_folder_group: root
+server_monitoring_host_letsencrypt_folder: /etc/letsencrypt
+# server_monitoring_basic_auth_username:
+# server_monitoring_basic_auth_password:
+# server_monitoring_certificate_name:
+
+server_monitoring_certbot_enabled: false
+server_monitoring_certbot_image: certbot/certbot:v2.11.0
+server_monitoring_certbot_user_id: 2318
+server_monitoring_certbot_group_id: 1800
+server_monitoring_certbot_config: |
+  logs-dir = /certbot/logs
+  work-dir = /certbot/work
+
+server_monitoring_nginx_enabled: true
+server_monitoring_nginx_image: nginxinc/nginx-unprivileged:1.24-alpine3.18-perl
+server_monitoring_nginx_user_id: 101
+server_monitoring_nginx_group_id: 1800
+server_monitoring_nginx_healthcheck:
+  test: ["CMD", "curl", "-f", "http://127.0.0.1/health"]
+  interval: 10s
+  timeout: 10s
+  retries: 3
+server_monitoring_nginx_worker_processes: auto
+server_monitoring_nginx_logs_folder: /var/log/nginx
+server_monitoring_nginx_listener_ip: 0.0.0.0
+
+server_monitoring_node_exporter_image: prom/node-exporter:v1.9.0
+server_monitoring_node_exporter_public_port: 9100
+server_monitoring_node_exporter_private_port: 9099
+server_monitoring_node_exporter_user_id: 65534
+server_monitoring_node_exporter_group_id: 65534
+server_monitoring_node_exporter_textfile_directory: /node-exporter-textfiles/
+server_monitoring_node_exporter_extra_commands: []
+server_monitoring_node_exporter_textfile_collector_enabled: false
+
+server_monitoring_cadvisor_enabled: true
+server_monitoring_cadvisor_image: gcr.io/cadvisor/cadvisor:v0.49.2
+server_monitoring_cadvisor_public_port: 9300
+server_monitoring_cadvisor_private_port: 9299
+server_monitoring_cadvisor_extra_commands:
+  - -docker_only
+
+# List of other metrics endpoints to put behind NGINX
+# Optional host field can be used for Docker-compose containers
+server_monitoring_extra_exporters: []
+  # - name: my-app
+  #   public_port: 9123
+  #   private_port: 9122
+  # - name: my-docker-app
+  #   public_port: 9223
+  #   private_port: 9222
+  #   host: my-docker-service-name
+# Gets added as YAML to the Docker-compose file
+# server_monitoring_extra_docker_services: {}

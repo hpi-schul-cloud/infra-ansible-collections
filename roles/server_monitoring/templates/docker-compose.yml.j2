@@ -1,0 +1,94 @@
+version: '3'
+
+services:
+{% if server_monitoring_certbot_enabled %}
+  certbot:
+    image: {{ server_monitoring_certbot_image }}
+    container_name: certbot
+    restart: unless-stopped
+    user: {{ server_monitoring_certbot_user_id }}:{{ server_monitoring_certbot_group_id }}
+    volumes:
+      - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt
+      - {{ server_monitoring_docker_volumes_folder }}/webroot:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; sleep 12h & wait $${!}; done;'"
+{% endif %}
+
+{% if server_monitoring_nginx_enabled %}
+  nginx:
+    image: {{ server_monitoring_nginx_image }}
+    container_name: nginx
+    restart: unless-stopped
+    user: {{ server_monitoring_nginx_user_id }}:{{ server_monitoring_nginx_group_id }}
+    ports:
+      - "{{ server_monitoring_nginx_listener_ip }}:{{ server_monitoring_node_exporter_public_port }}:{{ server_monitoring_node_exporter_public_port }}"
+{% if server_monitoring_certbot_enabled %}
+      - "{{ server_monitoring_nginx_listener_ip }}:80:80"
+      - "{{ server_monitoring_nginx_listener_ip }}:443:443"
+{% endif %}
+{% if server_monitoring_cadvisor_enabled %}
+      - "{{ server_monitoring_nginx_listener_ip }}:{{ server_monitoring_cadvisor_public_port }}:{{ server_monitoring_cadvisor_public_port }}"
+{% endif %}
+{% for exporter in server_monitoring_extra_exporters %}
+      - "{{ server_monitoring_nginx_listener_ip }}:{{ exporter.public_port }}:{{ exporter.public_port }}"
+{% endfor %}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx
+      - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt
+{% if server_monitoring_certbot_enabled %}
+      - {{ server_monitoring_docker_volumes_folder }}/webroot:/var/www/certbot
+{% endif %}
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
+{% if server_monitoring_nginx_healthcheck is defined %}
+    healthcheck:
+      {{ server_monitoring_nginx_healthcheck | to_nice_yaml | indent(6) }}
+{% endif %}
+    depends_on:
+      - cadvisor
+      - node-exporter
+{% endif %}
+
+  node-exporter:
+    image: {{ server_monitoring_node_exporter_image }}
+    container_name: node-exporter
+    restart: unless-stopped
+    user: "{{ server_monitoring_node_exporter_user_id }}:{{ server_monitoring_node_exporter_group_id }}"
+    network_mode: host
+    command:
+      - "--path.rootfs=/host"
+      - "--web.listen-address=0.0.0.0:{{ server_monitoring_node_exporter_private_port }}"
+{% if server_monitoring_node_exporter_textfile_collector_enabled %}
+      - "--collector.textfile.directory={{ server_monitoring_node_exporter_textfile_directory }}"
+{% endif %}
+{% for command in server_monitoring_node_exporter_extra_commands %}
+      - "{{ command }}"
+{% endfor %}
+    pid: "host"
+    volumes:
+      - /:/host:ro
+{% if server_monitoring_node_exporter_textfile_collector_enabled %}
+      - {{ server_monitoring_node_exporter_textfile_directory }}:{{ server_monitoring_node_exporter_textfile_directory }}
+{% endif %}
+
+{% if server_monitoring_cadvisor_enabled %}
+  cadvisor:
+    image: {{ server_monitoring_cadvisor_image }}
+    container_name: cadvisor
+    restart: unless-stopped
+    privileged: true
+    devices:
+      - /dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+{% endif %}
+
+{% if server_monitoring_extra_docker_services is defined %}
+  {{ server_monitoring_extra_docker_services | to_nice_yaml | indent(2) }}
+{% endif %}
