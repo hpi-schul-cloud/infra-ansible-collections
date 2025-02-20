@@ -73,6 +73,10 @@ server_monitoring_cadvisor_enabled: true
 server_monitoring_cadvisor_image: gcr.io/cadvisor/cadvisor:v0.49.2
 server_monitoring_cadvisor_public_port: 9300
 server_monitoring_cadvisor_private_port: 9299
+server_monitoring_cadvisor_user_id: 65534
+server_monitoring_cadvisor_group_id: 65534
+# Exposes cAdvisor outside of the Docker compose network, useful when not using the included Nginx
+server_monitoring_cadvisor_expose_port: false
 server_monitoring_cadvisor_resources:
   limits:
     cpus: '0.1'

@@ -85,6 +85,11 @@ services:
     image: {{ server_monitoring_cadvisor_image }}
     container_name: cadvisor
     restart: unless-stopped
+    user: "{{ server_monitoring_cadvisor_user_id }}:{{ server_monitoring_cadvisor_group_id }}"
+{% if server_monitoring_cadvisor_expose_port %}
+    ports:
+      - "{{ server_monitoring_cadvisor_private_port }}:8080"
+{% endif %}
     privileged: true
     devices:
       - /dev/kmsg
