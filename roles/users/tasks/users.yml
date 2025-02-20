@@ -1,5 +1,4 @@
 ---
-
   - name: create groups
     group:
       name: "{{ item.name }}"
@@ -17,7 +16,7 @@
     authorized_key:
       user: root
       state: present
-      key: "{{ lookup('file', 'sshkeys/technicaluser.pub') }}"
+      key: "{{ techncaluser_sshkey }}"
       exclusive: True
 
   - name: create users
@@ -71,7 +70,7 @@
     user: 
       name: technicaluser
       update_password: always
-      password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='technicaluser', vault='Infrastructure', session_shorthand='ansible-run', credentials=op_credentials, field='password')| string | password_hash('sha512')}}"
+      password: "{{ technicaluser_password }}"
 
   - name: remove users ( absent general )
     user:
