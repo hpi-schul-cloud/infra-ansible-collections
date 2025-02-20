@@ -1,9 +1,9 @@
 
 present_groups: []
-  - name: devops
-    gid: 1500
-    # If the devops group is missing we can't use sudo as technicaluser
-    allhosts: true
+  # - name: devops
+  #   gid: 1500
+  #   # If the devops group is missing we can't use sudo as technicaluser
+  #   allhosts: true
   # - name: support
   #   gid: 1600
   #   hosts:
