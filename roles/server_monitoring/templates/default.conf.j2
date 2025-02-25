@@ -1,0 +1,129 @@
+{% if server_monitoring_certbot_enabled %}
+server {
+    server_name acme-challenge;
+    
+    listen 80;
+    access_log  /var/log/nginx/acme-challenge.access.log;
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        deny all;
+        return 404;
+	}
+}
+
+server {
+    server_name acme-challenge-ssl;
+
+    listen 443 ssl;
+    ssl_certificate {{ certificates_path }}/fullchain.pem;
+    ssl_certificate_key {{ certificates_path }}/privkey.pem;
+    access_log  /var/log/nginx/acme-challenge-ssl.access.log;
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+    location / {
+        deny all;
+        return 404;
+	}
+}
+{% endif %}
+
+server {
+    server_name node-exporter;
+     
+    listen {{ server_monitoring_node_exporter_public_port }} ssl;
+    ssl_certificate {{ certificates_path }}/fullchain.pem;
+    ssl_certificate_key {{ certificates_path }}/privkey.pem;
+    access_log  /var/log/nginx/node-exporter.access.log;
+
+    location /metrics {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_redirect off;
+
+        auth_basic      "secured site tools";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        proxy_pass http://host.docker.internal:{{ server_monitoring_node_exporter_private_port }}/metrics;
+    }
+    location / {
+        deny all;
+        return 404;
+	}
+}
+
+{% if server_monitoring_cadvisor_enabled %}
+server {
+    server_name cadvisor;
+     
+    listen {{ server_monitoring_cadvisor_public_port }} ssl;
+    ssl_certificate /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/privkey.pem;
+    access_log  /var/log/nginx/cadvisor.access.log;
+
+    location /metrics {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_redirect off;
+
+        auth_basic      "secured site tools";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        proxy_pass http://cadvisor:8080/metrics;
+    }
+    location / {
+        deny all;
+        return 404;
+	}
+}
+{% endif %}
+
+{% for exporter in server_monitoring_extra_exporters %}
+server {
+    server_name {{ exporter.name }};
+     
+    listen {{ exporter.public_port }} ssl;
+    ssl_certificate {{ certificates_path }}/fullchain.pem;
+    ssl_certificate_key {{ certificates_path }}/privkey.pem;
+    access_log  /var/log/nginx/cadvisor.access.log;
+
+    location /metrics {
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host $http_host;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_redirect off;
+
+        auth_basic      "secured site tools";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+        proxy_pass http://{{ exporter.host | default('host.docker.internal') }}:{{ exporter.private_port }}/metrics;
+    }
+    location / {
+        deny all;
+        return 404;
+	}
+}
+{% endfor %}
+
+server {
+    server_name healthcheck;
+    
+    listen 127.0.0.1:80;
+    
+    location /health {
+        return 200;
+    }
+    location / {
+        deny all;
+        return 404;
+	}
+}
