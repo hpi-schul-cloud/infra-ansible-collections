@@ -35,7 +35,7 @@
         name: grafana-smtp
         namespace: monitoring
       spec:
-        itemPath: "vaults/{{ vault }}/items/grafana-smtp"
+        itemPath: "vaults/Infrastructure/items/grafana-smtp"
   tags: prometheus
 
 - name: Install Prometheus Stack
