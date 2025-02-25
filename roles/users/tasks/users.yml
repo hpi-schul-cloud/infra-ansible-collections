@@ -16,7 +16,7 @@
     authorized_key:
       user: root
       state: present
-      key: "{{ techncaluser_sshkey }}"
+      key: "{{ technicaluser_sshkey }}"
       exclusive: True
 
   - name: create users

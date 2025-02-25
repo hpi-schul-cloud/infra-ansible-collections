@@ -27,4 +27,4 @@ absent_users: []
 #  - name: hello.me
 #  - name: cute.dog
 technicaluser_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='technicaluser', vault='Infrastructure', session_shorthand='ansible-run', credentials=op_credentials, field='password')| string | password_hash('sha512')}}"
-techncaluser_sshkey: "{{ lookup('file', 'sshkeys/technicaluser.pub') }}"
+technicaluser_sshkey: "{{ lookup('file', 'sshkeys/technicaluser.pub') }}"
