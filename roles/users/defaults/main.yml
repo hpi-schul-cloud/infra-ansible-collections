@@ -1,0 +1,30 @@
+
+present_groups: []
+  # - name: devops
+  #   gid: 1500
+  #   # If the devops group is missing we can't use sudo as technicaluser
+  #   allhosts: true
+  # - name: support
+  #   gid: 1600
+  #   hosts:
+  #     - <ip or dnsname>
+present_users: []
+  # - name: technicaluser
+  #   uid: 2215          # Only needed if user has permissions for VMs, see below for how to find a uid for a new user
+  #   personal: False    # define whether the user is a technicaluser or a personal user
+  #   permissions:
+    #   kubernetes: # Optional
+    #     - hosts: <clusters where the user should have access>
+    #       role: <Name of the role the serviceaccount should be bound to on the clusters>
+    #     - <further host-role combinations)>
+    #   vms: # Optional
+    #     groups:
+    #       - <list of user groups>
+    #     hosts:
+    #       - <list of allow host>
+    #     allhosts: <true, alternative to listing all hosts>
+absent_users: []
+#  - name: hello.me
+#  - name: cute.dog
+technicaluser_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='technicaluser', vault='Infrastructure', session_shorthand='ansible-run', credentials=op_credentials, field='password')| string | password_hash('sha512')}}"
+technicaluser_sshkey: "{{ lookup('file', 'sshkeys/technicaluser.pub') }}"
