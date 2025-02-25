@@ -329,3 +329,18 @@ cloudprober_values:
       timeout_msec: 1000   # 1s
     }
     {% endif %}
+    {% if API_Hosts is defined  %}
+    probe {
+      name: "API"
+      type: HTTP
+      targets {
+        host_names: "{{ API_Hosts }}"
+      }
+      http_probe {
+        protocol: HTTPS
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
+
