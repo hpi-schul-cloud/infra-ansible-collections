@@ -21,15 +21,15 @@
             storage: "{{ prometheus_community_values.grafana.persistence.size }}"
   when: item.grafana.enabled
   tags: prometheus
-  
+
 - name: Create Kubernetes Secret for Grafana SMTP password
   kubernetes.core.k8s:
     state: present
-    kubeconfig: "/runner/.kube/infra-dev-collaboration-01.yaml"
-    proxy: "https://proxy.infra-dev-admin-01.dbildungscloud.dev:443"
-    proxy_headers: "{{ proxy_headers | default(omit) }}"
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
     definition:
-      apiVersion: onepassword.com/v1
+      apiVersion: v1
       kind: Secret
       metadata:
         name: grafana-smtp
@@ -38,6 +38,12 @@
       stringData:
         smtp_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='grafana-smtp', vault='Infrastructure', field='password', session_shorthand='ansible-run', credentials=op_credentials) }}"
   tags: prometheus
+
+
+
+
+    
+    
 
 - name: Install Prometheus Stack
   kubernetes.core.helm:
