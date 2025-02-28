@@ -18,8 +18,8 @@ server {
     server_name acme-challenge-ssl;
 
     listen 443 ssl;
-    ssl_certificate {{ certificates_path }}/fullchain.pem;
-    ssl_certificate_key {{ certificates_path }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/privkey.pem;
     access_log  /var/log/nginx/acme-challenge-ssl.access.log;
     
     location /.well-known/acme-challenge/ {
@@ -36,8 +36,8 @@ server {
     server_name node-exporter;
      
     listen {{ server_monitoring_node_exporter_public_port }} ssl;
-    ssl_certificate {{ certificates_path }}/fullchain.pem;
-    ssl_certificate_key {{ certificates_path }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/privkey.pem;
     access_log  /var/log/nginx/node-exporter.access.log;
 
     location /metrics {
@@ -91,8 +91,8 @@ server {
     server_name {{ exporter.name }};
      
     listen {{ exporter.public_port }} ssl;
-    ssl_certificate {{ certificates_path }}/fullchain.pem;
-    ssl_certificate_key {{ certificates_path }}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ server_monitoring_certificate_name }}/privkey.pem;
     access_log  /var/log/nginx/cadvisor.access.log;
 
     location /metrics {

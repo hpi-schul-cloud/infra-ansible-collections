@@ -11,6 +11,11 @@ docker_packages:
 server_monitoring_docker_compose_version: 1.25.5
 server_monitoring_docker_python_sdk_version: 5.0.3
 server_monitoring_docker_volumes_folder: /docker_volumes
+server_monitoring_create_ufw_rules: false
+server_monitoring_exporter_ports:
+  - "{{ [server_monitoring_node_exporter_private_port] }}"
+  - "{{ server_monitoring_cadvisor_enabled and server_monitoring_cadvisor_expose_port | ternary([server_monitoring_cadvisor_private_port], []) }}"
+  - "{{ (server_monitoring_extra_exporters | map(attribute='private_port')) }}"
 server_monitoring_folder: /server_monitoring
 server_monitoring_folder_permissions: "0700"
 server_monitoring_folder_owner: root
@@ -18,7 +23,7 @@ server_monitoring_folder_group: root
 server_monitoring_host_letsencrypt_folder: /etc/letsencrypt
 # server_monitoring_basic_auth_username:
 # server_monitoring_basic_auth_password:
-# server_monitoring_certificate_name:
+server_monitoring_certificate_name: "{{ inventory_hostname }}"
 
 server_monitoring_certbot_enabled: false
 server_monitoring_certbot_image: certbot/certbot:v2.11.0

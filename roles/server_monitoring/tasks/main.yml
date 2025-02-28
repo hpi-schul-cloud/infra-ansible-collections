@@ -121,3 +121,18 @@
   community.docker.docker_compose:
     project_src: "{{ server_monitoring_folder }}"
     remove_orphans: true
+
+- name: Get Docker bridge network info
+  community.docker.docker_network_info:
+    name: "{{ server_monitoring_folder | basename }}_default"
+  register: network_info
+  when: server_monitoring_create_ufw_rules
+
+- name: Allow access from Docker network in ufw
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    from_ip: "{{ network_info.network.IPAM.Config[0].Subnet }}"
+    proto: tcp
+  loop: "{{ server_monitoring_exporter_ports | flatten }}"
+  when: server_monitoring_create_ufw_rules
