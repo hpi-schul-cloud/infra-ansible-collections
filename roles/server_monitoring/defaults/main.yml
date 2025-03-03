@@ -69,7 +69,7 @@ server_monitoring_node_exporter_resources:
     cpus: '0.01'
     memory: '6M'
 server_monitoring_node_exporter_healthcheck:
-  test: ["CMD", "wget", "-q", "http://127.0.0.1:{{ server_monitoring_node_exporter_private_port }}", "-O", "/tmp/health"]
+  test: ["CMD", "wget", "-q", "http://127.0.0.1:{{ server_monitoring_node_exporter_private_port }}", "-O", "-"]
   interval: 10s
   timeout: 10s
   retries: 3
