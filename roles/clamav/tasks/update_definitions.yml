@@ -1,0 +1,59 @@
+---
+# This directory will store the ClamAV virus definition database files
+- name: Create ClamAV database directory
+  become: true
+  file:
+    path: "{{ clamav_db_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create ClamAV scan directory
+  become: true
+  file:
+    path: "{{ clamav_scan_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create ClamAV quarantine directory
+  become: true
+  file:
+    path: "{{ clamav_quarantine_path }}" # Infizierte Dateien werden hier gespeichert
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  
+# die Konfigurationsdatei von freshclam
+- name: Configure freshclam
+  become: true
+  template:
+    src: freshclam.conf.j2
+    dest: /etc/clamav/freshclam.conf
+    owner: root
+    group: root
+    mode: 0644
+    
+    
+# FreshClam ist ein Tool, das die ClamAV-Datenbank aktualisiert
+# freshclam lädt die neuesten Virensignaturen von ClamAV-Servern herunter
+- name: Run freshclam container to update definitions
+  become: true
+  docker_container:
+    name: "{{ clamav_freshclam_container_name }}"
+    image: "{{ clamav_image }}" 
+    restart_policy: no # Der Container wird nach dem Update gestoppt und gelöscht
+    volumes:
+      - "{{ clamav_db_path }}:/data"
+    command: freshclam
+    detach: false #  Do not run in detached mode. Keep the execution tied to the ansible host
+    remove: true # # Clean up and remove the container when finished
+  register: freshclam_result
+  failed_when: "'ERROR' in freshclam_result.stdout"
+
+- name: Log freshclam Update Result
+  debug:
+    msg: "{{ freshclam_result.stdout }}"

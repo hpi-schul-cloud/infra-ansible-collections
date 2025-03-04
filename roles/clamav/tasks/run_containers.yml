@@ -1,0 +1,15 @@
+---
+# This task is used for running a prebuild docker image and configure variables
+- name: Run ClamAV Scan Container 
+  become: true
+  docker_container:
+    name: "{{ clamav_container_name }}"
+    image: "{{ clamav_image }}"
+    state: started
+    restart_policy: unless-stopped # restart_policy: unless-stopped stellt sicher, dass der Scanner immer läuft, es sei denn, er wird bewusst gestoppt 
+    volumes: 
+      - "{{ clamav_db_path }}:/data:ro"  # Die ClamAV-Datenbank (/var/clamav-db auf dem Host) wird in den Container gemountet.
+      - "{{ clamav_scan_directory }}:/scanned:ro"  # Das Verzeichnis, das gescannt werden soll (/), wird als /scanned in den Container gemountet.
+      - "{{ clamav_quarantine_path }}:/quarantine" # Falls ClamAV eine infizierte Datei findet, verschiebt es sie nach /quarantine
+    ports: 
+      - "3310:3310" # ClamAV kann über Port 3310 Scan-Anfragen erhalten
