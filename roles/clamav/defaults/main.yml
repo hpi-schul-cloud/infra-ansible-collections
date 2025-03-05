@@ -1,14 +1,14 @@
-clamav_image: "clamav/clamav"  
+clamav_image: "clamav/clamav:1.4.2"  
 clamav_container_name: "clamav-scan" 
 clamav_freshclam_container_name: "clamav-freshclam"
 
 clamav_scan_directory: "/" 
-clamav_db_path: "/var/clamav-db"  # default is /var/lib/clamav using var/clamav-db allows us to control the permissions better to non-root
-clamav_quarantine_path: "/var/clamav-quarantine" 
+clamav_db_path: "/var/lib/clamav"  # default is /var/lib/clamav
+clamav_quarantine_path: "/var/lib/clamav-quarantine" 
 clamav_scan_log: "/var/log/clamav_scan.log" 
 
 clamav_enable_auto_scan: true 
-clamav_cron_schedule: "0 10 * * *" 
+clamav_cron_schedule: "0 23 * * *" 
 
 clamav_scan_exclude_directories:
   - "/dev/*"
@@ -31,4 +31,4 @@ clamav_scan_exclude_directories:
   - "/var/lib/update-manager/*"  
   - "/var/lib/usb_modeswitch/*" 
 
-clamav_scan_options: "-r --move=/quarantine"
+clamav_scan_options: "-r --move=/var/lib/clamav-quarantine"

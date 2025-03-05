@@ -1,5 +1,4 @@
 ---
 - import_tasks: pull_image.yml 
 - import_tasks: update_definitions.yml
-- import_tasks: run_containers.yml 
 - import_tasks: schedule_scan.yml
