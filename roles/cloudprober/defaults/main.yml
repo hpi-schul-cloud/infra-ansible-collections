@@ -94,6 +94,59 @@ cloudprober_values:
       }
     }
     {% endif %}
+    {% if Loki_Ingress is defined %}
+    probe {
+      name: "Loki_Probe"
+      type: HTTP
+      targets {
+        k8s {
+          namespace: "{{ cloudprober_namespace }}"
+          endpoints: "{{ Loki_Ingress }}"
+        }
+      }
+      http_probe {
+        header {
+          key: "Authorization"
+          value: "Basic {{'{{env "loki_secret"}}'}}"  # loki_secret stored in 1Password cloudprober as password with content: echo -n "<user>:<password>" | base64 
+          }
+        latency_breakdown: ALL_STAGES
+      }
+      validator {
+        name: "status_code_200"
+        http_validator {
+          success_status_codes: "200"
+        }
+      }
+      interval_msec: 2000
+      timeout_msec:  1000      
+    }          
+    {% endif %}
+    {% if Vmagent_Ingress is defined %}
+    probe {
+      name: "Vmagent_Probe"
+      type: HTTP
+      targets {
+        k8s {
+          namespace: "{{ cloudprober_namespace }}"
+          endpoints: "{{ Vmagent_Ingress }}"
+        }
+      }
+      http_probe {
+        relative_url: "/health"
+        latency_breakdown: ALL_STAGES
+        header {
+          key: "Authorization"
+          value: "Basic {{'{{env "vmagent_secret"}}'}}" # vmagent_secret stored in 1Password cloudprober as password with content: echo -n "<user>:<password>" | base64 
+        }
+      }
+      validator {
+        name: "data-integrity"
+        integrity_validator {
+          pattern_string: "OK"
+        }
+      }
+    }
+    {% endif %}
 
     probe {
       name: "K8S_Api"
