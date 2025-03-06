@@ -1,0 +1,138 @@
+---
+- name: Checks
+  assert:
+    that:
+      - server_monitoring_certbot_group_id == server_monitoring_nginx_group_id
+    fail_msg: "Certbot and Nginx should run as the same group to access the certificates"
+  when: server_monitoring_certbot_enabled and server_monitoring_nginx_enabled
+
+- name: Install Docker
+  import_role:
+    name: geerlingguy.docker
+
+- name: Install python3-pip
+  apt:
+    name: python3-pip
+
+- name: Install Python Docker SDK
+  pip:
+    name:
+      - docker=={{ server_monitoring_docker_python_sdk_version }}
+      - docker-compose=={{ server_monitoring_docker_compose_version }}
+
+- name: Create monitoring folder
+  file:
+    state: directory
+    path: "{{ server_monitoring_folder }}"
+    mode: "{{ server_monitoring_folder_permissions }}"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+
+- name: Create Docker volumes folder
+  file:
+    state: directory
+    path: "{{ server_monitoring_docker_volumes_folder }}"
+    mode: "0700"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+
+- name: Create Docker certbot folder
+  file:
+    state: directory
+    path: "{{ server_monitoring_docker_volumes_folder }}/certbot/"
+    mode: "0700"
+    owner: "{{ server_monitoring_certbot_user_id }}"
+    group: "{{ server_monitoring_certbot_group_id }}"
+  when: server_monitoring_certbot_enabled
+
+- name: Create Docker Nginx folder
+  file:
+    state: directory
+    path: "{{ server_monitoring_docker_volumes_folder }}/nginx"
+    mode: "0700"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled
+
+- name: Create Certbot config
+  copy:
+    content: "{{ server_monitoring_certbot_config }}"
+    dest: "{{ server_monitoring_host_letsencrypt_folder }}/cli.ini"
+    mode: "0750"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+  when: server_monitoring_certbot_enabled
+
+- name: Create Docker webroot folder
+  file:
+    state: directory
+    path: "{{ server_monitoring_docker_volumes_folder }}/webroot/"
+    mode: "0770"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled and server_monitoring_certbot_enabled
+
+- name: Create nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: "{{ server_monitoring_docker_volumes_folder }}/nginx/nginx.conf"
+    mode: "0600"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled
+
+- name: Create default.conf
+  template:
+    src: default.conf.j2
+    dest: "{{ server_monitoring_docker_volumes_folder }}/nginx/default.conf"
+    mode: "0600"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled
+
+- name: Copy basic auth user
+  community.general.htpasswd:
+    path: "{{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd"
+    name: "{{ server_monitoring_basic_auth_username }}"
+    password: "{{ server_monitoring_basic_auth_password }}"
+    mode: "0600"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled
+
+- name: Set log permissions
+  file:
+    path: "{{ server_monitoring_nginx_logs_folder }}"
+    mode: "0750"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+    recurse: true
+  when: server_monitoring_nginx_enabled
+
+- name: Copy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ server_monitoring_folder }}/docker-compose.yml"
+    mode: "0600"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+
+- name: Docker-compose up
+  community.docker.docker_compose:
+    project_src: "{{ server_monitoring_folder }}"
+    remove_orphans: true
+
+- name: Get Docker bridge network info
+  community.docker.docker_network_info:
+    name: "{{ server_monitoring_folder | basename }}_default"
+  register: network_info
+  when: server_monitoring_create_ufw_rules
+
+- name: Allow access from Docker network in ufw
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    from_ip: "{{ network_info.network.IPAM.Config[0].Subnet }}"
+    proto: tcp
+  loop: "{{ server_monitoring_exporter_ports | flatten }}"
+  when: server_monitoring_create_ufw_rules
