@@ -93,6 +93,18 @@ bbb_prometheus_scalelite_cadvisor_job:
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
+bbb_prometheus_scalelite_postgresexporter_job:
+  job_name: "{{ bbb_instance_name }}-scalelite-postgresexporter"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - "{{ scalelite_host }}:9188"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_scalelite_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
+
 bbb_prometheus_bbb_job:
   job_name: "{{ bbb_instance_name }}"
   scheme: https
