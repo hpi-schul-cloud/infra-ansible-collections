@@ -175,7 +175,7 @@ bbb_prometheus_turn_node_exporter_job:
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
 
-bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) + ([bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else []) + ([bbb_prometheus_scalelite_cadvisor_job] if scalelite_cadvisor_enabled else []) }}"
+bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) + ([bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else []) + ([bbb_prometheus_scalelite_cadvisor_job] if scalelite_cadvisor_enabled else []) + ([bbb_prometheus_scalelite_postgresexporter_job] if scalelite_postgresexporter_enabled else []) }}"
 
 bbb_prometheus_servers_only_scrape_config:
   - "{{ bbb_prometheus_bbb_job }}"
