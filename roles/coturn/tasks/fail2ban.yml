@@ -1,0 +1,18 @@
+---
+- name: Create filter file for fail2ban
+  copy:
+    content: "{{ coturn_fail2ban_filter }}"
+    dest: /etc/fail2ban/filter.d/turn-auth-fail.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban
+
+- name: Create jail file for fail2ban
+  copy:
+    content: "{{ coturn_fail2ban_jail }}"
+    dest: /etc/fail2ban/jail.d/jail.local
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban

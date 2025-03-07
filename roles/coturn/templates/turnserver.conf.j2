@@ -1,0 +1,78 @@
+# Settings taken from BBB Coturn installation script:
+# https://github.com/bigbluebutton/bbb-install/blob/master/bbb-install-2.5.sh#L975
+
+# These are the two network ports used by the TURN server which the client
+# may connect to. We enable the standard unencrypted port 3478 for STUN,
+# as well as port 443 for TURN over TLS, which can bypass firewalls.
+listening-port={{ coturn_listening_port }}
+tls-listening-port={{ coturn_tls_listening_port }}
+min-port={{ coturn_min_port }}
+max-port={{ coturn_max_port }}
+{% if coturn_verbose %}
+verbose
+{% endif %}
+new-log-timestamp
+# Enable logging of binding requests for fail2ban filters
+log-binding
+# log to a file, which can be read from outside the container
+log-file=/var/log/turnserver/turn.log
+# this makes the logfile not have date and pid, useful for using logrotate after
+simple-log
+# Fingerprints in TURN messages are required for WebRTC
+fingerprint
+# The long-term credential mechanism is required for WebRTC
+lt-cred-mech
+# Configure coturn to use the "TURN REST API" method for validating time-
+# limited credentials. BigBlueButton will generate credentials in this
+# format. Note that the static-auth-secret value specified here must match
+# the configuration in BigBlueButton's turn-stun-servers.xml
+# You can generate a new random value by running the command:
+#   openssl rand -hex 16
+use-auth-secret
+{% for secret in coturn_static_auth_secret %}
+static-auth-secret={{ secret }}
+{% endfor %}
+realm={{ coturn_realm }}
+# Configure TLS support.
+# Adjust these paths to match the locations of your certificate files
+cert={{ coturn_certificates_path }}/fullchain.pem
+pkey={{ coturn_certificates_path }}/privkey.pem
+# From https://ssl-config.mozilla.org/ Intermediate, openssl 1.1.0g, 2020-01
+cipher-list="ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384"
+dh-file=/etc/coturn/dhp.pem
+keep-address-family
+no-cli
+no-tlsv1
+no-tlsv1_1
+no-multicast-peers
+{% if coturn_metrics_enabled %}
+prometheus
+{% endif %}
+
+# Disable RFC5780 (NAT behavior discovery).
+#
+# Originally, if there are more than one listener address from the same
+# address family, then by default the NAT behavior discovery feature enabled.
+# This option disables the original behavior, because the NAT behavior
+# discovery adds extra attributes to response, and this increase the
+# possibility of an amplification attack.
+#
+# Strongly encouraged to use this option to decrease gain factor in STUN
+# binding responses.
+#
+no-rfc5780
+
+# Disable handling old STUN Binding requests and disable MAPPED-ADDRESS
+# attribute in binding response (use only the XOR-MAPPED-ADDRESS).
+#
+# Strongly encouraged to use this option to decrease gain factor in STUN
+# binding responses.
+#
+no-stun-backward-compatibility
+
+# Only send RESPONSE-ORIGIN attribute in binding response if RFC5780 is enabled.
+#
+# Strongly encouraged to use this option to decrease gain factor in STUN
+# binding responses.
+#
+response-origin-only-with-rfc5780

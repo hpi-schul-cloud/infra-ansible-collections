@@ -1,0 +1,68 @@
+---
+coturn_user_id: 65534
+coturn_group_id: 65534
+coturn_config: "{{ lookup('template', 'turnserver.conf.j2') }}"
+coturn_static_auth_secrets: []
+coturn_realm: "{{ inventory_hostname }}"
+
+coturn_certificates_folder: /etc/letsencrypt
+coturn_certificates_user_id: 0
+coturn_certificates_group_id: "{{ coturn_group_id }}"
+coturn_certificates_path: "{{ coturn_certificates_folder }}/live/{{ coturn_realm }}"
+coturn_listening_port: 3478
+coturn_tls_listening_port: 443
+coturn_min_port: 32769
+coturn_max_port: 65534
+# Docker has issues with large port ranges, so we use host network mode instead
+# See https://github.com/instrumentisto/coturn-docker-image/issues/3
+coturn_docker_network_mode_host: true
+coturn_container_ports:
+  - "{{ coturn_listening_port }}:{{ coturn_listening_port }}"
+  - "{{ coturn_listening_port }}:{{ coturn_listening_port }}/udp"
+  - "{{ coturn_min_port }}-{{ coturn_max_port }}:{{ coturn_min_port }}-{{ coturn_max_port }}/udp"
+coturn_metrics_enabled: true
+coturn_verbose: true
+coturn_docker_image: coturn/coturn:4.6.2-r5-alpine
+coturn_docker_compose_folder: /coturn
+coturn_docker_compose_folder_owner: 0
+coturn_docker_compose_folder_group: 0
+
+coturn_log_folder: /var/log/turnserver
+coturn_logrotate_config: |
+  /var/log/turnserver/*.log {
+    rotate 14
+    daily
+    compress
+    missingok
+    delaycompress
+    copytruncate
+  }
+
+coturn_container_name: coturn
+coturn_container_health_check:
+  test: ["CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/3478"]
+  interval: 30s
+  retries: 3
+  timeout: 30s
+coturn_container_resources:
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+coturn_fail2ban_filter: |
+  [Init]
+  # Enables search over 2 lines
+  maxlines = 2
+  [Definition]
+  # Since error logs are on a different line than the IP, we need to scan 2 lines.
+  # The first case is the regular one, the second might happen with multiple, rapid requests but is more rare
+  failregex = ^.*: INFO: handle_udp_packet: .* remote addr <HOST>:\d+\n.*: INFO: .* error 401: Unauthorized$
+              ^.*: INFO: handle_udp_packet: .* remote addr <HOST>:\d+\n.*ERROR: check_stun_auth: Cannot find credentials of user <.*>$
+  ignoreregex =
+coturn_fail2ban_jail: |
+  [turn-auth-fail]
+  enabled = true
+  filter = turn-auth-fail
+  logpath = /var/log/turnserver/turn.log
+  maxretry = 3
+  bantime = 3600
