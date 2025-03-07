@@ -1,0 +1,32 @@
+---
+- name: Enable ufw
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Allow OpenSSH
+  ufw:
+    rule: allow
+    name: OpenSSH
+
+# See https://docs.bigbluebutton.org/admin/setup-turn-server.html#required-ports
+- name: Allow TCP Ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - 443
+    - 9100
+    - 9642
+    - 3478
+
+- name: Allow UDP Ports
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: udp
+  loop:
+    - 443
+    - 3478
+    - 34769:65534

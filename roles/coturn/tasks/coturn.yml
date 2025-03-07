@@ -1,0 +1,73 @@
+---
+- name: Copy turnserver configuration
+  template:
+    src: turnserver.conf.j2
+    dest: /etc/turnserver.conf
+    mode: "0600"
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+  notify: Restart Coturn
+
+- name: Creating Coturn DH parameters next, this can take some time
+  debug:
+    msg: ""
+
+- name: Create Nginx DH parameters
+  openssl_dhparam:
+    path: /etc/turn-dhp.pem
+    size: 4096
+    mode: "0640"
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+  notify: Restart Coturn
+
+- name: Set certificates folder ownership and permissions
+  file:
+    path: "{{ coturn_certificates_folder }}"
+    state: directory
+    owner: "{{ coturn_certificates_user_id }}"
+    group: "{{ coturn_certificates_group_id }}"
+    recurse: true
+    mode: "0750"
+
+- name: Create Coturn log folder and set ownership and permissiosn
+  ansible.builtin.file:
+    path: "{{ coturn_log_folder }}"
+    state: directory
+    mode: "0771"
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+
+- name: Create Coturn log file and set ownership and permissiosn
+  ansible.builtin.file:
+    path: "{{ coturn_log_folder }}/turn.log"
+    state: touch
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+    mode: '0640'
+
+- name: Create Coturn docker container
+  community.docker.docker_container:
+    state: started
+    name: "{{ coturn_container_name }}"
+    image: "{{ coturn_docker_image }}"
+    user: "{{ coturn_user_id }}"
+    network_mode: host
+    restart_policy: unless-stopped
+    healthcheck: "{{ coturn_container_health_check }}"
+    cpus: "{{ coturn_container_cpus }}"
+    kernel_memory: "{{ coturn_container_kernel_memory }}"
+    volumes:
+      - /etc/turnserver.conf:/etc/coturn/turnserver.conf:ro
+      - /etc/turn-dhp.pem:/etc/coturn/dhp.pem:ro
+      - "{{ coturn_certificates_folder }}/:/etc/letsencrypt/:ro"
+      - /var/log/turnserver/turn.log:/var/log/turnserver/turn.log:rw
+    container_default_behavior: no_defaults
+    capabilities:
+      - cap_net_bind_service
+
+- name: Create Turn logrotate config
+  copy:
+    content: "{{ coturn_logrotate_config }}"
+    dest: /etc/logrotate.d/turnserver
+    mode: "0644"
