@@ -90,7 +90,7 @@ services:
     ports:
       - "{{ server_monitoring_cadvisor_private_port }}:8080"
 {% endif %}
-    privileged: true
+    privileged: {{ server_monitoring_cadvisor_privileged }}
     devices:
       - /dev/kmsg
     volumes:
