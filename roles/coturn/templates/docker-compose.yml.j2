@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  coturn:
+    image: {{ coturn_docker_image }}
+    container_name: coturn
+    user: "{{ coturn_user_id }}:{{ coturn_group_id }}"
+{% if coturn_docker_network_mode_host %}
+    network_mode: host
+{% else %}
+    ports:
+{% for port in coturn_container_ports %}
+      - "{{ port }}"
+{% endfor %}
+{% endif %}
+    restart: unless-stopped
+    healthcheck:
+      {{ coturn_container_health_check | to_nice_yaml | indent(6) }}
+    deploy:
+      resources:
+        {{ coturn_container_resources | to_nice_yaml | indent(8) }}
+    volumes:
+      - /etc/turnserver.conf:/etc/coturn/turnserver.conf:ro
+      - /etc/turn-dhp.pem:/etc/coturn/dhp.pem:ro
+      - "{{ coturn_certificates_folder }}/:/etc/letsencrypt/:ro"
+      - /var/log/turnserver/turn.log:/var/log/turnserver/turn.log:rw
+    cap_add:
+      - NET_BIND_SERVICE

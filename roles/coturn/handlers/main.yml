@@ -1,7 +1,4 @@
 ---
-- name: Reboot
-  reboot:
-
 - name: Restart Fail2ban
   systemd:
     name: fail2ban

@@ -13,20 +13,27 @@
 - name: Allow TCP Ports
   ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ item.port }}"
     proto: tcp
+    comment: "{{ item.comment }}"
   loop:
-    - 443
-    - 9100
-    - 9642
-    - 3478
+    - port: 9642
+      comment: Coturn metrics
+    - port: "{{ coturn_listening_port }}"
+      comment: Coturn listening port
+    - port: "{{ coturn_tls_listening_port }}"
+      comment: Coturn TLS listening port
 
 - name: Allow UDP Ports
   ufw:
     rule: allow
-    port: "{{ item }}"
+    port: "{{ item.port }}"
     proto: udp
+    comment: "{{ item.comment }}"
   loop:
-    - 443
-    - 3478
-    - 34769:65534
+    - port: "{{ coturn_listening_port }}"
+      comment: Coturn listening port
+    - port: "{{ coturn_tls_listening_port }}"
+      comment: Coturn TLS listening port
+    - port: "{{ coturn_min_port }}:{{ coturn_max_port }}"
+      comment: Coturn UDP ports

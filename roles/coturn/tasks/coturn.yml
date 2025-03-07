@@ -46,25 +46,26 @@
     group: "{{ coturn_group_id }}"
     mode: '0640'
 
-- name: Create Coturn docker container
-  community.docker.docker_container:
-    state: started
-    name: "{{ coturn_container_name }}"
-    image: "{{ coturn_docker_image }}"
-    user: "{{ coturn_user_id }}"
-    network_mode: host
-    restart_policy: unless-stopped
-    healthcheck: "{{ coturn_container_health_check }}"
-    cpus: "{{ coturn_container_cpus }}"
-    kernel_memory: "{{ coturn_container_kernel_memory }}"
-    volumes:
-      - /etc/turnserver.conf:/etc/coturn/turnserver.conf:ro
-      - /etc/turn-dhp.pem:/etc/coturn/dhp.pem:ro
-      - "{{ coturn_certificates_folder }}/:/etc/letsencrypt/:ro"
-      - /var/log/turnserver/turn.log:/var/log/turnserver/turn.log:rw
-    container_default_behavior: no_defaults
-    capabilities:
-      - cap_net_bind_service
+- name: Create Coturn Docker-Compose folder
+  file:
+    path: "{{ coturn_docker_compose_folder }}"
+    state: directory
+    mode: "0750"
+    owner: "{{ coturn_docker_compose_folder_owner }}"
+    group: "{{ coturn_docker_compose_folder_group }}"
+
+- name: Create Coturn Docker-Compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ coturn_docker_compose_folder }}/docker-compose.yml"
+    mode: "0600"
+    owner: "{{ coturn_docker_compose_folder_owner }}"
+    group: "{{ coturn_docker_compose_folder_group }}"
+
+- name: Docker-compose up
+  community.docker.docker_compose:
+    project_src: "{{ coturn_docker_compose_folder }}"
+    remove_orphans: true
 
 - name: Create Turn logrotate config
   copy:
