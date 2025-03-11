@@ -134,5 +134,21 @@
     port: "{{ item }}"
     from_ip: "{{ network_info.network.IPAM.Config[0].Subnet }}"
     proto: tcp
-  loop: "{{ server_monitoring_exporter_ports | flatten }}"
+  loop: "{{ server_monitoring_exporter_private_ports | flatten }}"
   when: server_monitoring_create_ufw_rules
+
+- name: Create Fail2ban jail
+  copy:
+    content: |
+      [nginx-http-auth]
+      enabled = true
+      port = {{ server_monitoring_exporter_public_ports | flatten | join(",") }}
+      logpath = {{ server_monitoring_nginx_logs_folder }}/error.log
+      maxretry = 3
+      bantime = 3600
+    dest: /etc/fail2ban/jail.d/server-monitoring.local
+    owner: root
+    group: root
+    mode: "0644"
+  when: server_monitoring_create_fail2ban_jail
+  notify: Restart Fail2ban

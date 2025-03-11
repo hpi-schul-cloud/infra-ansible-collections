@@ -1,0 +1,39 @@
+---
+- name: Enable ufw
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Allow OpenSSH
+  ufw:
+    rule: allow
+    name: OpenSSH
+
+# See https://docs.bigbluebutton.org/admin/setup-turn-server.html#required-ports
+- name: Allow TCP Ports
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: tcp
+    comment: "{{ item.comment }}"
+  loop:
+    - port: 9642
+      comment: Coturn metrics
+    - port: "{{ coturn_listening_port }}"
+      comment: Coturn listening port
+    - port: "{{ coturn_tls_listening_port }}"
+      comment: Coturn TLS listening port
+
+- name: Allow UDP Ports
+  ufw:
+    rule: allow
+    port: "{{ item.port }}"
+    proto: udp
+    comment: "{{ item.comment }}"
+  loop:
+    - port: "{{ coturn_listening_port }}"
+      comment: Coturn listening port
+    - port: "{{ coturn_tls_listening_port }}"
+      comment: Coturn TLS listening port
+    - port: "{{ coturn_min_port }}:{{ coturn_max_port }}"
+      comment: Coturn UDP ports

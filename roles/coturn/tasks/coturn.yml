@@ -1,0 +1,74 @@
+---
+- name: Copy turnserver configuration
+  template:
+    src: turnserver.conf.j2
+    dest: /etc/turnserver.conf
+    mode: "0600"
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+  notify: Restart Coturn
+
+- name: Creating Coturn DH parameters next, this can take some time
+  debug:
+    msg: ""
+
+- name: Create Nginx DH parameters
+  openssl_dhparam:
+    path: /etc/turn-dhp.pem
+    size: 4096
+    mode: "0640"
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+  notify: Restart Coturn
+
+- name: Set certificates folder ownership and permissions
+  file:
+    path: "{{ coturn_certificates_folder }}"
+    state: directory
+    owner: "{{ coturn_certificates_user_id }}"
+    group: "{{ coturn_certificates_group_id }}"
+    recurse: true
+    mode: "0750"
+
+- name: Create Coturn log folder and set ownership and permissiosn
+  ansible.builtin.file:
+    path: "{{ coturn_log_folder }}"
+    state: directory
+    mode: "0771"
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+
+- name: Create Coturn log file and set ownership and permissiosn
+  ansible.builtin.file:
+    path: "{{ coturn_log_folder }}/turn.log"
+    state: touch
+    owner: "{{ coturn_user_id }}"
+    group: "{{ coturn_group_id }}"
+    mode: '0640'
+
+- name: Create Coturn Docker-Compose folder
+  file:
+    path: "{{ coturn_docker_compose_folder }}"
+    state: directory
+    mode: "0750"
+    owner: "{{ coturn_docker_compose_folder_owner }}"
+    group: "{{ coturn_docker_compose_folder_group }}"
+
+- name: Create Coturn Docker-Compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ coturn_docker_compose_folder }}/docker-compose.yml"
+    mode: "0600"
+    owner: "{{ coturn_docker_compose_folder_owner }}"
+    group: "{{ coturn_docker_compose_folder_group }}"
+
+- name: Docker-compose up
+  community.docker.docker_compose:
+    project_src: "{{ coturn_docker_compose_folder }}"
+    remove_orphans: true
+
+- name: Create Turn logrotate config
+  copy:
+    content: "{{ coturn_logrotate_config }}"
+    dest: /etc/logrotate.d/turnserver
+    mode: "0644"
