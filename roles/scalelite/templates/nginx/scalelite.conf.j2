@@ -13,9 +13,6 @@ server {
 
 
 server {
-  # generated 2020-02-14, Mozilla Guideline v5.4, nginx 1.16.1, OpenSSL 1.1.1d, intermediate configuration
-  # https://ssl-config.mozilla.org/#server=nginx&version=1.16.1&config=intermediate&openssl=1.1.1d&guideline=5.4
-
   server_name {{ scalelite_hostname }};
   listen 443 ssl http2;
   listen [::]:443 ssl http2;

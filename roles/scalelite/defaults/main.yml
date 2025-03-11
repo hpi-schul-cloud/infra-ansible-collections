@@ -8,8 +8,11 @@ scalelite_certbot_image: certbot/certbot:v2.11.0
 # Custom UID to run certbot as
 scalelite_certbot_user_id: 9999
 scalelite_certbot_group_id: 9999
-# scalelite_certbot_os_access_key:
-# scalelite_certbot_os_secret_key:
+# scalelite_certbot_terraform_telekom_os_access_key:
+# scalelite_certbot_terraform_telekom_os_secret_key:
+# scalelite_certbot_terraform_telekom_domain:
+# scalelite_certbot_terraform_telekom_tenant:
+# scalelite_certbot_terraform_telekom_dns_zone_id:
 # scalelite_certbot_terraform_state_bucket:
 # scalelite_certbot_terraform_state_key:
 # scalelite_certbot_terraform_state_region:
@@ -39,6 +42,7 @@ scalelite_greenlight_allow_mail_notifications: true
 # scalelite_greenlight_smtp_username:
 # scalelite_greenlight_smtp_password:
 # scalelite_greenlight_smtp_auth:
+# scalelite_greenlight_smtp_sender
 # scalelite_bbb_tenant_api_key:
 scalelite_greenlight_smtp_auth: plain
 scalelite_greenlight_smtp_starttls_auto: true
@@ -140,7 +144,6 @@ scalelite_api_resources:
 scalelite_hostname: "{{ inventory_hostname }}"
 scalelite_letsencrypt_folder: /etc/letsencrypt
 scalelite_terraform_workspace: prod
-scalelite_dns_zone_id: 1234
 scalelite_bbb_dialin_enabled: false
 scalelite_metrics_basic_auth_username: metrics-user
 # scalelite_metrics_basic_auth_password:

@@ -2,9 +2,9 @@
 
 echo "Installing Terraform";
 opsys=linux;
-version=0.13.6;
+version=1.5.4;
 wget -O /tmp/terraform_${version}_${opsys}_amd64.zip https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${opsys}_amd64.zip 2>&1;
-unzip /tmp/terraform_${version}_${opsys}_amd64.zip -d /tmp/;
+unzip /tmp/terraform_${version}_${opsys}_amd64.zip -o -d /tmp/;
 
 set -e
 echo "Updating main.tf";

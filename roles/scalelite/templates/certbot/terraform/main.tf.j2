@@ -35,7 +35,7 @@ provider "opentelekomcloud" {
 }
 
 resource "opentelekomcloud_dns_recordset_v2" "a_records" {
-  zone_id     = "{{ scalelite_dns_zone_id }}"
+  zone_id     = "{{ scalelite_certbot_terraform_telekom_dns_zone_id }}"
   name        = "_acme-challenge.{{ scalelite_hostname }}."
   ttl         = 300
   type        = "TXT"
