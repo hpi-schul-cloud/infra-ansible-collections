@@ -1,10 +1,8 @@
-clamav_image: "clamav/clamav:1.4.2"  
+clamav_image: ""  
 clamav_container_name: "clamav-scan" 
-clamav_scan_directory: "/"
-clamav_db_path: "/var/lib/clamav" 
-clamav_quarantine_path: "/var/lib/clamav-quarantine" 
+clamav_scan_directory: ""
 clamav_log_path: "/var/log/clamav"
-clamav_enable_auto_scan: true 
+clamav_enable_auto_scan: false
 clamav_scan_exclude_directories:
   - "/dev/*"
   - "/proc/*"
@@ -25,3 +23,7 @@ clamav_scan_exclude_directories:
   - "/var/lib/tpm/*"  
   - "/var/lib/update-manager/*"  
   - "/var/lib/usb_modeswitch/*" 
+clamav_useruid: ""
+clamav_user_group: ""
+clamav_username: "" 
+clamav_port: "" 

@@ -1,37 +1,12 @@
 ---
-- name: Add clamav user to docker group
+- name: Add clamav user to designated group  
   become: true
   user:
-    name: clamav
-    groups: docker
+    name: "{{ clamav_username }}" 
+    uid: "{{ clamav_useruid }}"
+    groups: "{{ clamav_user_group }}"
     append: yes
-
-- name: Create ClamAV log directory
-  file:
-    path: "{{ clamav_log_path }}"
-    state: directory
-    owner: clamav
-    group: docker
-    mode: "0775"
-  become: true
-
-- name: Create ClamAV database directory
-  become: true
-  file:
-    path: "{{ clamav_db_path }}"
-    state: directory
-    owner: clamav
-    group: root
-    mode: 0755
-
-- name: Create ClamAV quarantine directory
-  become: true
-  file:
-    path: "{{ clamav_quarantine_path }}"
-    state: directory
-    owner: clamav
-    group: root
-    mode: 0755
+  when: clamav_enable_auto_scan
 
 - name: Run ClamAV Scan Container 
   become: true
@@ -41,9 +16,10 @@
     state: started
     restart_policy: unless-stopped 
     volumes: 
-      - "{{ clamav_db_path }}:{{ clamav_db_path }}:rw"  
-      - "{{ clamav_scan_directory }}:/scanned:rw"  
-      - "{{ clamav_quarantine_path }}:/quarantine:rw"
-      - "{{ clamav_log_path }}:/var/log/clamav:rw"
+      - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory is defined else omit }}"
+      - "{{ clamav_log_path + ':/var/log/clamav:rw' if clamav_log_path is defined else omit }}"
     entrypoint: "/init-unprivileged"
-    user: 2319
+    user: "{{ clamav_useruid }}"
+    ports: 
+      - "{{ clamav_port }}"
+  when: clamav_enable_auto_scan
