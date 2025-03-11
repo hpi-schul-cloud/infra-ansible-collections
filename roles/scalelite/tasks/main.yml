@@ -1,0 +1,120 @@
+---
+
+- name: Create folders
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+  loop:
+    - path: "{{ scalelite_docker_volumes_folder }}"
+      mode: "0700"
+    - path: "{{ scalelite_docker_volumes_folder }}/certbot"
+      mode: "0750"
+      owner: "{{ scalelite_certbot_user_id }}"
+      group: "{{ ssl_certs_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/certbot/terraform/"
+      mode: "0750"
+      owner: "{{ scalelite_certbot_user_id }}"
+      group: "{{ ssl_certs_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/webroot/"
+      mode: "0770"
+      owner: "{{ scalelite_certbot_user_id }}"
+      group: "{{ ssl_certs_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/postgres_data"
+      mode: "0700"
+      owner: "{{ scalelite_postgres_user_id }}"
+      group: "{{ scalelite_postgres_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/redis_data"
+      mode: "0700"
+      owner: "{{ scalelite_redis_user_id }}"
+      group: "{{ scalelite_redis_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/nginx"
+      mode: "0750"
+      owner: "{{ scalelite_nginx_user_id }}"
+      group: "{{ scalelite_nginx_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite"
+      mode: "0750"
+      owner: "{{ scalelite_nginx_user_id }}"
+      group: "{{ scalelite_nginx_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/autoscaler"
+      mode: "0750"
+    - path: "{{ scalelite_docker_volumes_folder }}/scalelite"
+      mode: "0700"
+      owner: "{{ scalelite_user_id }}"
+      group: "{{ scalelite_group_id }}"
+
+- name: Create Redis data folders for extra Greenlight instances
+  file:
+    state: directory
+    path: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data"
+    mode: "0700"
+    owner: "{{ scalelite_redis_user_id }}"
+    group: "{{ scalelite_redis_group_id }}"
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+
+- name: Certbot
+  include_tasks: certbot.yml
+
+- name: Nginx
+  include_tasks: nginx.yml
+
+- name: Copy updated Scalelite templates for dial-in
+  copy:
+    src: "scalelite/{{ item }}"
+    dest: "{{ scalelite_docker_volumes_folder }}/scalelite/{{ item }}"
+    mode: "0440"
+    owner: "{{ scalelite_user_id }}"
+    group: "{{ scalelite_group_id }}"
+  when: scalelite_bbb_dialin_enabled | bool
+  loop:
+    - bridge.xml.builder
+    - pin_prompt.xml.builder
+    - pin_reprompt.xml.builder
+  notify: Restart Scalelite
+
+- name: Create autoscaler config
+  copy:
+    content: "{{ scalelite_autoscaler_config | to_nice_yaml }}"
+    dest: "{{ scalelite_docker_volumes_folder }}/autoscaler/scaler_config.yml"
+    owner: "{{ scalelite_autoscaler_user_id }}"
+    group: "{{ scalelite_autoscaler_group_id }}"
+    mode: "0400"
+  notify: Restart bbb-autoscaler
+
+- name: Docker-Compose
+  include_tasks: docker-compose.yml
+
+- name: Certificates
+  include_tasks: certificates.yml
+
+- name: Create scripts
+  template:
+    src: "scripts/{{ item }}.j2"
+    dest: "/root/{{ item }}"
+    mode: "0700"
+  loop:
+    - register-servers.sh
+    - delete-servers.sh
+    - cordon-servers.sh
+
+- name: Create Node Exporter textfile collector directory
+  file:
+    path: "{{ scalelite_node_exporter_textfile_directory }}"
+    state: directory
+    mode: "0700"
+    owner: "{{ scalelite_node_exporter_user_id }}"
+    group: "{{ scalelite_node_exporter_group_id }}"
+
+- name: Fail2ban
+  include_tasks: fail2ban.yml
+
+- name: Logrotate
+  include_tasks: logrotate.yml
+
+- name: Reload scalelite-nginx in case some containers were restarted
+  community.docker.docker_container_exec:
+    container: scalelite-nginx
+    command: nginx -s reload
+  when: not ansible_check_mode

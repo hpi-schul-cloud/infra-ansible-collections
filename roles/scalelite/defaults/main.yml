@@ -1,0 +1,204 @@
+---
+scalelite_docker_volumes_folder: /docker_volumes
+scalelite_docker_compose_folder: /scalelite
+scalelite_docker_compose_owner: root
+scalelite_docker_compose_group: root
+
+scalelite_certbot_image: certbot/certbot:v2.11.0
+# Custom UID to run certbot as
+scalelite_certbot_user_id: 9999
+scalelite_certbot_group_id: 9999
+# scalelite_certbot_os_access_key:
+# scalelite_certbot_os_secret_key:
+# scalelite_certbot_terraform_state_bucket:
+# scalelite_certbot_terraform_state_key:
+# scalelite_certbot_terraform_state_region:
+# scalelite_certbot_terraform_state_endpoint:
+scalelite_certbot_terraform_version: 1.5.4
+scalelite_certbot_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 10M
+  limits:
+    cpus: '0.3'
+    memory: 30M
+# scalelite_letsencrypt_email:
+
+
+
+scalelite_greenlight_enabled: false
+scalelite_greenlight_image_repository: greenlight
+scalelite_greenlight_image_tag: v3.1.0.2
+scalelite_greenlight_extra_instances: []
+scalelite_greenlight_default_locale: de
+scalelite_greenlight_log_level: warn
+scalelite_greenlight_allow_mail_notifications: true
+# scalelite_greenlight_smtp_server:
+# scalelite_greenlight_smtp_port:
+# scalelite_greenlight_smtp_domain:
+# scalelite_greenlight_smtp_username:
+# scalelite_greenlight_smtp_password:
+# scalelite_greenlight_smtp_auth:
+# scalelite_bbb_tenant_api_key:
+scalelite_greenlight_smtp_auth: plain
+scalelite_greenlight_smtp_starttls_auto: true
+scalelite_greenlight_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 150M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+# Postgres Docker image runs as postgres:postgres (70:70)
+scalelite_postgres_user_id: 70
+scalelite_postgres_group_id: 70
+scalelite_postgres_image: postgres:14.8-alpine
+scalelite_postgres_resources:
+  reservations:
+    cpus: '0.2'
+    memory: 50M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+scalelite_postgres_exporter_image: prometheuscommunity/postgres-exporter:v0.17.1
+scalelite_postgres_exporter_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 10M
+  limits:
+    cpus: "0.5"
+    memory: "20M"
+
+scalelite_redis_image: redis:7.2.4-alpine
+# Redis Docker image runs as redis:redis (999:1000)
+scalelite_redis_user_id: 999
+scalelite_redis_group_id: 1000
+scalelite_redis_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 10M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+scalelite_nginx_image: nginxinc/nginx-unprivileged:1.24-alpine3.18-perl
+scalelite_nginx_user_id: 101
+scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
+scalelite_nginx_dhparam_size: 4096
+scalelite_nginx_worker_processes: auto
+scalelite_nginx_ssl: true
+scalelite_nginx_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 15M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+scalelite_nginx_metrics_endpoints:
+  - name: node-exporter
+    public_port: 9100
+    private_port: 9099
+  - name: bbb-autoscaler
+    public_port: 9200
+    private_port: "{{ scalelite_autoscaler_config.metrics_exporter_port }}"
+  - name: cadvisor
+    public_port: 9300
+    private_port: 9299
+  - name: postgres-exporter
+    public_port: 9188
+    private_port: 9187
+scalelite_nginx_logs_folder: /var/log/nginx
+
+scalelite_user_id: 1000
+scalelite_group_id: 1000
+scalelite_web_concurrency: 4
+scalelite_rails_max_threads: 4
+scalelite_log_level: warn
+scalelite_multitenancy_enabled: true
+scalelite_version: v1.5.1.7-focal260-alpine
+# scalelite_secret_key_base:
+# scalelite_api_key
+scalelite_poller_image: "blindsidenetwks/scalelite:{{ scalelite_version }}-poller"
+scalelite_poller_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 100M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+scalelite_api_image: "blindsidenetwks/scalelite:{{ scalelite_version }}-api"
+scalelite_api_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 250M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+scalelite_hostname: "{{ inventory_hostname }}"
+scalelite_letsencrypt_folder: /etc/letsencrypt
+scalelite_terraform_workspace: prod
+scalelite_dns_zone_id: 1234
+scalelite_bbb_dialin_enabled: false
+scalelite_metrics_basic_auth_username: metrics-user
+# scalelite_metrics_basic_auth_password:
+scalelite_security_txt: |
+  # Security.txt content
+
+scalelite_autoscaler_user_id: 65534
+scalelite_autoscaler_group_id: 65534
+scalelite_autoscaler_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 20M
+  limits:
+    cpus: '0.5'
+    memory: 100M
+scalelite_autoscaler_datacenter_ids: []
+scalelite_autoscaler_server_name_regex: "bbb-.*"
+# scalelite_autoscaler_ionos_username:
+# scalelite_autoscaler_ionos_password:
+# scalelite_autoscaler_ionos_contract_id:
+# scalelite_autoscaler_bbb_api_key:
+# scalelite_autoscaler_grafana_token:
+scalelite_autoscaler_bbb_resources:
+  cpu:
+    min_cores: 8
+    max_cores: 16
+    max_usage: 0.7
+  memory:
+    min_bytes: 16384
+    max_bytes: 32768
+    max_usage: 0.7
+scalelite_autoscaler_waiting_time: 60
+# scalelite_autoscaler_grafana_endpoint: https://grafana.example.com/api/datasources/proxy/uid/UUID/
+scalelite_autoscaler_metrics_private_port: 9199
+scalelite_autoscaler_config:
+  app_name: bbb-scaler
+  stage: prod
+  scaling_mode: heuristic
+  service_type: BBB
+  provider_type: Ionos
+  metrics_source_type: Prometheus
+  ionos_config:
+    username: $IONOS_USERNAME
+    password: $IONOS_PASSWORD
+    contract_id: $IONOS_CONTRACT_ID
+    server_source:
+      dynamic:
+        datacenter_ids: "{{ scalelite_autoscaler_datacenter_ids }}"
+        server_name_regex: "{{ scalelite_autoscaler_server_name_regex }}"
+  bbb_config:
+    resources: "{{ scalelite_autoscaler_bbb_resources }}"
+    cycle_time_seconds: "{{ scalelite_autoscaler_waiting_time }}"
+    api_token: $BBB_API_TOKEN
+  prometheus_config:
+    url: "{{ scalelite_autoscaler_grafana_endpoint }}"
+    token: $GRAFANA_TOKEN
+  metrics_exporter_port: "{{ scalelite_autoscaler_metrics_private_port }}"
+
+scalelite_node_exporter_textfile_directory: /node-exporter-textfiles/
+scalelite_node_exporter_user_id: 65534
+scalelite_node_exporter_group_id: 65534

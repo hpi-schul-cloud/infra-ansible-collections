@@ -8,6 +8,7 @@ docker_packages:
   - docker-ce-cli={{ docker_ce_version }}
   - docker-ce-rootless-extras={{ docker_ce_version }}
 
+server_monitoring_install_docker: true
 server_monitoring_docker_compose_version: 1.25.5
 server_monitoring_docker_python_sdk_version: 5.0.3
 server_monitoring_docker_volumes_folder: /docker_volumes
