@@ -1,0 +1,49 @@
+---
+- name: Add clamav user to docker group
+  become: true
+  user:
+    name: clamav
+    groups: docker
+    append: yes
+
+- name: Create ClamAV log directory
+  file:
+    path: "{{ clamav_log_path }}"
+    state: directory
+    owner: clamav
+    group: docker
+    mode: "0775"
+  become: true
+
+- name: Create ClamAV database directory
+  become: true
+  file:
+    path: "{{ clamav_db_path }}"
+    state: directory
+    owner: clamav
+    group: root
+    mode: 0755
+
+- name: Create ClamAV quarantine directory
+  become: true
+  file:
+    path: "{{ clamav_quarantine_path }}"
+    state: directory
+    owner: clamav
+    group: root
+    mode: 0755
+
+- name: Run ClamAV Scan Container 
+  become: true
+  docker_container:
+    name: "{{ clamav_container_name }}"
+    image: "{{ clamav_image }}"
+    state: started
+    restart_policy: unless-stopped 
+    volumes: 
+      - "{{ clamav_db_path }}:{{ clamav_db_path }}:rw"  
+      - "{{ clamav_scan_directory }}:/scanned:rw"  
+      - "{{ clamav_quarantine_path }}:/quarantine:rw"
+      - "{{ clamav_log_path }}:/var/log/clamav:rw"
+    entrypoint: "/init-unprivileged"
+    user: 2319

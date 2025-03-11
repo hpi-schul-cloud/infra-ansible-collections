@@ -1,21 +1,10 @@
 clamav_image: "clamav/clamav:1.4.2"  
 clamav_container_name: "clamav-scan" 
-clamav_freshclam_container_name: "clamav-freshclam"
-
-clamav_scan_directory: "/" 
+clamav_scan_directory: "/"
 clamav_db_path: "/var/lib/clamav" 
 clamav_quarantine_path: "/var/lib/clamav-quarantine" 
-clamav_scan_log: "/var/log/clamav_scan.log" 
-
+clamav_log_path: "/var/log/clamav"
 clamav_enable_auto_scan: true 
-clamav_cron_schedule: "0 23 * * *" 
-
-
-# Derzeit werden die folgenden Verzeichnisse vom Scan ausgeschlossen, um Probleme 
-# mit systemkritischen Pfaden, temporären Dateien und containerisierten Umgebungen zu vermeiden.
-# Diskussionsbedarf: Sollten weitere Verzeichnisse ausgeschlossen oder eingeschlossen werden, 
-# basierend auf spezifischen Anforderungen?
-
 clamav_scan_exclude_directories:
   - "/dev/*"
   - "/proc/*"
@@ -36,6 +25,3 @@ clamav_scan_exclude_directories:
   - "/var/lib/tpm/*"  
   - "/var/lib/update-manager/*"  
   - "/var/lib/usb_modeswitch/*" 
-
-# Infizierte Dateien sollten in das Verzeichnis /var/lib/clamav-quarantine verschoben werden, 
-clamav_scan_options: "-r --move=/var/lib/clamav-quarantine" 

@@ -1,22 +1,18 @@
 ---
-- name: Create ClamAV Cron Scan Exclude Options 
-  set_fact: 
-    clamav_scan_exclude_options: "{{ clamav_scan_exclude_directories | map('regex_replace', '(.*)', '--exclude-dir=\\1') | join(' ') }}" 
-
-- name: Build ClamAV Cron Scan Command 
-  set_fact: 
-    clamscan_cron_command: "docker exec {{ clamav_container_name }} clamscan {{ clamav_scan_options }} {{ clamav_scan_exclude_options }} /scanned >> {{ clamav_scan_log }} 2>&1"
-
+- name: Create ClamAV Cron Scan Exclude Options
+  set_fact:
+    clamav_scan_exclude_options: "{{ clamav_scan_exclude_directories | map('regex_replace', '(.*)', '--exclude-dir=\\1') | join(' ') }}"
 
 - name: Schedule Daily ClamAV Scan 
   become: true 
   cron: 
     name: "Daily ClamAV Scan" 
-    job: "{{ clamscan_cron_command }}" 
+    job: >
+      docker exec {{ clamav_container_name }} clamscan -r --move=/quarantine {{ clamav_scan_exclude_options }} /scanned 2>&1 | tee -a {{ clamav_log_path }}/clamav_scan.log
     cron_file: clamav_scan_schedule 
     state: "{{ 'present' if clamav_enable_auto_scan else 'absent' }}" 
-    minute: "*"  
-    hour: "23"    
+    minute: "32"  
+    hour: "*"    
     day: "*"     
     month: "*"   
     weekday: "*" 
