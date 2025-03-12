@@ -23,5 +23,5 @@
     user: "{{ clamav_user_id }}"
     group: "{{ clamav_group_id }}"
     ports: 
-      -  "{{ clamav_port | default('3310') }}:3310"
+      -  "{{ clamav_port }}:3310"
   when: clamav_enable_auto_scan
