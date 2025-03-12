@@ -25,7 +25,6 @@
     ports: 
       -  "{{ clamav_port }}:3310"
     memory: "{{ clamav_memory_limit }}"
-    memory_swap: "{{ clamav_memory_swap_limit }}"
-    cpu_shares: "{{ clamav_cpu_shares }}"      
+    cpus: "{{ clamav_cpu_limit }}"      
   when: clamav_enable_auto_scan
 
