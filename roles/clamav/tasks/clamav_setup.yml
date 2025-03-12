@@ -21,7 +21,7 @@
 
     entrypoint: "/init-unprivileged"
     user: "{{ clamav_user_id }}"
-    group: "{{ clamav_group_id }}"
+    groups: "{{ clamav_group_id }}"
     ports: 
       -  "{{ clamav_port }}:3310"
     memory: "{{ clamav_memory_limit }}"
