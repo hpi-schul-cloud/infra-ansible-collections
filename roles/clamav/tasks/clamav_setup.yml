@@ -1,12 +1,4 @@
 ---
-- name: Add clamav user to designated group  
-  become: true
-  user:
-    name: "{{ clamav_username }}" 
-    uid: "{{ clamav_user_id }}"
-    groups: "{{ clamav_group_id }}"
-    append: yes
-  when: clamav_enable_auto_scan
 
 - name: Run ClamAV Scan Container 
   become: true
@@ -18,10 +10,8 @@
     volumes: 
       - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory | length > 0 else omit }}"
       - "{{ clamav_log_path + ':/var/log/clamav:rw' if clamav_log_path | length > 0 else omit }}"
-
     entrypoint: "/init-unprivileged"
     user: "{{ clamav_user_id }}"
-    groups: "{{ clamav_group_id }}"
     ports: 
       -  "{{ clamav_port }}:3310"
     memory: "{{ clamav_memory_limit }}"
