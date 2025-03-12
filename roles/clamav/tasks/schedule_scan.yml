@@ -12,9 +12,8 @@
     cron_file: clamav_scan_schedule 
     state: "{{ 'present' if clamav_enable_auto_scan else 'absent' }}" 
     minute: "*"  
-    hour: "22"    
+    hour: "{{ clamav_cron_hour }}"    
     day: "*"     
     month: "*"   
     weekday: "*"
     user: "{{ clamav_username }}" 
-  when: clamav_enable_auto_scan 

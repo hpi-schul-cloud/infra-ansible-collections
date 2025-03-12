@@ -3,8 +3,8 @@
   become: true
   user:
     name: "{{ clamav_username }}" 
-    uid: "{{ clamav_useruid }}"
-    groups: "{{ clamav_user_group }}"
+    uid: "{{ clamav_user_id }}"
+    groups: "{{ clamav_group_id }}"
     append: yes
   when: clamav_enable_auto_scan
 
@@ -16,10 +16,12 @@
     state: started
     restart_policy: unless-stopped 
     volumes: 
-      - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory is defined else omit }}"
-      - "{{ clamav_log_path + ':/var/log/clamav:rw' if clamav_log_path is defined else omit }}"
+      - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory | length > 0 else omit }}"
+      - "{{ clamav_log_path + ':/var/log/clamav:rw' if clamav_log_path | length > 0 else omit }}"
+
     entrypoint: "/init-unprivileged"
-    user: "{{ clamav_useruid }}"
+    user: "{{ clamav_user_id }}"
+    group: "{{ clamav_group_id }}"
     ports: 
-      - "{{ clamav_port }}"
+      -  "{{ clamav_port | default('3310') }}:3310"
   when: clamav_enable_auto_scan
