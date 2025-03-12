@@ -24,4 +24,8 @@
     group: "{{ clamav_group_id }}"
     ports: 
       -  "{{ clamav_port }}:3310"
+    memory: "{{ clamav_memory_limit }}"
+    memory_swap: "{{ clamav_memory_swap_limit }}"
+    cpu_shares: "{{ clamav_cpu_shares }}"      
   when: clamav_enable_auto_scan
+
