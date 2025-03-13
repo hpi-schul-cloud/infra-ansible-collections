@@ -280,7 +280,7 @@ services:
       - SMTP_USERNAME=${SMTP_USERNAME}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_AUTH={{ scalelite_greenlight_smtp_auth }}
-      - SMTP_STARTTLS_AUTO={{ scalelite_greenlight_smtp_auth | lower }}
+      - SMTP_STARTTLS_AUTO={{ scalelite_greenlight_smtp_starttls_auto | lower }}
       - SMTP_SENDER_EMAIL=greenlight@{{ instance.hostname }}
 {% endif %}
     healthcheck:
