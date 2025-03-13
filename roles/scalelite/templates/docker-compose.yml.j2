@@ -48,7 +48,7 @@ services:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
 
   certbot:
-    image: {{ scalelite_certbot_image }}
+    image: {{ scalelite_certbot_image_repository }}:{{ scalelite_certbot_image_tag }}
     container_name: certbot
     restart: unless-stopped
     user: {{ scalelite_certbot_user_id }}:{{ scalelite_certbot_group_id }}
@@ -177,19 +177,17 @@ services:
         {{ scalelite_poller_resources | to_nice_yaml | indent(8) }}
 
   bbb-autoscaler:
-    image: {{ bbb_autoscaler_image }}
+    image: {{ scalelite_autoscaler_image_repository }}:{{ scalelite_autoscaler_image_tag }}
     container_name: bbb-autoscaler
     restart: unless-stopped
     ports:
       - "{{ scalelite_autoscaler_config.metrics_exporter_port }}:{{ scalelite_autoscaler_config.metrics_exporter_port }}"
     volumes:
       - {{ scalelite_docker_volumes_folder }}/autoscaler/scaler_config.yml:/config/scaler_config.yml
+{% if scalelite_autoscaler_environment | length > 0 %}
     environment:
-      - IONOS_USERNAME=${IONOS_USERNAME}
-      - IONOS_PASSWORD=${IONOS_PASSWORD}
-      - IONOS_CONTRACT_ID=${IONOS_CONTRACT_ID}
-      - BBB_API_TOKEN=${BBB_API_TOKEN}
-      - GRAFANA_TOKEN=${GRAFANA_TOKEN}
+      {{ scalelite_autoscaler_environment | to_nice_yaml | indent(6) }}
+{% endif %}
     healthcheck:
       test: wget -q -O /dev/null  http://localhost:9199/metrics  || exit 1
       interval: 30s

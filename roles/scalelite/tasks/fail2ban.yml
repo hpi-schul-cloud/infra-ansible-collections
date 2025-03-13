@@ -56,7 +56,7 @@
       filter     = nginx-errors
       logpath    = {{ scalelite_nginx_logs_folder }}/*.log
       maxretry   = 100
-      bantime    = 600
+      bantime    = 3600
       findtime   = 600
       [greenlight-signin-errors]
       enabled    = true

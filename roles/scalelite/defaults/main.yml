@@ -4,7 +4,8 @@ scalelite_docker_compose_folder: /scalelite
 scalelite_docker_compose_owner: root
 scalelite_docker_compose_group: root
 
-scalelite_certbot_image: certbot/certbot:v2.11.0
+scalelite_certbot_image_repository: certbot/certbot
+scalelite_certbot_image_tag: v2.11.0
 # Custom UID to run certbot as
 scalelite_certbot_user_id: 9999
 scalelite_certbot_group_id: 9999
@@ -87,7 +88,7 @@ scalelite_redis_resources:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
 
-scalelite_nginx_image: nginxinc/nginx-unprivileged:1.24-alpine3.18-perl
+scalelite_nginx_image: nginxinc/nginx-unprivileged:1.24-alpine3.18
 scalelite_nginx_user_id: 101
 scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
 scalelite_nginx_dhparam_size: 4096
@@ -152,55 +153,13 @@ scalelite_security_txt: |
 
 scalelite_autoscaler_user_id: 65534
 scalelite_autoscaler_group_id: 65534
-scalelite_autoscaler_resources:
-  reservations:
-    cpus: '0.1'
-    memory: 20M
-  limits:
-    cpus: '0.5'
-    memory: 100M
-scalelite_autoscaler_datacenter_ids: []
-scalelite_autoscaler_server_name_regex: "bbb-.*"
-# scalelite_autoscaler_ionos_username:
-# scalelite_autoscaler_ionos_password:
-# scalelite_autoscaler_ionos_contract_id:
-# scalelite_autoscaler_bbb_api_key:
-# scalelite_autoscaler_grafana_token:
-scalelite_autoscaler_bbb_resources:
-  cpu:
-    min_cores: 8
-    max_cores: 16
-    max_usage: 0.7
-  memory:
-    min_bytes: 16384
-    max_bytes: 32768
-    max_usage: 0.7
-scalelite_autoscaler_waiting_time: 60
-# scalelite_autoscaler_grafana_endpoint: https://grafana.example.com/api/datasources/proxy/uid/UUID/
+scalelite_autoscaler_image_repository: ghcr.io/dbildungsplattform/infra-autoscaler
+scalelite_autoscaler_image_tag: 2.0.0
 scalelite_autoscaler_metrics_private_port: 9199
-scalelite_autoscaler_config:
-  app_name: bbb-scaler
-  stage: prod
-  scaling_mode: heuristic
-  service_type: BBB
-  provider_type: Ionos
-  metrics_source_type: Prometheus
-  ionos_config:
-    username: $IONOS_USERNAME
-    password: $IONOS_PASSWORD
-    contract_id: $IONOS_CONTRACT_ID
-    server_source:
-      dynamic:
-        datacenter_ids: "{{ scalelite_autoscaler_datacenter_ids }}"
-        server_name_regex: "{{ scalelite_autoscaler_server_name_regex }}"
-  bbb_config:
-    resources: "{{ scalelite_autoscaler_bbb_resources }}"
-    cycle_time_seconds: "{{ scalelite_autoscaler_waiting_time }}"
-    api_token: $BBB_API_TOKEN
-  prometheus_config:
-    url: "{{ scalelite_autoscaler_grafana_endpoint }}"
-    token: $GRAFANA_TOKEN
-  metrics_exporter_port: "{{ scalelite_autoscaler_metrics_private_port }}"
+# Autoscaler config as YAML
+scalelite_autoscaler_config: {}
+# Autoscaler environment variables in name=value format, gets written to the docker-compose file
+scalelite_autoscaler_environment: []
 
 scalelite_node_exporter_textfile_directory: /node-exporter-textfiles/
 scalelite_node_exporter_user_id: 65534

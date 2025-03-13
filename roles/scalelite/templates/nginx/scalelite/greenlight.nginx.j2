@@ -29,6 +29,7 @@ location /greenlight {
     add_header X-Content-Type-Options "nosniff";
     add_header Cache-Control "max-age=0, private, must-revalidate";
     add_header X-Frame-Options SAMEORIGIN;
+    add_header Set-Cookie "Path=/; Secure; HttpOnly; SameSite=Strict";
 }
 
 location ~ '/greenlight/api/v1/rooms/\w{3}-\w{3}-\w{3}-\w{3}.json$' {
