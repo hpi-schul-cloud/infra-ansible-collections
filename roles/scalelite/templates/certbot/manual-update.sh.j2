@@ -1,0 +1,27 @@
+#!/bin/sh
+
+echo "Installing Terraform";
+opsys=linux;
+version=1.5.4;
+wget -O /tmp/terraform_${version}_${opsys}_amd64.zip https://releases.hashicorp.com/terraform/${version}/terraform_${version}_${opsys}_amd64.zip 2>&1;
+unzip /tmp/terraform_${version}_${opsys}_amd64.zip -o -d /tmp/;
+
+set -e
+echo "Updating main.tf";
+if grep -q /certbot/terraform/main.tf -e 'records = \[""\]';
+then
+ sed -i 's/records *= *\[""/records = \[ "\\"'"$CERTBOT_VALIDATION"'\\""/g' /certbot/terraform/main.tf
+else
+ sed -i 's/records *= *\[/records = \[ "\\"'"$CERTBOT_VALIDATION"'\\"", /g' /certbot/terraform/main.tf
+fi
+
+(cd /certbot/terraform/ ;
+ /tmp/terraform init;
+ /tmp/terraform workspace select {{ scalelite_terraform_workspace }} || /tmp/terraform workspace new {{ scalelite_terraform_workspace }};
+ /tmp/terraform apply -auto-approve)
+
+while ! nslookup -type=TXT _acme-challenge.$CERTBOT_DOMAIN | grep -q -e "$CERTBOT_VALIDATION";
+do
+ echo ".";
+ sleep 60;
+done

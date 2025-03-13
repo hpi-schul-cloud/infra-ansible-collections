@@ -1,0 +1,23 @@
+---
+- name: Check for certificates fullchain
+  stat:
+    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_hostname }}/fullchain.pem"
+  register: fullchain
+
+- name: Check for certificates privkey
+  stat:
+    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_hostname }}/privkey.pem"
+  register: privkey
+
+- name: Create Letsencrypt certificates
+  import_tasks:
+    file: initial-certificates.yml
+  when: not fullchain.stat.exists or not privkey.stat.exists
+
+- name: Extra Greenlight instances certificates
+  include_tasks:
+    file: extra-greenlight-certificates.yml
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "{{ instance.name }}"
