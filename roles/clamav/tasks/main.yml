@@ -1,0 +1,4 @@
+---
+- import_tasks: pull_image.yml 
+- import_tasks: clamav_setup.yml
+- import_tasks: schedule_scan.yml

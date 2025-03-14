@@ -1,0 +1,6 @@
+---
+- name: Pull ClamAV Docker Image
+  become: true
+  docker_image:
+    name: "{{ clamav_image }}"
+    source: pull
