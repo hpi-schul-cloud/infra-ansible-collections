@@ -10,7 +10,7 @@
       docker exec {{ clamav_container_name }} clamscan -r {{clamav_scan_options }}  {{ clamav_scan_exclude_options }} /scanned 2>&1 | tee -a {{ clamav_log_path }}/clamav_scan.log
     cron_file: clamav_scan_schedule 
     state: "{{ 'present' if clamav_enable_auto_scan else 'absent' }}" 
-    minute: "*"  
+    minute: "{{ clamav_cron_minute }}"   
     hour: "{{ clamav_cron_hour }}"    
     day: "*"     
     month: "*"   

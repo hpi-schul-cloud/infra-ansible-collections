@@ -26,12 +26,13 @@ clamav_scan_exclude_directories:
   - "/var/lib/usb_modeswitch/*" 
 clamav_user_id: "2330"
 clamav_group_id: "2330"
-clamav_username: "clamav" 
+clamav_username: "clamav"
+clamav_docker_group: "docker"
 clamav_port: "3310" 
 clamav_cron_hour: "22"
+clamav_cron_minute: "0"
 clamav_memory_limit: "2g"        
 clamav_cpu_limit: "0.5"
 clamav_remove: false
 clamav_quarantine: true
-clamav_quarantine_path: "/var/lib/clamav-quarantine"  
-clamav_create_log_directroy: true    
+clamav_quarantine_path: "/var/lib/clamav-quarantine"     
