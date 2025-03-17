@@ -1,0 +1,7 @@
+# USER_INSTALL_TYPE defines the installation type to
+# be used during install. It can only be "local",
+# "agent" or "server".
+
+USER_INSTALL_TYPE: "local"
+USER_EMAIL_ADDRESS: ""
+USER_EMAIL_SMTP: ""

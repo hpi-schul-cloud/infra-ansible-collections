@@ -1,0 +1,5 @@
+---
+- name: Restart OSSEC
+  systemd:
+    name: ossec
+    state: restarted

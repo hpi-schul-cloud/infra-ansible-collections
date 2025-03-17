@@ -1,0 +1,2 @@
+---
+- import_tasks: ossec_setup.yml

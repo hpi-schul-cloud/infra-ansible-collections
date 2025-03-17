@@ -1,0 +1,9 @@
+ossec_version: 3.8.0
+ossec_syscheck_frequency: "86400"        # Frequency of the Syscheck scan in seconds (24 hours)
+ossec_syscheck_scan_on_start: "yes"      # Run Syscheck immediately at system startup
+
+
+ossec_email_notification: "no"
+ossec_email_to: ""
+ossec_smtp_server: ""
+ossec_email_from: ""

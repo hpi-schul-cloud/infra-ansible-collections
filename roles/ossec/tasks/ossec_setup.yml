@@ -1,0 +1,57 @@
+---
+- name: Install necessary packages
+  apt:
+    name: 
+      - libssl-dev
+      - libpcre2-dev
+      - zlib1g-dev
+      - make
+      - gcc
+      - libsystemd-dev
+    state: present
+    update_cache: yes
+
+
+- name: Download OSSEC
+  get_url:
+      url: "https://github.com/ossec/ossec-hids/archive/{{ ossec_version }}.tar.gz"
+      dest: "/tmp/ossec.tar.gz"
+
+- name: Extract Ossec
+  unarchive: 
+    src:  "/tmp/ossec.tar.gz" 
+    dest: "/tmp/" 
+    
+# USER_EMAIL_ADDRESS defines the destination e-mail of the alerts.
+# USER_EMAIL_SMTP defines the SMTP server to send the e-mails.
+# If USER_ENABLE_ACTIVE_RESPONSE is set to "n",
+# active response will be disabled.
+- name: Install OSSEC
+  command: ./install.sh
+  args:
+    chdir: "/tmp/ossec-hids-{{ ossec_version }}"
+  environment:    
+    USER_INSTALL_TYPE: "{{ USER_INSTALL_TYPE }}"
+    USER_ENABLE_ACTIVE_RESPONSE: "{{ USER_ENABLE_ACTIVE_RESPONSE }}"
+    USER_EMAIL_ADDRESS: "{{ USER_EMAIL_ADDRESS }}"
+    USER_EMAIL_SMTP: "{{ USER_EMAIL_SMTP }}"
+
+
+- name: Configure OSSEC for critical directories monitoring
+  blockinfile:
+    path: /var/ossec/etc/ossec.conf
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: |
+          <ossec_config>
+          <syscheck>
+          <frequency>{{ ossec_syscheck_frequency }}</frequency>
+          <scan_on_start>{{ ossec_syscheck_scan_on_start }}</scan_on_start>
+          </syscheck>
+          <global>
+          <email_notification>{{ enable_email_notification }}</email_notification>
+          <email_to>{{ ossec_email_to }}</email_to>
+          <smtp_server>{{ ossec_smtp_server }}</smtp_server>
+          </global>
+           </ossec_config>
+  notify: Restart OSSEC
+          
