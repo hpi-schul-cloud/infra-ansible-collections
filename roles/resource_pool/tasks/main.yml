@@ -10,8 +10,8 @@
     IONOS_TOKEN: "{{ ionos_token | default(omit) }}"
     AWS_ACCESS_KEY_ID: "{{ aws_access_key_id }}"
     AWS_SECRET_ACCESS_KEY: "{{ aws_secret_access_key }}"
-    OS_ACCESS_KEY: "{{ os_access_key }}"
-    OS_SECRET_KEY: "{{ os_secret_key }}"
+    # OS_ACCESS_KEY: "{{ os_access_key }}"
+    # OS_SECRET_KEY: "{{ os_secret_key }}"
   community.general.terraform:
     project_path: '{{ playbook_dir }}/../terraform/resource-pools/{{ resource_pool }}'
     state: "{{ 'planned' if terraform_plan else 'present' }}"
