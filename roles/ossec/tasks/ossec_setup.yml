@@ -21,6 +21,8 @@
   unarchive: 
     src:  "/tmp/ossec.tar.gz" 
     dest: "/tmp/" 
+  mode: 0755
+  remote_src: yes
     
 # USER_EMAIL_ADDRESS defines the destination e-mail of the alerts.
 # USER_EMAIL_SMTP defines the SMTP server to send the e-mails.
