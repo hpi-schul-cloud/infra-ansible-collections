@@ -1,0 +1,95 @@
+location /greenlight/cable {
+    proxy_pass http://{{ scalelite_greenlight_container | default('greenlight') }}:3000;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Upgrade $http_upgrade;
+}
+
+location /greenlight {
+    proxy_pass http://{{ scalelite_greenlight_container | default('greenlight') }}:3000;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Connection "";
+    
+    # Set Headers
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self'; frame-ancestors 'self'; form-action 'self'; worker-src 'self'";
+    add_header Strict-Transport-Security "max-age=31556952; includeSubDomains";
+    add_header X-Content-Type-Options "nosniff";
+    add_header Cache-Control "max-age=0, private, must-revalidate";
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header Set-Cookie "Path=/; Secure; HttpOnly; SameSite=Strict";
+}
+
+location ~ '/greenlight/api/v1/rooms/\w{3}-\w{3}-\w{3}-\w{3}.json$' {
+    proxy_pass http://{{ scalelite_greenlight_container | default('greenlight') }}:3000;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Connection "";
+
+    client_max_body_size 31m;
+}
+
+location ~ '/greenlight/api/v1/users/\w{8}-\w{4}-\w{4}-\w{4}-\w{12}.json$' {
+    proxy_pass http://{{ scalelite_greenlight_container | default('greenlight') }}:3000;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Connection "";
+
+    client_max_body_size 4m;
+}
+
+location ~ /greenlight/api/v1/admin/site_settings/BrandingImage.json$ {
+    proxy_pass http://{{ scalelite_greenlight_container | default('greenlight') }}:3000;
+    proxy_redirect off;
+    proxy_http_version 1.1;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Connection "";
+
+    client_max_body_size 4m;
+}
+
+location /security.txt {
+    add_header Content-Security-Policy "default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'self'; form-action 'self'";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+    add_header X-Content-Type-Options "nosniff";
+    add_header Cache-Control "max-age=36000, immutable";
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header Content-Type "text/plain;charset=utf-8";
+    return 200 '{{ scalelite_security_txt| replace('\n', '\\n') }}';
+}
+
+location /.well-known/security.txt {
+    add_header Content-Security-Policy "default-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self'; img-src 'self'; style-src 'self' 'unsafe-inline'; frame-ancestors 'self'; form-action 'self'";
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+    add_header X-Content-Type-Options "nosniff";
+    add_header Cache-Control "max-age=36000, immutable";
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header Content-Type "text/plain;charset=utf-8";
+    return 200 '{{ scalelite_security_txt | replace('\n', '\\n') }}';
+}

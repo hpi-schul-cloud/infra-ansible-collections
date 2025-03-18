@@ -1,0 +1,20 @@
+---
+- name: Restart Fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+
+- name: Restart Scalelite
+  community.docker.docker_container:
+    name: scalelite-api
+    restart: true
+
+- name: Restart scalelite-nginx
+  community.docker.docker_container:
+    name: scalelite-nginx
+    restart: true
+
+- name: Restart bbb-autoscaler
+  community.docker.docker_container:
+    name: bbb-autoscaler
+    restart: true
