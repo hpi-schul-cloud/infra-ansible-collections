@@ -64,9 +64,12 @@ server_monitoring_node_exporter_public_port: 9100
 server_monitoring_node_exporter_private_port: 9099
 server_monitoring_node_exporter_user_id: 65534
 server_monitoring_node_exporter_group_id: 65534
+server_monitoring_node_exporter_create_apparmor_profile: false
+server_monitoring_node_exporter_apparmor_profile: node-exporter
 server_monitoring_node_exporter_textfile_directory: /node-exporter-textfiles/
 server_monitoring_node_exporter_extra_commands: []
 server_monitoring_node_exporter_textfile_collector_enabled: false
+server_monitoring_node_exporter_systemd_collector_enabled: false
 server_monitoring_node_exporter_resources:
   limits:
     cpus: '0.1'
