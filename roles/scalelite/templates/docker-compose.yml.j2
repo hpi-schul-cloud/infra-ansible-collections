@@ -284,7 +284,7 @@ services:
       - SMTP_SENDER_EMAIL=greenlight@{{ instance.hostname }}
 {% endif %}
     healthcheck:
-      test: wget -q -O /dev/null  http://localhost:9199/metrics  || exit 1
+      test: ["CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/3000"]
       interval: 30s
       timeout: 10s
       retries: 5
