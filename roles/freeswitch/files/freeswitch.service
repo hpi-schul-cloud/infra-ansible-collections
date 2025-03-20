@@ -17,7 +17,7 @@ PIDFile=/usr/local/freeswitch/run/freeswitch.pid
 ; PermissionsStartOnly=true
 ; -nonat disables Network Address Translation probing at FreeSWITCH start, which might not be what you want!
 ; blank ExecStart= line flushes the list
-ExecStart=/usr/local/freeswitch/bin/freeswitch -u freeswitch -g freeswitch -ncwait -rp
+ExecStart=/usr/local/freeswitch/bin/freeswitch -ncwait -rp
 TimeoutStartSec=45
 TimeoutStopSec=45
 ; Restart=always will ALWAYS restart FreeSWITCH even when you wish to stop it to debug and configure it
@@ -26,8 +26,7 @@ UMask=0007
 
 ; exec
 WorkingDirectory=/usr/local/freeswitch/bin
-User=root
-Group=daemon
+User=freeswitch
 LimitCORE=infinity
 LimitNOFILE=100000
 LimitNPROC=60000
