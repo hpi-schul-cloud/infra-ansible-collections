@@ -76,6 +76,7 @@ services:
 
   scalelite-nginx:
     image: {{ scalelite_nginx_image }}
+#    read_only: true
     container_name: scalelite-nginx
     restart: unless-stopped
     user: {{ scalelite_nginx_user_id }}:{{ scalelite_certbot_group_id }}
@@ -87,6 +88,12 @@ services:
 {% endfor %}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    tmpfs:
+      - /etc/nginx:rw,mode=777 
+      - /etc/modsecurity.d:rw,mode=777 
+      - /opt/owasp-crs:rw,mode=777 
+      - /tmp:rw,mode=777 
+      - /var/cache/nginx:rw,mode=777
     volumes:
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
