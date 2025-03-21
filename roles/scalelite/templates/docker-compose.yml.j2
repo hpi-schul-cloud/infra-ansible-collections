@@ -90,12 +90,12 @@ services:
       timeout: 10s
       retries: 5
       # start_period: 60s
-    tmpfs:
-      - /etc/nginx:rw,mode=777 
-      - /etc/modsecurity.d:rw,mode=777 
-      - /opt/owasp-crs:rw,mode=777 
-      - /tmp:rw,mode=777 
-      - /var/cache/nginx:rw,mode=777 
+#    tmpfs:
+#      - /etc/nginx:rw,mode=777 
+#      - /etc/modsecurity.d:rw,mode=777 
+#      - /opt/owasp-crs:rw,mode=777 
+#      - /tmp:rw,mode=777 
+#      - /var/cache/nginx:rw,mode=777 
     environment:
       SERVERNAME: modsec
       BACKEND: http://localhost
