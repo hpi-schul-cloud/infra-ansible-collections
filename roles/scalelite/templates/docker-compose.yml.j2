@@ -80,8 +80,8 @@ services:
     restart: unless-stopped
     read_only: true
     ports:
-      - "79:80"
-      - "442:443"
+      - "79:8080"
+      - "442:8443"
     depends_on:
       - scalelite-nginx
     healthcheck:
@@ -99,8 +99,8 @@ services:
     environment:
       SERVERNAME: modsec
       BACKEND: http://localhost
-      PORT: "80"
-      SSL_PORT: "443"
+      PORT: "8080"
+      SSL_PORT: "8443"
       MODSEC_RULE_ENGINE: DetectionOnly
       BLOCKING_PARANOIA: 2
       TZ: "${TZ}"
