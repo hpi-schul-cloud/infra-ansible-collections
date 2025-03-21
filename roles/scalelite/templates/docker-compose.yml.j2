@@ -74,9 +74,52 @@ services:
       resources:
         {{ scalelite_certbot_resources | to_nice_yaml | indent(8) }}
 
+  owasp-waf-nginx:
+    image: {{ scalelite_owasp_waf_image }}
+    container_name: owasp_waf
+    restart: unless-stopped
+    read_only: true
+    ports:
+      - "79:80"
+      - "442:443"
+    depends_on:
+      - scalelite-nginx
+    healthcheck:
+      test: curl --fail http://localhost:80/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # start_period: 60s
+    tmpfs:
+      /etc/nginx:rw,mode=777 
+      /etc/modsecurity.d:rw,mode=777 
+      /opt/owasp-crs:rw,mode=777 
+      /tmp:rw,mode=777 
+      /var/cache/nginx:rw,mode=777 
+    environment:
+      SERVERNAME: modsec
+      BACKEND: http://localhost
+      PORT: "80"
+      SSL_PORT: "443"
+      MODSEC_RULE_ENGINE: DetectionOnly
+      BLOCKING_PARANOIA: 2
+      TZ: "${TZ}"
+      ERRORLOG: "/var/log/error.log"
+      ACCESSLOG: "/var/log/access.log"
+      MODSEC_AUDIT_LOG_FORMAT: Native
+      MODSEC_AUDIT_LOG_TYPE: Serial
+      MODSEC_AUDIT_LOG: "/var/log/modsec_audit.log"
+      MODSEC_TMP_DIR: "/tmp"
+      MODSEC_RESP_BODY_ACCESS: "On"
+      MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
+      COMBINED_FILE_SIZES: "65535"
+    deploy:
+      resources:
+        {{ scalelite_owasp_waf_resources | to_nice_yaml | indent(8) }}
+
+
   scalelite-nginx:
     image: {{ scalelite_nginx_image }}
-#    read_only: true
     container_name: scalelite-nginx
     restart: unless-stopped
     user: {{ scalelite_nginx_user_id }}:{{ scalelite_certbot_group_id }}
@@ -88,12 +131,6 @@ services:
 {% endfor %}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    tmpfs:
-      - /etc/nginx:rw,mode=777 
-      - /etc/modsecurity.d:rw,mode=777 
-      - /opt/owasp-crs:rw,mode=777 
-      - /tmp:rw,mode=777 
-      - /var/cache/nginx:rw,mode=777
     volumes:
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
