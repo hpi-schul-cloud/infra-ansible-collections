@@ -78,6 +78,7 @@ services:
     image: {{ scalelite_owasp_waf_image }}
     container_name: owasp_waf
     restart: unless-stopped
+    user: {{ scalelite_owasp_user_id }}:{{ scalelite_owasp_group_id }}
 #    read_only: true
     ports:
       - "79:8080"
@@ -113,6 +114,8 @@ services:
       MODSEC_RESP_BODY_ACCESS: "On"
       MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
       COMBINED_FILE_SIZES: "65535"
+    volumes:
+      - {{ scalelite_owasp_logs_folder }}:/var/log
     deploy:
       resources:
         {{ scalelite_owasp_waf_resources | to_nice_yaml | indent(8) }}

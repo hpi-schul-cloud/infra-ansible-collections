@@ -166,6 +166,9 @@ scalelite_node_exporter_user_id: 65534
 scalelite_node_exporter_group_id: 65534
 
 scalelite_owasp_waf_image: owasp/modsecurity-crs:4.11.0-nginx-alpine-202502070602
+scalelite_owasp_logs_folder: /var/log/owasp
+scalelite_owasp_user_id: 101
+scalelite_owasp_group_id: "{{ scalelite_certbot_group_id }}"
 scalelite_owasp_waf_resources:
   reservations:
     cpus: '0.1'
