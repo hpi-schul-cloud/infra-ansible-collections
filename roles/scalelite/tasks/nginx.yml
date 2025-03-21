@@ -17,6 +17,7 @@
   loop:
     - nginx/nginx.conf
     - nginx/scalelite.conf
+    - nginx/error.html
 
 - name: Creating Nginx DH parameters next, this can take some time
   debug:
