@@ -89,8 +89,8 @@ services:
     environment:
       PORT: "8080"
       SSL_PORT: "8443"
-      MODSEC_RULE_ENGINE: "On"
-#      MODSEC_RULE_ENGINE: DetectionOnly
+#      MODSEC_RULE_ENGINE: "On"
+      MODSEC_RULE_ENGINE: DetectionOnly
       BLOCKING_PARANOIA: 1
       MODSEC_AUDIT_LOG: "/var/log/modsecurity/mod_sec_audit.log"
       MODSEC_DEBUG_LOG: "/var/log/modsecurity/mod_sec_debug.log"
