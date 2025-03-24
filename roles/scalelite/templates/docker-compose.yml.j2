@@ -105,8 +105,10 @@ services:
       - "host.docker.internal:host-gateway"
     tmpfs:
       - /etc/nginx:rw,mode=777
+      - /etc/modsecurity.d:rw,mode=777
       - /tmp:rw,mode=777
-
+      - /opt/owasp-crs:rw,mode=777
+      - /var/cache/nginx:rw,mode=777
     volumes:
       - {{ scalelite_nginx_logs_folder }}:/var/log/modsecurity
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
