@@ -88,7 +88,7 @@ scalelite_redis_resources:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
 
-scalelite_nginx_image: nginxinc/nginx-unprivileged:1.24-alpine3.18
+scalelite_nginx_image: owasp/modsecurity-crs:4.11.0-nginx-alpine-202502070602
 scalelite_nginx_user_id: 101
 scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
 scalelite_nginx_dhparam_size: 4096
@@ -164,15 +164,3 @@ scalelite_autoscaler_environment: []
 scalelite_node_exporter_textfile_directory: /node-exporter-textfiles/
 scalelite_node_exporter_user_id: 65534
 scalelite_node_exporter_group_id: 65534
-
-scalelite_owasp_waf_image: owasp/modsecurity-crs:4.11.0-nginx-alpine-202502070602
-scalelite_owasp_logs_folder: /var/log/owasp
-scalelite_owasp_user_id: 101
-scalelite_owasp_group_id: "{{ scalelite_certbot_group_id }}"
-scalelite_owasp_waf_resources:
-  reservations:
-    cpus: '0.1'
-    memory: 15M
-  limits:
-    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
-    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"

@@ -80,18 +80,3 @@
     group: "{{ scalelite_nginx_group_id }}"
     recurse: true
 
-- name: Set log permissions OWASP
-  file:
-    path: "{{ scalelite_owasp_logs_folder }}"
-    mode: "0750"
-    owner: "{{ scalelite_owasp_user_id }}"
-    group: "{{ scalelite_owasp_group_id }}"
-    recurse: true
-
-- name: Set log permissions OWASP nginx
-  file:
-    path: "{{ scalelite_owasp_logs_folder }}/nginx"
-    mode: "0750"
-    owner: "{{ scalelite_owasp_user_id }}"
-    group: "{{ scalelite_owasp_group_id }}"
-    recurse: true
