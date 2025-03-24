@@ -74,7 +74,7 @@ services:
       resources:
         {{ scalelite_certbot_resources | to_nice_yaml | indent(8) }}
 
-    scalelite-nginx:
+  scalelite-nginx:
     image: {{ scalelite_nginx_image }}
     container_name: scalelite-nginx
     restart: unless-stopped
@@ -83,7 +83,7 @@ services:
       - "80:8080"
       - "443:8443"
 {% for server in scalelite_nginx_metrics_endpoints %}
-      - "{{ server.public_port - 1}}:{{ server.public_port }}"
+      - "{{ server.public_port }}:{{ server.public_port }}"
 {% endfor %}
     environment:
       PORT: "8080"
