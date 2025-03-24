@@ -91,8 +91,8 @@ services:
       MODSEC_RULE_ENGINE: "On"
 #      MODSEC_RULE_ENGINE: DetectionOnly
       BLOCKING_PARANOIA: 2
-      MODSEC_AUDIT_LOG: "/var/log/nginx/mod_sec_audit.log"
-      MODSEC_DEBUG_LOG: "/var/log/nginx/mod_sec_debug.log"
+      MODSEC_AUDIT_LOG: "/var/log/modsecurity/mod_sec_audit.log"
+      MODSEC_DEBUG_LOG: "/var/log/modsecurity/mod_sec_debug.log"
       MODSEC_DEBUG_LOGLEVEL: 2
       MODSEC_AUDIT_LOG_FORMAT: Native
       MODSEC_AUDIT_LOG_TYPE: Serial
@@ -102,7 +102,10 @@ services:
       COMBINED_FILE_SIZES: "65535"      
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    tmpfs:
+        /tmp:rw,mode=777 
     volumes:
+      - {{ scalelite_nginx_logs_folder }}:/var/log/modsecurity
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
