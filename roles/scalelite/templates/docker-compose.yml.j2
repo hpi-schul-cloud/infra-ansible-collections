@@ -104,8 +104,9 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     tmpfs:
-        /tmp:rw,mode=777
-        /etc/nginx:rw,mode=777
+      - /etc/nginx:rw,mode=777
+      - /tmp:rw,mode=777
+      - /etc/modsecurity.d:rw,mode=777 
 
     volumes:
       - {{ scalelite_nginx_logs_folder }}:/var/log/modsecurity
