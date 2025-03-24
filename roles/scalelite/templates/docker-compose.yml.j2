@@ -94,6 +94,12 @@ services:
       MODSEC_AUDIT_LOG: "/var/log/nginx/mod_sec_audit.log"
       MODSEC_DEBUG_LOG: "/var/log/nginx/mod_sec_debug.log"
       MODSEC_DEBUG_LOGLEVEL: 2
+      MODSEC_AUDIT_LOG_FORMAT: Native
+      MODSEC_AUDIT_LOG_TYPE: Serial
+      MODSEC_TMP_DIR: "/tmp"
+      MODSEC_RESP_BODY_ACCESS: "On"
+      MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
+      COMBINED_FILE_SIZES: "65535"      
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
