@@ -78,7 +78,7 @@ services:
     image: {{ scalelite_nginx_image }}
     container_name: scalelite-nginx
     restart: unless-stopped
-    read_only: true
+#    read_only: true
     user: {{ scalelite_nginx_user_id }}:{{ scalelite_certbot_group_id }}
     ports:
       - "80:8080"
@@ -106,7 +106,7 @@ services:
     tmpfs:
         /tmp:rw,mode=777
         /etc/nginx:rw,mode=777
-        
+
     volumes:
       - {{ scalelite_nginx_logs_folder }}:/var/log/modsecurity
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
