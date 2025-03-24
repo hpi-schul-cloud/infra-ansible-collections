@@ -1,0 +1,43 @@
+---
+- name: Make sure the keyring directory exists (older distros)
+  file:
+    state: directory
+    path: /etc/apt/keyrings
+
+- name: Get key for Wazuh repo
+  ansible.builtin.get_url:
+    url: https://packages.wazuh.com/key/GPG-KEY-WAZUH
+    dest: /etc/apt/keyrings/wazuh.asc
+    checksum: "{{ wazuh_repokey_checksum | default(omit) }}"
+
+- name: Add Wazuh repo
+  ansible.builtin.apt_repository:
+    repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/wazuh.asc] https://packages.wazuh.com/4.x/apt/ stable main"
+    state: present
+
+- name: Install Wazuh agent
+  environment:
+    WAZUH_MANAGER: "{{ wazuh_manager_host }}"
+    WAZUH_AGENT_NAME: "{{ wazuh_agent_name }}"
+    WAZUH_AGENT_GROUP: "{{ wazuh_agent_group }}"
+    WAZUH_REGISTRATION_PASSWORD: "{{ wazuh_agent_registration_password }}"
+    WAZUH_REGISTRATION_CA: "{{ wazuh_agent_registration_ca }}"
+    WAZUH_REGISTRATION_CERTIFICATE: "{{ wazuh_agent_registration_certificate}}"
+    WAZUH_REGISTRATION_KEY: "{{ wazuh_agent_registration_key }}"
+  apt:
+    update_cache: true
+    name: "wazuh-agent{{ '=' ~ wazuh_agent_version if wazuh_agent_version is defined else '' }}"
+    allow_change_held_packages: "{{ wazuh_agent_hold_package }}"
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Hold Wazuh agent package
+  ansible.builtin.dpkg_selections:
+    name: wazuh-agent
+    selection: "{{ 'hold' if wazuh_agent_hold_package else 'install' }}"
+
+- name: Enable and start wazuh service
+  service:
+    name: wazuh-agent
+    enabled: true
+    state: started
+  ignore_errors: "{{ ansible_check_mode }}"
