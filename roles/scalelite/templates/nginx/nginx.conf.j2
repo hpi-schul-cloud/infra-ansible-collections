@@ -91,6 +91,7 @@ http {
 
 	# Includes virtual hosts configs.
 	access_log /var/log/nginx/access.log;
+	include /etc/nginx/conf.d/modsecurity.conf
 	include /etc/nginx/http.d/*.conf;
 }
 
