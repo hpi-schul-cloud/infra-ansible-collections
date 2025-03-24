@@ -97,7 +97,7 @@ services:
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
-      - {{ scalelite_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/templates/conf.d/default.conf.template
+      - {{ scalelite_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template
       - {{ scalelite_docker_volumes_folder }}/nginx/nodeexporter.conf:/etc/nginx/http.d/nodeexporter.conf
       - {{ scalelite_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
 {% if scalelite_greenlight_enabled | bool %}
