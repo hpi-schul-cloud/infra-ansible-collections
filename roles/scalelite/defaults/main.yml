@@ -118,25 +118,14 @@ scalelite_nginx_logs_folder: /var/log/nginx
 
 scalelite_modsec_logs_folder: /var/log/modsec
 
+
+scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or ON 
+scalelite_modsec_level: 1   # Paranoia level for ModSecurity 
 scalelite_modsec_before: |
   # Dummy comment
 
-scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or ON 
-scalelite_modsec_level: 2   # Paranoia level for ModSecurity 
 scalelite_modsec_after: |
-  SecRuleRemoveById 920350
-  SecRule REQUEST_URI "@beginsWith /.git/config" \
-    "id:1000,\
-    phase:1,\
-    pass,\
-    nolog,\
-    ctl:ruleRemoveById=930130"
-  SecRule REQUEST_URI "@beginsWith /fsapi" \
-    "id:1001,\
-    phase:1,\
-    pass,\
-    nolog,\
-    ctl:ruleRemoveById=932230"
+  # Dummy comment
 
 scalelite_user_id: 1000
 scalelite_group_id: 1000
