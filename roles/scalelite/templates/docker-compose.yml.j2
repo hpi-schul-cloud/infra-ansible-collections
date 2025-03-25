@@ -108,8 +108,8 @@ services:
       - "host.docker.internal:host-gateway"
     tmpfs:
       - /tmp:rw,mode=777
-#      - /opt/owasp-crs:rw,mode=777 
-#      - /var/cache/nginx:rw,mode=777 
+      - /opt/owasp-crs:rw,mode=777 
+      - /var/cache/nginx:rw,mode=777 
 
     volumes:
       - {{ scalelite_docker_volumes_folder }}/owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/opt/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
