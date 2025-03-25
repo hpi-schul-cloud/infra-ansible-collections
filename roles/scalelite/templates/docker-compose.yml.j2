@@ -89,10 +89,9 @@ services:
     environment:
       PORT: "8080"
       SSL_PORT: "8443"
-#      MODSEC_RULE_ENGINE: "On"
-      MODSEC_RULE_ENGINE: DetectionOnly
-      BLOCKING_PARANOIA: 1
-      DETECTION_PARANOIA: 1
+      MODSEC_RULE_ENGINE: {{ scalelite_modsec_mode }}
+      BLOCKING_PARANOIA: {{ scalelite_modsec_level }}
+      DETECTION_PARANOIA: {{ scalelite_modsec_level }}
       MODSEC_AUDIT_LOG: "/var/log/modsecurity/mod_sec_audit.log"
       MODSEC_DEBUG_LOG: "/var/log/modsecurity/mod_sec_debug.log"
       MODSEC_DEBUG_LOGLEVEL: 3      
@@ -101,7 +100,6 @@ services:
       MODSEC_TMP_DIR: "/tmp"
       MODSEC_RESP_BODY_ACCESS: "On"
       MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
-      ANNOMALY_INBOUND: 6
       REPORTING_LEVEL: 2
       COMBINED_FILE_SIZES: "65535"      
     extra_hosts:

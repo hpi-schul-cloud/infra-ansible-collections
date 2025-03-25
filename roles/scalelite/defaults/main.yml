@@ -121,6 +121,8 @@ scalelite_modsec_logs_folder: /var/log/modsec
 scalelite_modsec_before: |
   # Dummy comment
 
+scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or ON 
+scalelite_modsec_level: 2   # Paranoia level for ModSecurity 
 scalelite_modsec_after: |
   SecRuleRemoveById 920350
   SecRule REQUEST_URI "@beginsWith /.git/config" \
