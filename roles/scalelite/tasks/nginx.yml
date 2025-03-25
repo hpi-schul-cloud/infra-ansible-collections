@@ -95,4 +95,4 @@
     path: "{{ scalelite_nginx_logs_folder }}"
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_certbot_group_id }}"
-    recursive: true
+    recurse: true
