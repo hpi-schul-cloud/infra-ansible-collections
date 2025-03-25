@@ -76,3 +76,10 @@
 # SecRuleUpdateActionById 959100 "t:none,drop"
 
 {{ scalelite_modsec_after }}
+  SecRuleRemoveById 920350
+  SecRule REQUEST_URI "@beginsWith /.git/config" \
+    "id:1000,\
+    phase:1,\
+    pass,\
+    nolog,\
+    ctl:ruleRemoveById=930130"

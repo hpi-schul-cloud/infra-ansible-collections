@@ -121,13 +121,7 @@ scalelite_modsec_logs_folder: /var/log/modsec
 scalelite_modsec_before:
 
 scalelite_modsec_after:
-  SecRuleRemoveById 920350
-  SecRule REQUEST_URI "@beginsWith /.git/config" \
-    "id:1000,\
-    phase:1,\
-    pass,\
-    nolog,\
-    ctl:ruleRemoveById=930130"
+
 
 scalelite_user_id: 1000
 scalelite_group_id: 1000
