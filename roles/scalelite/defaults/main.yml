@@ -127,9 +127,13 @@ scalelite_modsec_after: |
     "id:1000,\
     phase:1,\
     pass,\
-    nolog,\
     ctl:ruleRemoveById=930130"
   SecRule REQUEST_URI "@beginsWith /fsapi" \
+    "id:1001,\
+    phase:1,\
+    pass,\
+    ctl:ruleRemoveById=932230"
+  SecRule REQUEST_URI "@beginsWith /thiswillneverhapen" \
     "id:1001,\
     phase:1,\
     pass,\
