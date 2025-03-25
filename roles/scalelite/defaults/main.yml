@@ -136,7 +136,7 @@ scalelite_modsec_after: |
     pass,\
     ctl:ruleRemoveById=932230"
   SecRule REQUEST_URI "@beginsWith /thiswillneverhapen" \
-    "id:1001,\
+    "id:1002,\
     phase:1,\
     pass,\
     nolog,\
