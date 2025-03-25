@@ -78,5 +78,5 @@
     mode: "0750"
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_nginx_group_id }}"
-    # recurse: true
+    recurse: true
 
