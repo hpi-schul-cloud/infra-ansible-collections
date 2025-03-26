@@ -116,11 +116,13 @@ scalelite_nginx_metrics_endpoints:
     private_port: 9187
 scalelite_nginx_logs_folder: /var/log/nginx
 
+scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or '"ON"'
+# Paranoia level for ModSecurity 
+scalelite_modsec_level: 1
+# Debug Level for logging
+scalelite_modsec_debuglevel: 1 
+scalelite_modsec_reportlevel: 1
 scalelite_modsec_logs_folder: /var/log/modsec
-
-
-scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or ON 
-scalelite_modsec_level: 1   # Paranoia level for ModSecurity 
 scalelite_modsec_before: |
   # Dummy comment
 

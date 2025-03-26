@@ -94,13 +94,13 @@ services:
       DETECTION_PARANOIA: {{ scalelite_modsec_level }}
       MODSEC_AUDIT_LOG: "/var/log/modsecurity/mod_sec_audit.log"
       MODSEC_DEBUG_LOG: "/var/log/modsecurity/mod_sec_debug.log"
-      MODSEC_DEBUG_LOGLEVEL: 3      
+      MODSEC_DEBUG_LOGLEVEL: {{ scalelite_modsec_debuglevel }}
       MODSEC_AUDIT_LOG_FORMAT: Native
       MODSEC_AUDIT_LOG_TYPE: Serial
       MODSEC_TMP_DIR: "/tmp"
       MODSEC_RESP_BODY_ACCESS: "On"
       MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
-      REPORTING_LEVEL: 2
+      REPORTING_LEVEL:  {{ scalelite_modsec_reportlevel }}
       COMBINED_FILE_SIZES: "65535"      
     extra_hosts:
       - "host.docker.internal:host-gateway"
