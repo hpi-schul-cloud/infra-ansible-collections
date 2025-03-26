@@ -63,14 +63,24 @@ services:
 {% if server_monitoring_node_exporter_textfile_collector_enabled %}
       - "--collector.textfile.directory={{ server_monitoring_node_exporter_textfile_directory }}"
 {% endif %}
+{% if server_monitoring_node_exporter_systemd_collector_enabled %}
+      - "--collector.systemd"
+{% endif %}
 {% for command in server_monitoring_node_exporter_extra_commands %}
       - "{{ command }}"
 {% endfor %}
     pid: "host"
+{% if server_monitoring_node_exporter_create_apparmor_profile %}
+    security_opt:
+      - apparmor:{{ server_monitoring_node_exporter_apparmor_profile }}
+{% endif %}
     volumes:
       - /:/host:ro
 {% if server_monitoring_node_exporter_textfile_collector_enabled %}
       - {{ server_monitoring_node_exporter_textfile_directory }}:{{ server_monitoring_node_exporter_textfile_directory }}
+{% endif %}
+{% if server_monitoring_node_exporter_systemd_collector_enabled %}
+      - /run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
 {% endif %}
 {% if server_monitoring_node_exporter_healthcheck is defined %}
     healthcheck:
