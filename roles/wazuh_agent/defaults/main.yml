@@ -1,0 +1,19 @@
+# wazuh_manager_host: host of the Wazu server (IP or domain)
+# 
+# wazuh_repokey_checksum: optional, if defined, the checksum of the Repository key will be verified
+# wazuh_agent_version: optional, can be defined to install a specific version
+# 
+# Optional (hostname is default)
+wazuh_agent_name: ""
+wazuh_agent_group: ""
+
+# Optional, see https://documentation.wazuh.com/current/user-manual/agent/agent-enrollment/security-options/index.html
+# Certificates/keys are paths (usual place would be /var/ossec/etc/<cert>)
+wazuh_agent_registration_password: ""
+wazuh_agent_registration_ca: ""
+wazuh_agent_registration_certificate: ""
+wazuh_agent_registration_key: ""
+
+# Recommended to prevent accidentally having a higher version than the server
+# (https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html#deploy-a-wazuh-agent)
+wazuh_agent_hold_package: true
