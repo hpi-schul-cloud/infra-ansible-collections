@@ -18,3 +18,8 @@
   community.docker.docker_container:
     name: bbb-autoscaler
     restart: true
+
+- name: Restart OWASP
+  community.docker.docker_container:
+    name: scalelite-nginx
+    restart: true
