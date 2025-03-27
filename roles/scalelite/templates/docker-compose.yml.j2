@@ -100,6 +100,8 @@ services:
       MODSEC_TMP_DIR: "/tmp"
       MODSEC_RESP_BODY_ACCESS: "On"
       MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
+      ANOMALY_INBOUND: {{ scalelite_modsec_inbound_anomaly }}
+      ANOMALY_OUTBOUND: {{ scalelite_modsec_outbound_anomaly }}      
       REPORTING_LEVEL:  {{ scalelite_modsec_reportlevel }}
       COMBINED_FILE_SIZES: "65535"      
     extra_hosts:

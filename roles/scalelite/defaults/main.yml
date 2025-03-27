@@ -123,6 +123,8 @@ scalelite_modsec_level: 1
 scalelite_modsec_debuglevel: 1 
 scalelite_modsec_reportlevel: 1
 scalelite_modsec_logs_folder: /var/log/modsec
+scalelite_modsec_outbound_anomaly: 4
+scalelite_modsec_inbound_anomaly: 5
 scalelite_modsec_before: |
   # Dummy comment
 
