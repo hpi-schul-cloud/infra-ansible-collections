@@ -26,3 +26,17 @@
       }
     dest: /etc/logrotate.d/scalelite-nginx
     mode: "0644"
+
+- name: Create Scalelite Modsec logrotate config
+  copy:
+    content: |
+      {{ scalelite_modsec_logs_folder }}/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/scalelite-modsec
+    mode: "0644"

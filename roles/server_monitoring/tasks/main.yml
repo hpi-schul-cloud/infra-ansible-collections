@@ -112,6 +112,21 @@
     recurse: true
   when: server_monitoring_nginx_enabled
 
+- name: Create Node-Exporter AppArmor profile
+  template:
+    src: node-exporter-apparmor.j2
+    dest: "/etc/apparmor.d/{{ server_monitoring_node_exporter_apparmor_profile }}"
+    mode: "0600"
+    owner: root
+    group: root
+  register: create_node_exporter_apparmor
+  when: server_monitoring_node_exporter_create_apparmor_profile
+
+- name: Load Node-Exporter AppArmor profile
+  command:
+    cmd: "apparmor_parser -r /etc/apparmor.d/{{ server_monitoring_node_exporter_apparmor_profile }}"
+  when: create_node_exporter_apparmor.changed
+
 - name: Copy docker-compose.yml
   template:
     src: docker-compose.yml.j2

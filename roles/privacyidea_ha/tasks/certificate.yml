@@ -119,9 +119,7 @@
     content: |
       #!/bin/bash
       service ha-cluster-exporter reload
-      {% if is_main_node %}
-      service nginx reload
-      {% endif %}
+      pcs resource restart nginx
 
 - name: Execute the post hook to close port and sync the certificate for the first time
   command: bash /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
