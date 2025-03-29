@@ -121,6 +121,7 @@ services:
       - {{ scalelite_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template
       - {{ scalelite_docker_volumes_folder }}/nginx/nodeexporter.conf:/etc/nginx/http.d/nodeexporter.conf
       - {{ scalelite_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
+      - {{ scalelite_docker_volumes_folder }}/nginx/error.html:/var/www/html/error.html
 {% if scalelite_greenlight_enabled | bool %}
       - {{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx:/etc/nginx/http.d/scalelite/greenlight.nginx
 {% endif %}
