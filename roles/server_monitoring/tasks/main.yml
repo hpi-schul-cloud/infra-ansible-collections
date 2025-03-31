@@ -103,14 +103,6 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
-- name: Create server monitoring nginx container tmp directory 
-  become: true
-  file:
-    path: "/tmp/container_nginx"
-    state: directory
-    owner: "{{ server_monitoring_nginx_user_id }}"
-    group: "{{ server_monitoring_nginx_group_id }}"
-    mode: "0775"
 
 - name: Create server monitoring nginx container logs directory 
   become: true

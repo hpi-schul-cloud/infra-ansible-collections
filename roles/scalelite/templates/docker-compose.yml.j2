@@ -293,7 +293,7 @@ services:
     deploy:
       resources:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
-wstance.name }}:
+  greenlight-{{ instance.name }}:
     image: {{ instance.image | default(scalelite_greenlight_image_repository ~ ":" ~ scalelite_greenlight_image_tag) }}
     container_name: greenlight-{{ instance.name }}
     restart: unless-stopped
