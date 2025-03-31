@@ -16,6 +16,7 @@ services:
 {% if server_monitoring_nginx_enabled %}
   nginx:
     image: {{ server_monitoring_nginx_image }}
+    read_only: true
     container_name: nginx
     restart: unless-stopped
     user: {{ server_monitoring_nginx_user_id }}:{{ server_monitoring_nginx_group_id }}
@@ -35,6 +36,7 @@ services:
       - "host.docker.internal:host-gateway"
     # here we should add readonly etc
     volumes:
+      - /tmp/container_nginx:/tmp/:rw
       - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx:rw
       - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt:rw
 {% if server_monitoring_certbot_enabled %}

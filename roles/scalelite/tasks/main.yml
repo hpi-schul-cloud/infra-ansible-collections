@@ -48,6 +48,18 @@
       mode: "0700"
       owner: "{{ scalelite_user_id }}"
       group: "{{ scalelite_group_id }}"
+    - path: "{{ scalelite_nginx_logs_folder }}"
+      mode: "0750"
+      owner: "{{ scalelite_nginx_user_id }}"
+      group: "{{ scalelite_certbot_group_id }}"
+    - path: "/tmp/container_certbot
+      mode: "0700"
+      # make this a variable
+      owner: "2325"
+      group: "2325"
+    # evalutae whether the container should get a own user with access to this, this is all writeable, used for yarn stuff
+    # - path: "tmp/container_greenlight"
+    #   mode: "0777"
 
 - name: Create Redis data folders for extra Greenlight instances
   file:

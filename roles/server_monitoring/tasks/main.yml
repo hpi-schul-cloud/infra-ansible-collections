@@ -103,14 +103,23 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
-- name: Set log permissions
+- name: Create server monitoring nginx container tmp directory 
+  become: true
   file:
-    path: "{{ server_monitoring_nginx_logs_folder }}"
-    mode: "0750"
+    path: "/tmp/container_nginx"
+    state: directory
     owner: "{{ server_monitoring_nginx_user_id }}"
     group: "{{ server_monitoring_nginx_group_id }}"
-    recurse: true
-  when: server_monitoring_nginx_enabled
+    mode: "0775"
+
+- name: Create server monitoring nginx container logs directory 
+  become: true
+  file:
+    path: "{{ server_monitoring_nginx_logs_folder }}"
+    state: directory
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+    mode: "0775"
 
 - name: Create Node-Exporter AppArmor profile
   template:
