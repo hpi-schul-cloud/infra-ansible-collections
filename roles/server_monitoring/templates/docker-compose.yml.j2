@@ -34,8 +34,9 @@ services:
 {% endfor %}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    tmpfs:
+      - /tmp:rw,mode=777
     volumes:
-      - /tmp/container_nginx:/tmp/:rw
       - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx
       - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt
 {% if server_monitoring_certbot_enabled %}

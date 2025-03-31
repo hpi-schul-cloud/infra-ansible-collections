@@ -39,6 +39,13 @@
     group: "{{ clamav_group_id }}"
     mode: "0775"
 
+
+- name: Remove clamav-scan container if it exists
+  docker_container:
+    name: "{{ clamav_container_name }}"
+    state: absent
+  when: clamav_delete_old_container
+
 - name: Create Clamav Docker-Compose folder
   file:
     path: "{{ clamav_folder }}"
@@ -54,14 +61,6 @@
     mode: "0600"
     owner: "{{ clamav_folder_owner }}"
     group: "{{ clamav_folder_group }}"
-
-- name: Create Clamav /tmp folder
-  file:
-    path: "tmp/container_clamav"
-    state: directory
-    mode: "0700"
-    owner: "{{ clamav_user_id }}"
-    group: "{{ clamav_group_id }}"
 
 - name: Docker-compose up
   community.docker.docker_compose:

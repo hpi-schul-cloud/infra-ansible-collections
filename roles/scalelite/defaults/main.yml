@@ -91,7 +91,7 @@ scalelite_redis_resources:
 scalelite_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
 scalelite_nginx_user_id: 101
 scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
-scalelite_nginx_logs_folder: /var/log/nginx/container_scalelite-nginx
+scalelite_nginx_logs_folder: /var/log/nginx
 scalelite_nginx_dhparam_size: 4096
 scalelite_nginx_worker_processes: auto
 scalelite_nginx_ssl: true
@@ -179,3 +179,5 @@ scalelite_autoscaler_environment: []
 scalelite_node_exporter_textfile_directory: /node-exporter-textfiles/
 scalelite_node_exporter_user_id: 65534
 scalelite_node_exporter_group_id: 65534
+
+scalelite_delete_old_nginx_logrotate: true

@@ -16,8 +16,8 @@ services:
     user: {{ scalelite_postgres_user_id }}:{{ scalelite_postgres_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/postgres_data/:/var/lib/postgresql/data
-      # not sure wheter to put it one folder in hierarchiy down or not
-      - {{ scalelite_docker_volumes_folder }}/postgres_data/:/var/run
+    tmpfs:
+      - /var/run:rw,mode=777
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -61,7 +61,8 @@ services:
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
       - {{ scalelite_docker_volumes_folder }}/certbot/:/certbot
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
-      - /tmp/container_certbot:/tmp
+    tmpfs:
+      - /tmp:rw,mode=777
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; sleep 12h & wait $${!}; done;'"
     environment:
 {% if scalelite_aws_access_key_id is defined %}
@@ -292,8 +293,7 @@ services:
     deploy:
       resources:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
-
-  greenlight-{{ instance.name }}:
+wstance.name }}:
     image: {{ instance.image | default(scalelite_greenlight_image_repository ~ ":" ~ scalelite_greenlight_image_tag) }}
     container_name: greenlight-{{ instance.name }}
     restart: unless-stopped
