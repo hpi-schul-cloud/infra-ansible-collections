@@ -128,6 +128,21 @@
     cmd: "apparmor_parser -r /etc/apparmor.d/{{ server_monitoring_node_exporter_apparmor_profile }}"
   when: create_node_exporter_apparmor.changed
 
+# once executed this task can get deleted
+- name: Ensure /etc/logrotate/file is removed
+  file:
+    path: /etc/logrotate.d/nginx
+    state: absent
+  when: delete_old_nginx_logrotate
+
+# once executed this task can get deleted
+- name: Change ownership of files in /var/log/nginx
+  file:
+    path: /var/log/nginx
+    recurse: yes
+    owner: systemd-resolve
+    group: ssl-certs
+
 - name: Copy docker-compose.yml
   template:
     src: docker-compose.yml.j2
