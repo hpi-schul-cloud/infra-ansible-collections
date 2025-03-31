@@ -119,7 +119,7 @@
     state: directory
     owner: "{{ server_monitoring_nginx_user_id }}"
     group: "{{ server_monitoring_nginx_group_id }}"
-    mode: "0775"
+    mode: "0750"
 
 - name: Create Node-Exporter AppArmor profile
   template:

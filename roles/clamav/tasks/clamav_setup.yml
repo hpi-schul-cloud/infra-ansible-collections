@@ -47,14 +47,6 @@
     owner: "{{ clamav_folder_owner }}"
     group: "{{ clamav_folder_group }}"
 
-- name: Create Clamav /tmp folder
-  file:
-    path: "{{ clamav_folder }}/tmp"
-    state: directory
-    mode: "0750"
-    owner: "{{ clamav_user_id }}"
-    group: "{{ clamav_group_id }}"
-
 - name: Create Clamav Docker-Compose file
   template:
     src: docker-compose.yml.j2
@@ -62,6 +54,14 @@
     mode: "0600"
     owner: "{{ clamav_folder_owner }}"
     group: "{{ clamav_folder_group }}"
+
+- name: Create Clamav /tmp folder
+  file:
+    path: "tmp/container_clamav"
+    state: directory
+    mode: "0700"
+    owner: "{{ clamav_user_id }}"
+    group: "{{ clamav_group_id }}"
 
 - name: Docker-compose up
   community.docker.docker_compose:

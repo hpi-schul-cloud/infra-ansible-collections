@@ -38,15 +38,9 @@ clamav_resources:
   limits:
     cpus: '0.5'
     memory: '2G'
-  # needed?
-  # reservations:
-  #   cpus: '0.01'
-  #   memory: '6M'
+  reservations:
+    cpus: '0.05'
+    memory: '500M'
 clamav_remove: false
 clamav_quarantine: true
 clamav_quarantine_path: "/var/lib/clamav-quarantine"
-# clamav_container_health_check:
-#   test: ["CMD", "bash", "-c", "echo 'hello_world'"]
-#   interval: 30s
-#   retries: 3
-#   timeout: 30s

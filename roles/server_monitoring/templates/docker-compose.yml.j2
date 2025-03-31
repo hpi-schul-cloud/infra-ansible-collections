@@ -34,17 +34,16 @@ services:
 {% endfor %}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    # here we should add readonly etc
     volumes:
       - /tmp/container_nginx:/tmp/:rw
-      - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx:rw
-      - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt:rw
+      - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx
+      - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt
 {% if server_monitoring_certbot_enabled %}
-      - {{ server_monitoring_docker_volumes_folder }}/webroot:/var/www/certbot:rw
+      - {{ server_monitoring_docker_volumes_folder }}/webroot:/var/www/certbot
 {% endif %}
-      - {{ server_monitoring_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - {{ server_monitoring_docker_volumes_folder }}/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - {{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd:ro
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
 {% if server_monitoring_nginx_healthcheck is defined %}
     healthcheck:
       {{ server_monitoring_nginx_healthcheck | to_nice_yaml | indent(6) }}

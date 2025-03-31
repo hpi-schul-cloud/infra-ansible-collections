@@ -10,7 +10,7 @@ services:
     ports: 
       - "{{ clamav_port }}:3310"
     volumes:
-      - "{{ clamav_folder }}/tmp:/tmp:rw"
+      - "/tmp/container_clamav:/tmp:rw"
       - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory | length > 0 else '' }}"
       - "{{ clamav_log_path }}:/var/log/clamav:rw"
       - "{{ clamav_db_path }}:/var/lib/clamav:rw"
