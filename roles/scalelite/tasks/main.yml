@@ -91,12 +91,6 @@
     mode: "0400"
   notify: Restart bbb-autoscaler
 
-- name: Ensure /etc/logrotate/file is removed
-  file:
-    path: /etc/logrotate.d/nginx
-    state: absent
-  when: scalelite_delete_old_nginx_logrotate
-
 - name: Docker-Compose
   include_tasks: docker-compose.yml
 
