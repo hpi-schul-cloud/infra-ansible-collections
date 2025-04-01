@@ -45,7 +45,8 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_data:/data
-      - {{ scalelite_docker_volumes_folder }}/redis_data/redis.conf:/redis-stack.conf
+      - {{ scalelite_docker_volumes_folder }}/redis_data/redis.conf:/usr/local/etc/redis.conf
+    command: ["/usr/local/etc/redis.conf"]
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -63,7 +64,8 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data:/data
-      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/redis-stack.conf
+      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/redis.conf
+    command: ["/usr/local/etc/redis.conf"]
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -301,6 +303,8 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_{{ instance.name }}_data:/data
+      - {{ scalelite_docker_volumes_folder }}/redis_{{ instance.name }}_data/redis.conf:/usr/local/etc/redis.conf
+    command: ["/usr/local/etc/redis.conf"]
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
       interval: 30s
