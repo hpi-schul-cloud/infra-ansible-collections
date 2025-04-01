@@ -3,6 +3,7 @@ version: '3'
 volumes:
   postgres-data:
   redis-data:
+  redis-greenlight-data:
 {% for instance in scalelite_greenlight_extra_instances %}
   redis-{{ instance.name }}-data:
 {% endfor %}
@@ -37,6 +38,23 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_data:/data
+    healthcheck:
+      test:  ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # start_period: 60s
+    deploy:
+      resources:
+        {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
+
+  redis-greenlight:
+    image: {{ scalelite_redis_image }}
+    container_name: redis-greenlight
+    restart: unless-stopped
+    user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
+    volumes:
+      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data:/data
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -237,7 +255,7 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://redis-greenlight:6379
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-v3
 {% if greenlight_phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ greenlight_phone_number }}
