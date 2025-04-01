@@ -85,7 +85,8 @@
 # You will also need to set a password unless you explicitly disable protected
 # mode.
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-bind 127.0.0.1 -::1
+# As we are running in an isolated container we will bind all interfaces
+# bind 127.0.0.1 -::1
 
 # By default, outgoing connections (from replica to master, from Sentinel to
 # instances, cluster bus, etc.) are not bound to a specific local address. In
