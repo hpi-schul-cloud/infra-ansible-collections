@@ -62,6 +62,20 @@
     group: "{{ scalelite_redis_group_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
 
+- name: Create Redis Configuration for main redis instances
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}/redis.conf"
+  loop:
+    - redis_data
+    - redis_greenlight_data
+
+- name: Create Redis Configuration for extra redis instances
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item }}_data/redis.conf"
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+
 - name: Certbot
   include_tasks: certbot.yml
 

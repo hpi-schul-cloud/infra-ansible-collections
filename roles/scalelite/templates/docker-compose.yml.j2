@@ -38,6 +38,7 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_data:/data
+      - {{ scalelite_docker_volumes_folder }}/redis_data/redis.conf:/redis-stack.conf
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -55,6 +56,7 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data:/data
+      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/redis-stack.conf
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -278,7 +280,7 @@ services:
       # start_period: 60s
     depends_on:
       - db
-      - redis
+      - redis-greenlight
     deploy:
       resources:
         {{ scalelite_greenlight_resources | to_nice_yaml | indent(8) }}
