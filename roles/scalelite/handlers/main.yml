@@ -31,7 +31,7 @@
 
 - name: Restart Redis redis_greenlight_data
   community.docker.docker_container:
-    name: redis_greenlight
+    name: redis-greenlight
     restart: true
 
 - name: Restart Redis Instaces
