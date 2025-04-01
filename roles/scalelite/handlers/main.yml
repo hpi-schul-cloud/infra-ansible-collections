@@ -24,12 +24,12 @@
     name: scalelite-nginx
     restart: true
 
-- name: Restart redis_data
+- name: Restart Redis redis_data
   community.docker.docker_container:
     name: redis
     restart: true
 
-- name: Restart redis_greenlight_data
+- name: Restart Redis redis_greenlight_data
   community.docker.docker_container:
     name: redis_greenlight
     restart: true
