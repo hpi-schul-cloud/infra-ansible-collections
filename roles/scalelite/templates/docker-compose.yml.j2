@@ -8,6 +8,13 @@ volumes:
   redis-{{ instance.name }}-data:
 {% endfor %}
 
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 192.168.64.0/20
+
+
 services:
   db:
     image: "{{ scalelite_postgres_image }}"
