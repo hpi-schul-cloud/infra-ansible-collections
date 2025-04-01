@@ -69,7 +69,7 @@
   loop:
     - redis_data
     - redis_greenlight_data
-  notify: Restart Redis
+  notify: Restart Redis {{ item }}
 
 - name: Create Redis Configuration for extra redis instances
   template:
