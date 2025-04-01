@@ -26,12 +26,14 @@
 
 - name: Restart Redis
   community.docker.docker_container:
-    name: {{ item }}
+    name: redis
     restart: true
-  loop:
-    - redis
-    - redis-greenlight
-    
+
+- name: Restart Redis-Greenlight
+  community.docker.docker_container:
+    name: redis-greenlight
+    restart: true
+
 - name: Restart Redis Instaces
   community.docker.docker_container:
     name: redis-{{ item.name }}
