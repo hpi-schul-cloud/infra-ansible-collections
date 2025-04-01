@@ -23,3 +23,19 @@
   community.docker.docker_container:
     name: scalelite-nginx
     restart: true
+
+- name: Restart Redis
+  community.docker.docker_container:
+    name: {{ item }}
+    restart: true
+  loop:
+    - redis
+    - redis-greenlight
+    
+- name: Restart Redis Instaces
+  community.docker.docker_container:
+    name: redis-{{ item.name }}
+    restart: true
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  
+  
