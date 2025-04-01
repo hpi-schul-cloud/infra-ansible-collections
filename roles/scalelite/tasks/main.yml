@@ -65,7 +65,7 @@
 - name: Create Redis Configuration for main redis instances
   template:
     src: "templates/redis/redis.conf.j2"
-    dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}/redis.conf"
+    dest: "{{ scalelite_docker_volumes_folder }}/{{ item.name }}/redis.conf"
   loop:
     - redis_data
     - redis_greenlight_data
