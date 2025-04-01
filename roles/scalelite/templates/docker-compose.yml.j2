@@ -64,7 +64,7 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data:/data
-      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/redis.conf
+      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/usr/local/etc/redis.conf
     command: ["/usr/local/etc/redis.conf"]
     healthcheck:
       test:  ["CMD", "redis-cli", "ping"]
