@@ -47,6 +47,12 @@ server {
     proxy_http_version 1.1;
   }
 
+  error_page 400 401 403 404 500 502 503 504 /error.html;
+  location = /error.html {
+    root /var/www/html;
+    internal;
+  }
+
   include http.d/scalelite/*;
 }
 
