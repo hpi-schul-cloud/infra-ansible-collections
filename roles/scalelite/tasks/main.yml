@@ -30,6 +30,10 @@
       mode: "0700"
       owner: "{{ scalelite_redis_user_id }}"
       group: "{{ scalelite_redis_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/redis_api_data"
+      mode: "0700"
+      owner: "{{ scalelite_redis_user_id }}"
+      group: "{{ scalelite_redis_group_id }}"
     - path: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data"
       mode: "0700"
       owner: "{{ scalelite_redis_user_id }}"
@@ -68,6 +72,7 @@
     dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}/redis.conf"
   loop:
     - redis_data
+    - redis_api_data
     - redis_greenlight_data
   notify: Restart Redis {{ item }}
 

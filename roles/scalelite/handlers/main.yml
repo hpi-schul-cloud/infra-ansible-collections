@@ -29,6 +29,11 @@
     name: redis
     restart: true
 
+- name: Restart Redis redis_api_data
+  community.docker.docker_container:
+    name: api-redis
+    restart: true
+
 - name: Restart Redis redis_greenlight_data
   community.docker.docker_container:
     name: redis-greenlight
