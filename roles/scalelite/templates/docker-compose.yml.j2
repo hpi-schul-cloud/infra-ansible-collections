@@ -57,26 +57,6 @@ services:
       resources:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
 
-  api-redis:
-    image: {{ scalelite_redis_image }}
-    container_name: api-redis
-    restart: unless-stopped
-    user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
-    volumes:
-      - {{ scalelite_docker_volumes_folder }}/redis_api_data:/data
-      - {{ scalelite_docker_volumes_folder }}/redis_api_data/redis.conf:/usr/local/etc/redis.conf
-    command: ["/usr/local/etc/redis.conf"]
-    healthcheck:
-      test:  ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      # start_period: 60s
-    deploy:
-      resources:
-        {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
-
-
   redis-greenlight:
     image: {{ scalelite_redis_image }}
     container_name: redis-greenlight
@@ -200,7 +180,7 @@ services:
     environment:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - LOADBALANCER_SECRET=${LOADBALANCER_SECRET}
-      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@api-redis:6379
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis:6379
       - DATABASE_URL=postgresql://postgres:{{ scalelite_postgres_password }}@db:5432/scalelite?pool=5
       - WEB_CONCURRENCY={{ scalelite_web_concurrency }}
       - RAILS_MAX_THREADS={{ scalelite_rails_max_threads }}
