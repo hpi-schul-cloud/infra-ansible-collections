@@ -200,7 +200,7 @@ services:
     environment:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - LOADBALANCER_SECRET=${LOADBALANCER_SECRET}
-      - REDIS_URL=redis://$(REDIS_USER):$(REDIS_SECRET)@api-redis:6379
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@api-redis:6379
       - DATABASE_URL=postgresql://postgres:{{ scalelite_postgres_password }}@db:5432/scalelite?pool=5
       - WEB_CONCURRENCY={{ scalelite_web_concurrency }}
       - RAILS_MAX_THREADS={{ scalelite_rails_max_threads }}
@@ -232,7 +232,7 @@ services:
     restart: unless-stopped
     environment:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
-      - REDIS_URL=redis://$(REDIS_USER):$(REDIS_SECRET)@redis:6379
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis:6379
       - WEB_CONCURRENCY={{ scalelite_web_concurrency }}
       - RAILS_MAX_THREADS={{ scalelite_rails_max_threads }}
       - SERVER_ID_IS_HOSTNAME=true
@@ -285,7 +285,7 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://$(REDIS_USER)}:$(REDIS_SECRET)@redis-greenlight:6379
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis-greenlight:6379
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-v3
 {% if greenlight_phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ greenlight_phone_number }}
@@ -345,7 +345,7 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://$(REDIS_USER):$(REDIS_SECRET)@redis-{{ instance.name}}:6379
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis-{{ instance.name}}:6379
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
 {% if instance.phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ instance.phone_number }}
