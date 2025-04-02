@@ -89,7 +89,7 @@ scalelite_redis_resources:
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
 # Connection metrics-user
 scalelite_redis_user: "worker"
-scalelite_redis_password: "1_SomeSecretPassword_!"  
+# scalelite_redis_password: "1_SomeSecretPassword_!"  
 
 scalelite_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
 scalelite_nginx_user_id: 101
