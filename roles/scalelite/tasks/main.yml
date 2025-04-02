@@ -75,6 +75,9 @@
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/redis.conf"
+    mode: '0600'
+    group: {{ scalelite_redis_group_id }}
+    owner: {{ scalelite_redis_user_id }}
   loop: "{{ scalelite_greenlight_extra_instances }}"
   notify: Restart Redis Instaces
 
