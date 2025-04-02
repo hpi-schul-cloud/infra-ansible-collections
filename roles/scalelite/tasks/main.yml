@@ -66,6 +66,9 @@
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
   loop:
     - redis_data
     - redis_greenlight_data
