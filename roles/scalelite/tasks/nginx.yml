@@ -18,6 +18,7 @@
     - nginx/nginx.conf
     - nginx/scalelite.conf
     - nginx/error.html
+    
 - name: Copy OWASP config (templates)
   template:
     src: "{{ item }}.j2"
