@@ -1037,7 +1037,7 @@ replica-priority 100
 #
 # For more information about ACL configuration please refer to
 # the Redis web site at
-user {{ scalelite_redis_user }} on +@all -@admin -@dangerous allkeys >{{ scalelite_redis_password }}
+user {{ scalelite_redis_user }} on +@all -@admin -@dangerous ~* &* >{{ scalelite_redis_password }}
 user default off
 
 # ACL LOG
