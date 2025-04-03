@@ -12,6 +12,16 @@ server {
         deny all;
         return 404;
 	}
+
+    {% if neutral_error_pages %}
+    error_page 400 401 403 404 500 502 503 504 /error.html;
+    location = /error.html {
+        root /var/www/html;
+        internal;
+        return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';      
+    }
+    {% endif %}
+
 }
 
 server {
@@ -29,6 +39,14 @@ server {
         deny all;
         return 404;
 	}
+    {% if neutral_error_pages %}
+    error_page 400 401 403 404 500 502 503 504 /error.html;
+    location = /error.html {
+        root /var/www/html;
+        internal;
+        return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';      
+    }
+    {% endif %}
 }
 {% endif %}
 
@@ -56,6 +74,14 @@ server {
         deny all;
         return 404;
 	}
+    {% if neutral_error_pages %}
+    error_page 400 401 403 404 500 502 503 504 /error.html;
+    location = /error.html {
+        root /var/www/html;
+        internal;
+        return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';      
+    }
+    {% endif %}
 }
 
 {% if server_monitoring_cadvisor_enabled %}
@@ -83,6 +109,14 @@ server {
         deny all;
         return 404;
 	}
+    {% if neutral_error_pages %}
+    error_page 400 401 403 404 500 502 503 504 /error.html;
+    location = /error.html {
+        root /var/www/html;
+        internal;
+        return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';      
+    }
+    {% endif %}
 }
 {% endif %}
 
@@ -111,6 +145,14 @@ server {
         deny all;
         return 404;
 	}
+    {% if neutral_error_pages %}
+    error_page 400 401 403 404 500 502 503 504 /error.html;
+    location = /error.html {
+        root /var/www/html;
+        internal;
+        return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';      
+    }
+    {% endif %}
 }
 {% endfor %}
 
@@ -126,4 +168,12 @@ server {
         deny all;
         return 404;
 	}
+    {% if neutral_error_pages %}
+    error_page 400 401 403 404 500 502 503 504 /error.html;
+    location = /error.html {
+        root /var/www/html;
+        internal;
+        return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';      
+    }
+    {% endif %}
 }
