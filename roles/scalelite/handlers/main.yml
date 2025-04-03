@@ -23,3 +23,8 @@
   community.docker.docker_container:
     name: scalelite-nginx
     restart: true
+
+- name: Restart postgres
+  community.docker.docker_container:
+    name: db
+    restart: true

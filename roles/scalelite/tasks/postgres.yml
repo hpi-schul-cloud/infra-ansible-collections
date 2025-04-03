@@ -1,0 +1,20 @@
+---
+- name: Make sure the postgres is up
+  community.docker.docker_container_info:
+    name: db
+  until: "container_info.container.State.Health.Status == 'healthy'"
+  register: container_info
+  retries: 15
+  delay: 10
+
+- name: Prevent external connection as postgres user
+  lineinfile:
+    path: "{{ scalelite_docker_volumes_folder }}/postgres_data/pg_hba.conf"
+    line: "host all postgres all reject"
+    insertbefore: "^host\\s+all\\s+all\\s+all"
+  notify: Restart postgres
+
+- name: Ensure the correct permissions for the DBs
+  community.docker.docker_container_exec:
+    container: db
+    command: "{{ scalelite_docker_volumes_folder }}/postgres_init/db_permissions.sh"
