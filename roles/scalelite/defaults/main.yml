@@ -87,7 +87,8 @@ scalelite_redis_resources:
   limits:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
-# Connection metrics-user
+
+# Connection redis-user
 scalelite_redis_user: "worker"
 # scalelite_redis_password: "1_SomeSecretPassword_!"  
 
