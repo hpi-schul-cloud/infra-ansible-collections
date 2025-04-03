@@ -17,4 +17,4 @@
 - name: Ensure the correct permissions for the DBs
   community.docker.docker_container_exec:
     container: db
-    command: "{{ scalelite_docker_volumes_folder }}/postgres_init/db_permissions.sh"
+    command: "/docker-entrypoint-initdb.d/db_permissions.sh"
