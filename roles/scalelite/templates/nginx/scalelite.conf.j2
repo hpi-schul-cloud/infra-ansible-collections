@@ -6,7 +6,7 @@ server {
 
    error_page 400 401 403 404 500 502 503 504 /error.html;
   location = /error.html {
-    return $status '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';
+    return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';
     internal;
   }
   
@@ -57,7 +57,7 @@ server {
   error_page 400 401 403 404 500 502 503 504 /error.html;
   location = /error.html {
     internal;
-    return $status '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';
+    return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';
   }
 
   include http.d/scalelite/*;
@@ -86,7 +86,7 @@ server {
   error_page 400 401 403 404 500 502 503 504 /error.html;
   location = /error.html {
     internal;
-    return $status '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';
+    return 500 '<html><body><h1>Error Code: $status</h1><p>Something went wrong. Please try again later or contact your administrator.</p></body></html>';
   }
 
   location /.well-known/acme-challenge/ {
