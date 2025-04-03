@@ -267,8 +267,8 @@ services:
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
       - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis-greenlight:6379
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-v3
-{% if greenlight_phone_number is defined %}
-      - VOICE_BRIDGE_PHONE_NUMBER={{ greenlight_phone_number }}
+{% if scalelite_greenlight_phone_number is defined %}
+      - VOICE_BRIDGE_PHONE_NUMBER={{ scalelite_greenlight_phone_number }}
 {% endif %}
 {% if scalelite_greenlight_allow_mail_notifications %}
       - SMTP_SERVER=${SMTP_SERVER}
