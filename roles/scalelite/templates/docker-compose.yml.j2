@@ -12,7 +12,7 @@ networks:
   default:
     ipam:
       config:
-        - subnet: 192.168.64.0/20
+        - subnet: {{ scalelite_docker_net }}
 
 
 services:
@@ -67,7 +67,7 @@ services:
       - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/usr/local/etc/redis.conf
     command: ["/usr/local/etc/redis.conf"]
     healthcheck:
-      test:  ["CMD-SHELL", "redis-cli --user '${REDIS_USER}' --pass '${REDIS_SECRET}' ping | grep 'PONG' || exit 1"]
+      test:  ["CMD-SHELL", "redis-cli --user '${GREENLIGHT_REDIS_USER}' --pass '${GREENLIGHT_REDIS_SECRET}' ping | grep 'PONG' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -265,7 +265,7 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis-greenlight:6379
+      - REDIS_URL=redis://${GREENLIGHT_REDIS_USER}:${GREENLIGHT_REDIS_SECRET}@redis-greenlight:6379
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-v3
 {% if scalelite_greenlight_phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ scalelite_greenlight_phone_number }}
@@ -305,7 +305,7 @@ services:
       - {{ scalelite_docker_volumes_folder }}/redis_{{ instance.name }}_data/redis.conf:/usr/local/etc/redis.conf
     command: ["/usr/local/etc/redis.conf"]
     healthcheck:
-      test:  ["CMD-SHELL", "redis-cli --user '${REDIS_USER}' --pass '${REDIS_SECRET}' ping | grep 'PONG' || exit 1"]
+      test:  ["CMD-SHELL", "redis-cli --user '${GREENLIGHT_REDIS_USER}' --pass '${GREENLIGHT_REDIS_SECRET}' ping | grep 'PONG' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -325,7 +325,7 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis-{{ instance.name}}:6379
+      - REDIS_URL=redis://${GREENLIGHT_REDIS_USER}:${GREENLIGHT_REDIS_SECRET}@redis-{{ instance.name}}:6379
       - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
 {% if instance.phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ instance.phone_number }}
