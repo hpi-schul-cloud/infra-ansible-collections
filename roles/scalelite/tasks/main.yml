@@ -52,6 +52,10 @@
       mode: "0700"
       owner: "{{ scalelite_user_id }}"
       group: "{{ scalelite_group_id }}"
+    - path: "{{ scalelite_nginx_logs_folder }}"
+      mode: "0750"
+      owner: "{{ scalelite_nginx_user_id }}"
+      group: "{{ scalelite_certbot_group_id }}"
 
 - name: Create Redis data folders for extra Greenlight instances
   file:

@@ -25,7 +25,7 @@ scalelite_certbot_resources:
     memory: 10M
   limits:
     cpus: '0.3'
-    memory: 30M
+    memory: 70M
 # scalelite_letsencrypt_email:
 
 
@@ -98,6 +98,7 @@ scalelite_greenlight_redis_user: "greenlight"
 scalelite_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
 scalelite_nginx_user_id: 101
 scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
+scalelite_nginx_logs_folder: /var/log/nginx
 scalelite_nginx_dhparam_size: 4096
 scalelite_nginx_worker_processes: auto
 scalelite_nginx_ssl: true
@@ -121,7 +122,6 @@ scalelite_nginx_metrics_endpoints:
   - name: postgres-exporter
     public_port: 9188
     private_port: 9187
-scalelite_nginx_logs_folder: /var/log/nginx
 
 scalelite_docker_net: "192.168.64.0/24"
 scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or '"ON"'

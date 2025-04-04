@@ -3,6 +3,7 @@ version: '3'
 services:
   coturn:
     image: {{ coturn_docker_image }}
+    read_only: true
     container_name: coturn
     user: "{{ coturn_user_id }}:{{ coturn_group_id }}"
 {% if coturn_docker_network_mode_host %}

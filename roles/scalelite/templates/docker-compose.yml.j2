@@ -10,10 +10,13 @@ services:
   db:
     image: "{{ scalelite_postgres_image }}"
     container_name: db
+    read_only: true
     restart: unless-stopped
     user: {{ scalelite_postgres_user_id }}:{{ scalelite_postgres_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/postgres_data/:/var/lib/postgresql/data
+    tmpfs:
+      - /var/run:rw,mode=777
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -32,6 +35,7 @@ services:
   redis:
     image: {{ scalelite_redis_image }}
     container_name: redis
+    read_only: true
     restart: unless-stopped
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
@@ -70,12 +74,15 @@ services:
   certbot:
     image: {{ scalelite_certbot_image_repository }}:{{ scalelite_certbot_image_tag }}
     container_name: certbot
+    read_only: true
     restart: unless-stopped
     user: {{ scalelite_certbot_user_id }}:{{ scalelite_certbot_group_id }}
     volumes:
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
       - {{ scalelite_docker_volumes_folder }}/certbot/:/certbot
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
+    tmpfs:
+      - /tmp:rw,mode=777
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; sleep 12h & wait $${!}; done;'"
     environment:
 {% if scalelite_aws_access_key_id is defined %}
@@ -97,8 +104,8 @@ services:
   scalelite-nginx:
     image: {{ scalelite_nginx_image }}
     container_name: scalelite-nginx
+    # read_only: true #currently not supported by modsecurity
     restart: unless-stopped
-#    read_only: true
     user: {{ scalelite_nginx_user_id }}:{{ scalelite_certbot_group_id }}
     ports:
       - "80:8080"
@@ -160,6 +167,7 @@ services:
 
   scalelite-api:
     image: "{{ scalelite_api_image }}"
+    read_only: true
     container_name: scalelite-api
     restart: unless-stopped
 {% if scalelite_bbb_dialin_enabled | bool %}
@@ -199,6 +207,7 @@ services:
 
   scalelite-poller:
     image: "{{ scalelite_poller_image }}"
+    read_only: true
     container_name: scalelite-poller
     restart: unless-stopped
     environment:
@@ -224,6 +233,7 @@ services:
 
   bbb-autoscaler:
     image: {{ scalelite_autoscaler_image_repository }}:{{ scalelite_autoscaler_image_tag }}
+    read_only: true
     container_name: bbb-autoscaler
     restart: unless-stopped
     ports:
@@ -288,6 +298,7 @@ services:
 {% for instance in scalelite_greenlight_extra_instances %}
   redis-{{ instance.name }}:
     image: {{ scalelite_redis_image }}
+    read_only: true
     container_name: redis-{{ instance.name }}
     restart: unless-stopped
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
@@ -304,7 +315,6 @@ services:
     deploy:
       resources:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
-
   greenlight-{{ instance.name }}:
     image: {{ instance.image | default(scalelite_greenlight_image_repository ~ ":" ~ scalelite_greenlight_image_tag) }}
     container_name: greenlight-{{ instance.name }}
@@ -347,6 +357,7 @@ services:
 
   postgres-exporter:
     image: {{ scalelite_postgres_exporter_image }}
+    read_only: true
     ports:
       - 9187:9187
     environment:
