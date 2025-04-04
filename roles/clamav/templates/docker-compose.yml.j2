@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  clamav-scan:
+    image: {{ clamav_image }}
+    read_only: true
+    container_name: {{ clamav_container_name }}
+    restart: unless-stopped
+    user: {{ clamav_user_id }}:{{ clamav_group_id }}
+    ports: 
+      - "{{ clamav_port }}:3310"
+    volumes:
+      - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory | length > 0 else '' }}"
+      - "{{ clamav_log_path }}:/var/log/clamav:rw"
+      - "{{ clamav_db_path }}:/var/lib/clamav:rw"
+      - "{{ clamav_quarantine_path + ':/quarantine:rw' if clamav_quarantine  else '' }}"
+    tmpfs:
+      - /tmp:rw,mode=777
+    entrypoint: "/init-unprivileged"
+    deploy:
+      resources:
+        {{ clamav_resources | to_nice_yaml | indent(8) }}

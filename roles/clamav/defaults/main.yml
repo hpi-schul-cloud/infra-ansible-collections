@@ -1,8 +1,11 @@
 clamav_image: "clamav/clamav"  
-clamav_container_name: "clamav-scan" 
+clamav_container_name: "clamav-scan"
 clamav_scan_directory: ""
 clamav_log_path: "/var/log/clamav"
 clamav_db_path: "/var/lib/clamav" 
+clamav_folder: /clamav
+clamav_folder_owner: 0
+clamav_folder_group: 0
 clamav_enable_auto_scan: false
 clamav_scan_exclude_directories:
   - "/dev/*"
@@ -31,8 +34,15 @@ clamav_docker_group: "docker"
 clamav_port: "3310" 
 clamav_cron_hour: "22"
 clamav_cron_minute: "0"
-clamav_memory_limit: "2g"        
-clamav_cpu_limit: "0.5"
+clamav_resources:
+  limits:
+    cpus: '0.5'
+    memory: '2G'
+  reservations:
+    cpus: '0.05'
+    memory: '500M'
 clamav_remove: false
 clamav_quarantine: true
-clamav_quarantine_path: "/var/lib/clamav-quarantine"     
+clamav_quarantine_path: "/var/lib/clamav-quarantine"
+
+clamav_delete_old_container: false

@@ -16,6 +16,7 @@ services:
 {% if server_monitoring_nginx_enabled %}
   nginx:
     image: {{ server_monitoring_nginx_image }}
+    read_only: true
     container_name: nginx
     restart: unless-stopped
     user: {{ server_monitoring_nginx_user_id }}:{{ server_monitoring_nginx_group_id }}
@@ -33,6 +34,8 @@ services:
 {% endfor %}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    tmpfs:
+      - /tmp:rw,mode=777
     volumes:
       - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx
       - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt
@@ -53,6 +56,7 @@ services:
 
   node-exporter:
     image: {{ server_monitoring_node_exporter_image }}
+    read_only: true
     container_name: node-exporter
     restart: unless-stopped
     user: "{{ server_monitoring_node_exporter_user_id }}:{{ server_monitoring_node_exporter_group_id }}"
@@ -93,6 +97,7 @@ services:
 {% if server_monitoring_cadvisor_enabled %}
   cadvisor:
     image: {{ server_monitoring_cadvisor_image }}
+    read_only: true
     container_name: cadvisor
     restart: unless-stopped
     user: "{{ server_monitoring_cadvisor_user_id }}:{{ server_monitoring_cadvisor_group_id }}"
@@ -104,6 +109,7 @@ services:
     devices:
       - /dev/kmsg
     volumes:
+      - /ect/machine-id:/etc/machine-id:ro
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro

@@ -38,26 +38,32 @@
     owner: "{{ clamav_user_id }}"
     group: "{{ clamav_group_id }}"
     mode: "0775"
-  
-- name: Run ClamAV Scan Container 
-  become: true
-  vars:
-    volumes: 
-      - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory | length > 0 else '' }}"
-      - "{{ clamav_log_path }}:/var/log/clamav:rw"
-      - "{{ clamav_db_path }}:/var/lib/clamav:rw"
-      - "{{ clamav_quarantine_path + ':/quarantine:rw' if clamav_quarantine  else '' }}"
+
+
+- name: Remove clamav-scan container if it exists
   docker_container:
     name: "{{ clamav_container_name }}"
-    image: "{{ clamav_image }}"
-    state: started
-    restart_policy: unless-stopped 
-    volumes: "{{volumes | select | list}}"
-    entrypoint: "/init-unprivileged"
-    user: "{{ clamav_user_id }}:{{ clamav_group_id }}"
-    ports: 
-      -  "{{ clamav_port }}:3310"
-    memory: "{{ clamav_memory_limit }}"
-    cpus: "{{ clamav_cpu_limit }}"      
-  when: clamav_enable_auto_scan
+    state: absent
+  when: clamav_delete_old_container
+
+- name: Create Clamav Docker-Compose folder
+  file:
+    path: "{{ clamav_folder }}"
+    state: directory
+    mode: "0750"
+    owner: "{{ clamav_folder_owner }}"
+    group: "{{ clamav_folder_group }}"
+
+- name: Create Clamav Docker-Compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ clamav_folder }}/docker-compose.yml"
+    mode: "0600"
+    owner: "{{ clamav_folder_owner }}"
+    group: "{{ clamav_folder_group }}"
+
+- name: Docker-compose up
+  community.docker.docker_compose:
+    project_src: "{{ clamav_folder }}"
+    remove_orphans: true
 
