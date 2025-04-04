@@ -1,19 +1,10 @@
 version: '3'
 
-volumes:
-  postgres-data:
-  redis-data:
-  redis-greenlight-data:
-{% for instance in scalelite_greenlight_extra_instances %}
-  redis-{{ instance.name }}-data:
-{% endfor %}
-
 networks:
   default:
     ipam:
       config:
         - subnet: {{ scalelite_docker_net }}
-
 
 services:
   db:
