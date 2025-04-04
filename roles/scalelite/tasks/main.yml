@@ -62,7 +62,7 @@
     group: "{{ scalelite_redis_group_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
 
-- name: Create Redis Configuration for main redis instances
+- name: Create Redis Configuration for main redis instance
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_data/redis.conf"
@@ -70,6 +70,8 @@
     group: "{{ scalelite_redis_group_id }}"
     owner: "{{ scalelite_redis_user_id }}"
   notify: Restart Redis redis_data
+
+- name: Create Redis Configuration for greenlight redis instance
   template:
     src: "templates/redis/redis.conf.greenlight.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf"
