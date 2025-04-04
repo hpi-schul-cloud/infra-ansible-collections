@@ -1,3 +1,3 @@
 protected-mode yes
-user {{ scalelite_redis_user }} on +@all -@admin -@dangerous ~* &* #{{ scalelite_redis_password | hash('sha-256') }}
+user {{ scalelite_redis_user }} on +@all -@scripting -@admin -@dangerous ~* &* #{{ scalelite_redis_password | hash('sha-256') }}
 user default off
