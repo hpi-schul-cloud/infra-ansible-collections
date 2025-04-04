@@ -8,10 +8,12 @@
   delay: 10
 
 - name: Prevent external connection as postgres user
-  lineinfile:
-    path: "{{ scalelite_docker_volumes_folder }}/postgres_data/pg_hba.conf"
-    line: "host all postgres all reject"
-    insertbefore: "^host\\s+all\\s+all\\s+all"
+  copy:
+    src: "postgres/pg_hba.conf"
+    dest: "{{ scalelite_docker_volumes_folder }}/postgres_data/pg_hba.conf"
+    owner: "{{ scalelite_postgres_user_id }}"
+    group: "{{ scalelite_postgres_group_id }}"
+    mode: "0600"
   notify: Restart postgres
 
 - name: Ensure the correct permissions for the DBs
