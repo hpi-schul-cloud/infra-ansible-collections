@@ -25,7 +25,7 @@
         chart_version: "{{ kyverno_chart_version }}"
         kubeconfig: "{{ kubeconfig }}"
         release_namespace: "kyverno"
-        # values: "{{ kyverno_values }}"
+        values: "{{ kyverno_values }}"
 
     - name: Get all namespaces in cluster
       kubernetes.core.k8s_info:
