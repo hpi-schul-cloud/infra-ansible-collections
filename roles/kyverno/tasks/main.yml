@@ -6,7 +6,7 @@
         proxy: "{{ proxy_url | default(omit, true) }}"
         proxy_headers: "{{ proxy_headers | default(omit, true) }}"
         api_version: v1
-        name: "kyverno"
+        name: "{{ kyverno_namespace }}"
         kind: Namespace
 
     - name: Add kyverno chart repo
@@ -48,7 +48,7 @@
             name: docker-token
             namespace: "{{ item }}"
           spec:
-            itemPath: "vaults/infra-dev/items/dockerhub-schulcloudci-docker-pull"
+            itemPath: "vaults/{{ vault }}/items/dockerhub-schulcloudci-docker-pull"
       loop: "{{ cluster_namespaces.resources | map(attribute='metadata.name') | list }}"
 
     - name: Apply Kyverno Policy
