@@ -73,6 +73,8 @@
     owner: "{{ scalelite_redis_user_id }}"
     group: "{{ scalelite_redis_group_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control:
+    label: "{{ item.name }}"
 
 - name: Certbot
   include_tasks: certbot.yml
