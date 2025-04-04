@@ -43,7 +43,7 @@ services:
       - {{ server_monitoring_docker_volumes_folder }}/nginx/default.conf:/etc/nginx/conf.d/default.conf
       - {{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
       {% if neutral_error_pages %}
-      - {{ scalelite_docker_volumes_folder }}/nginx/error.html:/var/www/html/error.html
+      - {{ server_monitoring_docker_volumes_folder }}/nginx/error.html:/var/www/html/error.html
       {% endif %}
 {% if server_monitoring_nginx_healthcheck is defined %}
     healthcheck:
