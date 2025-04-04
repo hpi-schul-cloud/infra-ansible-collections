@@ -112,3 +112,6 @@ server_monitoring_extra_exporters: []
   #   host: my-docker-service-name
 # Gets added as YAML to the Docker-compose file
 # server_monitoring_extra_docker_services: {}
+
+#use text based html as error page
+neutral_error_pages: true
