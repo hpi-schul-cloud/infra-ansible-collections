@@ -84,6 +84,15 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
+- name: Create error.html
+  template:
+    src: error.html.j2
+    dest: "{{ server_monitoring_docker_volumes_folder }}/nginx/error.html"
+    mode: "0600"
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled and neutral_error_pages
+
 - name: Create default.conf
   template:
     src: default.conf.j2
