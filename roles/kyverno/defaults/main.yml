@@ -1,0 +1,6 @@
+---
+# Kyverno Helm chart install
+# apply policy imagePullSecrets docker-token
+
+kyverno_chart_version: "3.3.7"
+kyverno_values: []
