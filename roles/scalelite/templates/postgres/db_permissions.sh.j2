@@ -7,6 +7,9 @@ echo "SELECT 'CREATE DATABASE \"{{ db }}\"' WHERE NOT EXISTS (SELECT FROM pg_dat
 echo "ALTER DATABASE \"{{ db }}\" OWNER TO \"{{ db }}\";" | psql -d postgres -w
 echo "REVOKE ALL ON DATABASE \"{{ db }}\" FROM PUBLIC;" | psql -d postgres -w
 echo "REVOKE ALL ON SCHEMA public FROM PUBLIC;" | psql -d {{ db }} -w
+# Some steps of greenlight/scalelite fail without the permission even if the DB already exists
+# See https://github.com/bigbluebutton/greenlight/issues/1740
+echo "ALTER USER \"{{ db }}\" CREATEDB;" | psql -d postgres -w
 # Needed to migrate existing DB
 echo "ALTER SCHEMA public OWNER TO \"{{ db }}\";" | psql -d {{ db }} -w
 echo "SELECT 'ALTER TABLE ' || tablename || ' OWNER TO \"{{ db }}\";' FROM pg_tables WHERE schemaname = 'public'\gexec" | psql -d {{ db }} -w

@@ -336,7 +336,7 @@ services:
     ports:
       - 9187:9187
     environment:
-      DATA_SOURCE_NAME: "postgresql://exporter:${POSTGRES_EXPORTER_PASSWORD}@db:5432/?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://exporter:${POSTGRES_EXPORTER_PASSWORD}@db:5432/postgres?sslmode=disable"
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9187"]
       interval: 30s

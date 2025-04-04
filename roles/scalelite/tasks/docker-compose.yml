@@ -14,7 +14,6 @@
     owner: "{{ scalelite_docker_compose_owner }}"
     group: "{{ scalelite_docker_compose_group }}"
     mode: "0600"
-  register: env_file
 
 - name: Migrate old Postgres and Redis data for non-root containers
   include_tasks:
@@ -24,5 +23,4 @@
 - name: Docker-compose up
   community.docker.docker_compose:
     project_src: "{{ scalelite_docker_compose_folder }}"
-    restarted: "{{ env_file.changed }}"
     remove_orphans: true
