@@ -103,14 +103,15 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
-- name: Set log permissions
+
+- name: Create server monitoring nginx container logs directory 
+  become: true
   file:
     path: "{{ server_monitoring_nginx_logs_folder }}"
-    mode: "0750"
+    state: directory
     owner: "{{ server_monitoring_nginx_user_id }}"
     group: "{{ server_monitoring_nginx_group_id }}"
-    recurse: true
-  when: server_monitoring_nginx_enabled
+    mode: "0750"
 
 - name: Create Node-Exporter AppArmor profile
   template:
@@ -126,6 +127,21 @@
   command:
     cmd: "apparmor_parser -r /etc/apparmor.d/{{ server_monitoring_node_exporter_apparmor_profile }}"
   when: create_node_exporter_apparmor.changed
+
+# once executed this task can get deleted
+- name: Ensure /etc/logrotate/file is removed
+  file:
+    path: /etc/logrotate.d/nginx
+    state: absent
+  when: delete_old_nginx_logrotate
+
+# once executed this task can get deleted
+- name: Change ownership of files in /var/log/nginx
+  file:
+    path: /var/log/nginx
+    recurse: yes
+    owner: systemd-resolve
+    group: ssl-certs
 
 - name: Copy docker-compose.yml
   template:
