@@ -14,6 +14,7 @@ services:
       - "{{ clamav_log_path }}:/var/log/clamav:rw"
       - "{{ clamav_db_path }}:/var/lib/clamav:rw"
       - "{{ clamav_config_path }}/clamd.conf:/etc/clamav/clamd.conf:ro"
+      - "{{ clamav_socket_path }}:/run/clamav:rw"
       - "{{ clamav_quarantine_path + ':/quarantine:rw' if clamav_quarantine  else '' }}"
 
     tmpfs:

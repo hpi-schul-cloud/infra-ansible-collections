@@ -1,5 +1,4 @@
 ---
-
 - name: Add clamav user to designated group  
   become: true
   user:
@@ -18,7 +17,6 @@
     owner: "{{clamav_user_id }}"
     group: "{{clamav_group_id }}"
     mode: 0775
-
 
 - name: Create ClamAV quarantine directory
   become: true
@@ -39,6 +37,15 @@
     group: "{{ clamav_group_id }}"
     mode: "0775"
 
+- name: Create ClamAV Config directory 
+  become: true
+  file:
+    path: "{{ clamav_config_path }}"
+    state: directory
+    owner: "{{ clamav_user_id }}"
+    group: "{{ clamav_group_id }}"
+    mode: "0775"
+
 - name: Create ClamAV socket directory 
   become: true
   file:
@@ -48,14 +55,13 @@
     group: "{{ clamav_group_id }}"
     mode: "0775"
 
-- name: Copy template of clamd.conf and modify socket path
+- name: Copy template of clamd.conf
   template:
     src: clamd.conf.j2
     dest: "{{ clamav_config_path }}/clamd.conf"
     owner: "{{ clamav_user_id }}"
     group: "{{ clamav_group_id }}"
     mode: '0644'
-
 
 - name: Remove clamav-scan container if it exists
   docker_container:
@@ -79,8 +85,21 @@
     owner: "{{ clamav_folder_owner }}"
     group: "{{ clamav_folder_group }}"
 
+- name: Create systemd tmpfiles.d rule for ClamAV socket folder
+  become: true
+  copy:
+    dest: /etc/tmpfiles.d/clamav-cleanup.conf
+    content: |
+      d /run/clamav 0755 {{ clamav_user_id }} {{ clamav_group_id }} -
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Trigger tmpfiles.d rule to create /run/clamav with correct permissions
+  become: true
+  command: systemd-tmpfiles --create
+
 - name: Docker-compose up
   community.docker.docker_compose:
     project_src: "{{ clamav_folder }}"
     remove_orphans: true
-
