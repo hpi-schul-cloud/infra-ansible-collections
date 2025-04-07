@@ -39,6 +39,23 @@
     group: "{{ clamav_group_id }}"
     mode: "0775"
 
+- name: Create ClamAV socket directory 
+  become: true
+  file:
+    path: "{{ clamav_socket_path }}"
+    state: directory
+    owner: "{{ clamav_user_id }}"
+    group: "{{ clamav_group_id }}"
+    mode: "0775"
+
+- name: Copy template of clamd.conf and modify socket path
+  template:
+    src: clamd.conf.j2
+    dest: "{{ clamav_config_path }}/clamd.conf"
+    owner: "{{ clamav_user_id }}"
+    group: "{{ clamav_group_id }}"
+    mode: '0644'
+
 
 - name: Remove clamav-scan container if it exists
   docker_container:

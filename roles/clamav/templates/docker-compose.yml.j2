@@ -13,7 +13,9 @@ services:
       - "{{ clamav_scan_directory + ':/scanned:rw' if clamav_scan_directory | length > 0 else '' }}"
       - "{{ clamav_log_path }}:/var/log/clamav:rw"
       - "{{ clamav_db_path }}:/var/lib/clamav:rw"
+      - "{{ clamav_config_path }}/clamd.conf:/etc/clamav/clamd.conf:ro"
       - "{{ clamav_quarantine_path + ':/quarantine:rw' if clamav_quarantine  else '' }}"
+
     tmpfs:
       - /tmp:rw,mode=777
     entrypoint: "/init-unprivileged"

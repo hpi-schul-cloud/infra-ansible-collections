@@ -2,6 +2,8 @@ clamav_image: "clamav/clamav"
 clamav_container_name: "clamav-scan"
 clamav_scan_directory: ""
 clamav_log_path: "/var/log/clamav"
+clamav_socket_path: "/run/clamav/"
+clamav_config_path: "/etc/clamav/"
 clamav_db_path: "/var/lib/clamav" 
 clamav_folder: /clamav
 clamav_folder_owner: 0
