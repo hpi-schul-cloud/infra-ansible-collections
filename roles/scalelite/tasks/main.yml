@@ -67,6 +67,9 @@
   loop: "{{ scalelite_greenlight_extra_instances }}"
 
 - name: Create Redis Configuration for main redis instance
+  var: 
+    template_user: {{ scalelite_redis_user }}
+    template_secret: {{ scalelite_redis_password }}
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_data/redis.conf"
@@ -76,8 +79,11 @@
   notify: Restart Redis redis_data
 
 - name: Create Redis Configuration for greenlight redis instance
+  var: 
+    template_user: {{ scalelite_greenlight_redis_user }}
+    template_secret: {{ scalelite_greenlight_redis_password }}
   template:
-    src: "templates/redis/redis.conf.greenlight.j2"
+    src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf"
     mode: '0400'
     group: "{{ scalelite_redis_group_id }}"
@@ -85,8 +91,11 @@
   notify: Restart Redis redis_greenlight_data
 
 - name: Create Redis Configuration for extra redis instances
+  var:
+    template_user: {{ item.redis_user }}
+    template_secret: {{ item.redis_secret }}
   template:
-    src: "templates/redis/redis.conf.greenlight.j2"
+    src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/redis.conf"
     mode: '0400'
     group: "{{ scalelite_redis_group_id }}"

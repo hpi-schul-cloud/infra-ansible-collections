@@ -1,3 +1,4 @@
+# See https://github.com/redis/redis/blob/7.2/redis.conf
 protected-mode yes
 user {{ scalelite_redis_user }} on +@all -@scripting -@admin -@dangerous ~* &* #{{ scalelite_redis_password | hash('sha-256') }}
 user default off
