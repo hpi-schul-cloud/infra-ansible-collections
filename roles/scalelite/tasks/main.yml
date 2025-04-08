@@ -67,7 +67,7 @@
   loop: "{{ scalelite_greenlight_extra_instances }}"
 
 - name: Create Redis Configuration for main redis instance
-  var: 
+  vars: 
     template_user: "{{ scalelite_redis_user }}"
     template_secret: "{{ scalelite_redis_password }}"
   template:
@@ -79,7 +79,7 @@
   notify: Restart Redis redis_data
 
 - name: Create Redis Configuration for greenlight redis instance
-  var: 
+  vars: 
     template_user: "{{ scalelite_greenlight_redis_user }}"
     template_secret: "{{ scalelite_greenlight_redis_password }}"
   template:
@@ -91,7 +91,7 @@
   notify: Restart Redis redis_greenlight_data
 
 - name: Create Redis Configuration for extra redis instances
-  var:
+  vars:
     template_user: "{{ item.redis_user }}"
     template_secret: "{{ item.redis_secret }}"
   template:
