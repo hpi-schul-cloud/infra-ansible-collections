@@ -39,5 +39,7 @@
     name: redis-{{ item.name }}
     restart: true
   loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control: 
+    label: "{{ item.name }}"
   
   

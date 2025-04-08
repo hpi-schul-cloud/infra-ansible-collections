@@ -65,6 +65,9 @@
     owner: "{{ scalelite_redis_user_id }}"
     group: "{{ scalelite_redis_group_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control: 
+    label: "{{ item.name }}"
+
 
 - name: Create Redis Configuration for main redis instance
   vars: 
@@ -102,7 +105,7 @@
     owner: "{{ scalelite_redis_user_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
   loop_control: 
-    label: item.name
+    label: "{{ item.name }}"
   notify: Restart Redis Instaces
 
 - name: Certbot
