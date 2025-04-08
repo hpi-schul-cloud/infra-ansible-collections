@@ -5,7 +5,8 @@ scalelite_docker_compose_owner: root
 scalelite_docker_compose_group: root
 
 scalelite_certbot_image_repository: certbot/certbot
-scalelite_certbot_image_tag: v2.11.0
+# v2.11.0
+scalelite_certbot_image_digest: sha256:ddf9e5d226a56e886986838fa0ebedc0237511c78664352e8d0f4346ee022cd8
 # Custom UID to run certbot as
 scalelite_certbot_user_id: 9999
 scalelite_certbot_group_id: 9999
@@ -58,7 +59,8 @@ scalelite_greenlight_resources:
 # Postgres Docker image runs as postgres:postgres (70:70)
 scalelite_postgres_user_id: 70
 scalelite_postgres_group_id: 70
-scalelite_postgres_image: postgres:14.8-alpine
+# postgres:14.8-alpine
+scalelite_postgres_image: postgres:sha256:fa48198f8c88d5563e7ff3f6d5d269be58a7571e4464d70e4cb6c0987d903ba3
 scalelite_postgres_resources:
   reservations:
     cpus: '0.2'
@@ -66,8 +68,8 @@ scalelite_postgres_resources:
   limits:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
-
-scalelite_postgres_exporter_image: prometheuscommunity/postgres-exporter:v0.17.1
+# prometheuscommunity/postgres-exporter:v0.17.1
+scalelite_postgres_exporter_image: prometheuscommunity/postgres-exporter@sha256:38606faa38c54787525fb0ff2fd6b41b4cfb75d455c1df294927c5f611699b17
 scalelite_postgres_exporter_resources:
   reservations:
     cpus: '0.1'
@@ -75,8 +77,8 @@ scalelite_postgres_exporter_resources:
   limits:
     cpus: "0.5"
     memory: "20M"
-
-scalelite_redis_image: redis:7.2.4-alpine
+# redis:7.2.4-alpine
+scalelite_redis_image: redis@sha256:c8bb255c3559b3e458766db810aa7b3c7af1235b204cfdb304e79ff388fe1a5a
 # Redis Docker image runs as redis:redis (999:1000)
 scalelite_redis_user_id: 999
 scalelite_redis_group_id: 1000
@@ -137,10 +139,11 @@ scalelite_web_concurrency: 4
 scalelite_rails_max_threads: 4
 scalelite_log_level: warn
 scalelite_multitenancy_enabled: true
-scalelite_version: v1.5.1.7-focal260-alpine
+# v1.5.1.7-focal260-alpine
+scalelite_version: sha256:2dbffceb9731e9ec0c2ab41f53332efdbbf73c31cdb3688b77bb52b8ef627582
 # scalelite_secret_key_base:
 # scalelite_api_key
-scalelite_poller_image: "blindsidenetwks/scalelite:{{ scalelite_version }}-poller"
+scalelite_poller_image: "blindsidenetwks/scalelite@{{ scalelite_version }}-poller"
 scalelite_poller_resources:
   reservations:
     cpus: '0.1'
@@ -169,7 +172,8 @@ scalelite_security_txt: |
 scalelite_autoscaler_user_id: 65534
 scalelite_autoscaler_group_id: 65534
 scalelite_autoscaler_image_repository: ghcr.io/dbildungsplattform/infra-autoscaler
-scalelite_autoscaler_image_tag: 2.0.0
+# 2.0.0
+scalelite_autoscaler_image_digest: sha256:95cf770296448cea86e775f6622a5caa9d09fa02e5b0ce29ceeadc59cf1ed531
 scalelite_autoscaler_metrics_private_port: 9199
 # Autoscaler config as YAML
 scalelite_autoscaler_config: {}
