@@ -68,8 +68,8 @@
 
 - name: Create Redis Configuration for main redis instance
   var: 
-    template_user: {{ scalelite_redis_user }}
-    template_secret: {{ scalelite_redis_password }}
+    template_user: "{{ scalelite_redis_user }}"
+    template_secret: "{{ scalelite_redis_password }}"
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_data/redis.conf"
@@ -80,8 +80,8 @@
 
 - name: Create Redis Configuration for greenlight redis instance
   var: 
-    template_user: {{ scalelite_greenlight_redis_user }}
-    template_secret: {{ scalelite_greenlight_redis_password }}
+    template_user: "{{ scalelite_greenlight_redis_user }}"
+    template_secret: "{{ scalelite_greenlight_redis_password }}"
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf"
@@ -92,8 +92,8 @@
 
 - name: Create Redis Configuration for extra redis instances
   var:
-    template_user: {{ item.redis_user }}
-    template_secret: {{ item.redis_secret }}
+    template_user: "{{ item.redis_user }}"
+    template_secret: "{{ item.redis_secret }}"
   template:
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/redis.conf"
