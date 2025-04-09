@@ -15,6 +15,14 @@
     owner: "{{ scalelite_certbot_user_id }}"
     group: "{{ scalelite_certbot_group_id }}"
 
+- name: Change Owner for update Certbot
+  file:
+    state: directory
+    path: "{{ scalelite_docker_volumes_folder }}/certbot"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}" 
+    recurse: true
+
 - name: Copy Certbot post hook script
   copy:
     src: "certbot/post-hook.sh"

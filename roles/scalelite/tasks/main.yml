@@ -34,6 +34,10 @@
       mode: "0700"
       owner: "{{ scalelite_redis_user_id }}"
       group: "{{ scalelite_redis_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data"
+      mode: "0700"
+      owner: "{{ scalelite_redis_user_id }}"
+      group: "{{ scalelite_redis_group_id }}"
     - path: "{{ scalelite_docker_volumes_folder }}/nginx"
       mode: "0750"
       owner: "{{ scalelite_nginx_user_id }}"
@@ -77,8 +81,48 @@
     owner: "{{ scalelite_redis_user_id }}"
     group: "{{ scalelite_redis_group_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
-  loop_control:
+  loop_control: 
     label: "{{ item.name }}"
+
+
+- name: Create Redis Configuration for main redis instance
+  vars: 
+    template_user: "{{ scalelite_redis_user }}"
+    template_secret: "{{ scalelite_redis_password }}"
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_data/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
+  notify: Restart Redis redis_data
+
+- name: Create Redis Configuration for greenlight redis instance
+  vars: 
+    template_user: "{{ scalelite_greenlight_redis_user }}"
+    template_secret: "{{ scalelite_greenlight_redis_password }}"
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
+  notify: Restart Redis redis_greenlight_data
+
+- name: Create Redis Configuration for extra redis instances
+  vars:
+    template_user: "Redis_{{ item.name }}"
+    template_secret: "{{ item.redis_secret }}"
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control: 
+    label: "{{ item.name }}"
+  notify: Restart Redis Instaces
 
 - name: Certbot
   include_tasks: certbot.yml
