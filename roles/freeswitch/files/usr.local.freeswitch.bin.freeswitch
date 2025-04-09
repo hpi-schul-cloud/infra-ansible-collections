@@ -1,0 +1,40 @@
+#include <tunables/global>
+
+/usr/local/freeswitch/bin/freeswitch  {
+#/usr/local/freeswitch/bin/freeswitch flags=(complain) {
+   #include <abstractions/base>
+
+   capability sys_nice,
+
+   /usr/share/ca-certificates/mozilla/** r,
+
+   /usr/local/freeswitch/mod/** mr,
+   /usr/local/freeswitch/certs/** r,
+   /usr/local/freeswitch/conf/** r,
+   /usr/local/freeswitch/log/** wr,
+   /usr/local/freeswitch/lib/** mr,
+   /usr/local/freeswitch/db/** wrk,
+   /usr/local/freeswitch/sounds/** r,
+   /usr/local/freeswitch/run/freeswitch.pid wk,
+
+   /etc/ssl/openssl.cnf r,
+   /etc/ssl/certs/** r,
+   /etc/ssl/certs/ r,
+   /etc/hosts r,
+   /etc/host.conf r,
+   /etc/gai.conf r,
+   /sys/devices/system/node/** r,
+   /sys/devices/system/node// r,
+   /etc/nsswitch.conf r,
+   /run/systemd/resolve/stub-resolv.conf r,
+
+   /proc/@{pid}/** r,
+
+   owner /tmp/** rw,
+
+   /usr/local/freeswitch/bin/freeswitch r,
+
+   network dgram,
+   network raw,
+   network stream,
+}

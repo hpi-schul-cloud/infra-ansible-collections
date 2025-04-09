@@ -68,7 +68,7 @@
       loop: "{{ freeswitch_enabled_modules }}"
       notify: Restart freeswitch
 
-    - name: Disable Freeswitch signalwire module
+    - name: Disable Freeswitch non required modules
       xml:
         path: "/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml"
         xpath: /configuration/modules/load[@module="{{ item | split('/') | last }}"]
@@ -78,9 +78,16 @@
 
     - name: Create freeswitch systemd file
       copy:
+        src: usr.local.freeswitch.bin.freeswitch
+        dest: /etc/apparmor.d/usr.local.freeswitch.bin.freeswitch
+      register: freeswitch_systemd
+      notify: Restart freeswitch
+
+    - name: Create freeswitch AppArmor file
+      copy:
         src: freeswitch.service
         dest: /etc/systemd/system/freeswitch.service
-      register: freeswitch_systemd
+      register: freeswitch_apparmor
       notify: Restart freeswitch
 
     - name: Systemctl daemon reload
@@ -92,3 +99,7 @@
       systemd:
         name: freeswitch
         enabled: true
+
+    - name: Reread AppArmor
+      ansible.builtin.command: /usr/sbin/apparmor_parser -r /etc/apparmor.d/usr.local.freeswitch.bin.freeswitch
+      when: freeswitch_apparmor.changed
