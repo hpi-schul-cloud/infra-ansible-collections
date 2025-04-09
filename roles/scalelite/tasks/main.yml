@@ -95,7 +95,7 @@
 
 - name: Create Redis Configuration for extra redis instances
   vars:
-    template_user: "{{ item.redis_user }}"
+    template_user: "Redis_{{ item.name }}"
     template_secret: "{{ item.redis_secret }}"
   template:
     src: "templates/redis/redis.conf.j2"
