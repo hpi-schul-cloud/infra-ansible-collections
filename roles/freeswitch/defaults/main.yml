@@ -2,6 +2,36 @@
 freeswitch_enabled_modules: []
 freeswitch_disabled_modules:
   - applications/mod_signalwire
+  - endpoint/mod_verto
+  - multi-faceted/mod_enum
+  - event_handler/mod_cdr_csv
+  - endpoint/mod_loopback
+  - endpoint/mod_rtc
+  - application/mod_conference
+  - application/mod_db
+  - application/mod_fifo
+  - application/mod_hash
+  - application/mod_voicemail
+  - application/mod_esf
+  - application/mod_fsv
+  - application/mod_valet_parking
+  - application/mod_httapi
+  - dialplan/mod_dialplan_asterisk
+  - codec/mod_spandsp
+  - codec/mod_g723_1
+  - codec/mod_g729
+  - codec/mod_amr
+  - codec/mod_b64
+  - codec/mod_opus
+  - fileformat/mod_av
+  - fileformat/mod_native_file
+  - fileformat/mod_local_stream
+  - fileformat/mod_tone_stream
+  - languages/mod_lua
+  - say/mod_say_en
+  - say/mod_shout
+  - languages/mod_xml_curl
+
 # Expects a tar.gz file:
 #   freeswitch_binaries_download_url
 # Optional:

@@ -27,6 +27,7 @@
         home: /usr/local/freeswitch
         comment: FreeSWITCH open source softswitch
         groups: freeswitch
+        shell: /usr/sbin/nologin
         append: true
 
     - name: Download freeswitch binaries
