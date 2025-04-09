@@ -16,7 +16,6 @@ services:
       - "{{ clamav_config_path }}/clamd.conf:/etc/clamav/clamd.conf:ro"
       - "{{ clamav_socket_path }}:/run/clamav:rw"
       - "{{ clamav_quarantine_path + ':/quarantine:rw' if clamav_quarantine  else '' }}"
-
     tmpfs:
       - /tmp:rw,mode=777
     entrypoint: "/init-unprivileged"
