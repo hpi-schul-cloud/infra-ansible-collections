@@ -68,23 +68,33 @@
               match:
                 resources:
                   kinds:
-                  - Pod
+                  - DaemonSet
+                  - Deployment
+                  - Job
+                  - StatefulSet
               mutate:
                 patchStrategicMerge:
                   spec:
-                    containers:
-                    - (image): "docker.io/*"
-                    imagePullSecrets:
-                    - name: docker-token
+                    template: 
+                      spec: 
+                        containers:
+                        - (image): "docker.io/*"
+                        imagePullSecrets:
+                        - name: docker-token
             - name: add-imagepullsecret-docker-repo
               match:
                 resources:
                   kinds:
-                  - Pod
+                  - DaemonSet
+                  - Deployment
+                  - Job
+                  - StatefulSet
               mutate:
                 patchStrategicMerge:
                   spec:
-                    containers:
-                    - (image): "*/*"
-                    imagePullSecrets:
-                    - name: docker-token
+                    template: 
+                      spec: 
+                        containers:
+                        - (image): "*/*"
+                        imagePullSecrets:
+                        - name: docker-token
