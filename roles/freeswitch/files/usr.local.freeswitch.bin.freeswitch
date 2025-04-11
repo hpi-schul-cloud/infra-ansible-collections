@@ -26,7 +26,7 @@
    /etc/host.conf r,
    /etc/gai.conf r,
    /sys/devices/system/node/** r,
-   /sys/devices/system/node// r,
+   /sys/devices/system/node/ r,
    /etc/nsswitch.conf r,
    /run/systemd/resolve/stub-resolv.conf r,
 
