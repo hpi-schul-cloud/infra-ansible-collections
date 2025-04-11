@@ -17,6 +17,8 @@
    /usr/local/freeswitch/sounds/** r,
    /usr/local/freeswitch/run/freeswitch.pid wk,
 
+   /var/log/** wr,
+   
    /etc/ssl/openssl.cnf r,
    /etc/ssl/certs/** r,
    /etc/ssl/certs/ r,
