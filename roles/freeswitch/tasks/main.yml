@@ -27,6 +27,7 @@
         system: true
         home: /usr/local/freeswitch
         comment: FreeSWITCH open source softswitch
+        group: freeswitch
         groups: freeswitch,syslog
         shell: /usr/sbin/nologin
         append: true
