@@ -32,3 +32,13 @@ freeswitch_disabled_modules:
 # Optional:
 #   freeswitch_binaries_additional_headers
 #   freeswitch_binaries_checksum
+
+freeswitch_logrotate_config: |
+  /var/log/freeswitch.log {
+    rotate 14
+    daily
+    compress
+    missingok
+    delaycompress
+    copytruncate
+  }

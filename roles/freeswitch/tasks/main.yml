@@ -87,6 +87,12 @@
         mode: 0644
       notify: Restart freeswitch
 
+    - name: Set Logrotate for freeswitch
+      copy:
+        content: "{{ freeswitch_logrotate_config }}"
+        dest: /etc/logrotate.d/freeswitch
+        mode: "0644"
+
     - name: Create freeswitch systemd file
       copy:
         src: usr.local.freeswitch.bin.freeswitch
