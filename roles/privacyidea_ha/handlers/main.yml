@@ -1,0 +1,42 @@
+---
+
+- name: restart sshd
+  service: 
+    name: sshd
+    state: restarted
+  
+- name: restart fail2ban
+  service:
+    name: fail2ban
+    state: restarted
+    enabled: yes
+
+- name: Reload ha-cluster-exporter
+  ansible.builtin.service:
+    name: ha-cluster-exporter
+    enabled: true
+    state: reloaded
+
+- name: restart uwsgi
+  command:
+    cmd: /usr/sbin/pcs resource restart uwsgi
+  become: true
+  ignore_errors: true
+
+- name: Restart exporter
+  command:
+    cmd: /usr/sbin/pcs resource restart privacyidea-exporter
+  become: true
+  ignore_errors: true
+
+- name: reload nginx
+  command:
+    cmd: /usr/sbin/pcs resource reload nginx
+  become: true
+  ignore_errors: true
+
+- name: restart nginx
+  command:
+    cmd: /usr/sbin/pcs resource restart nginx
+  become: true
+  ignore_errors: true

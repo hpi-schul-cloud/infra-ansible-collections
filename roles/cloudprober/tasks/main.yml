@@ -1,0 +1,52 @@
+# Setup Cloudprober
+# Create Namespace
+- name: Create monitoring namespace
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    api_version: v1
+    name: "{{ cloudprober_namespace }}"
+    kind: Namespace
+  tags: cloudprober
+    
+# Create Secret to store tokens and access data required
+- name: Create Cloudprober secret
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: onepassword.com/v1
+      kind: OnePasswordItem
+      metadata:
+        name: "{{ cloudprober_secret }}"
+        namespace: "{{ cloudprober_namespace }}"
+      spec:
+        itemPath: "vaults/{{ vault }}/items/cloudprober"
+  tags: cloudprober
+
+# add helm chart location
+- name: Add Cloudprober chart repo
+  kubernetes.core.helm_repository:
+    name: cloudprober
+    repo_url: "https://helm.cloudprober.org"
+  check_mode: false
+  changed_when: false
+  tags: cloudprober
+
+# execute helm chart with values
+- name: Install Cloudprober
+  kubernetes.core.helm:
+    name: cloudprober
+    chart_ref: cloudprober/cloudprober
+    update_repo_cache: true
+    chart_version: "{{ cloudprober_chart_version }}"
+    kubeconfig: "{{ kubeconfig }}"
+    release_namespace: "{{ cloudprober_namespace }}"
+    wait: true
+    values:
+      "{{ cloudprober_values }}"
+  tags: cloudprober

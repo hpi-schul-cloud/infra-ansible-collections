@@ -1,0 +1,18 @@
+[Unit]
+Description=PrivacyIDEA Prometheus Exporter
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/uwsgi --ini /etc/uwsgi/apps-enabled/privacyidea-exporter.ini
+ExecStartPre=+/bin/mkdir -p /run/uwsgi/app/privacyidea-exporter
+ExecStartPre=+/bin/chown www-data:www-data /run/uwsgi/app/privacyidea-exporter
+
+Restart=always
+KillSignal=SIGQUIT
+User=www-data
+Group=www-data
+Environment=EXPORTER_USERNAME_HASH={{ exporter_username_hash }}
+Environment=EXPORTER_PASSWORD_HASH={{ exporter_password_hash }}
+
+[Install]
+WantedBy=multi-user.target

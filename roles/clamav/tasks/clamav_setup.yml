@@ -1,0 +1,69 @@
+---
+
+- name: Add clamav user to designated group  
+  become: true
+  user:
+    name: "{{ clamav_username }}" 
+    uid: "{{ clamav_user_id }}"
+    groups: 
+      - "{{ clamav_docker_group }}"
+    append: yes  
+  when: clamav_enable_auto_scan
+
+- name: Create ClamAV database directory
+  become: true
+  file:
+    path: "{{ clamav_db_path }}"
+    state: directory
+    owner: "{{clamav_user_id }}"
+    group: "{{clamav_group_id }}"
+    mode: 0775
+
+
+- name: Create ClamAV quarantine directory
+  become: true
+  file:
+    path: "{{ clamav_quarantine_path }}" 
+    state: directory
+    owner: "{{clamav_user_id }}"
+    group: "{{clamav_group_id }}"
+    mode: 0770
+  when: clamav_quarantine
+
+- name: Create ClamAV log directory 
+  become: true
+  file:
+    path: "{{ clamav_log_path }}"
+    state: directory
+    owner: "{{ clamav_user_id }}"
+    group: "{{ clamav_group_id }}"
+    mode: "0775"
+
+
+- name: Remove clamav-scan container if it exists
+  docker_container:
+    name: "{{ clamav_container_name }}"
+    state: absent
+  when: clamav_delete_old_container
+
+- name: Create Clamav Docker-Compose folder
+  file:
+    path: "{{ clamav_folder }}"
+    state: directory
+    mode: "0750"
+    owner: "{{ clamav_folder_owner }}"
+    group: "{{ clamav_folder_group }}"
+
+- name: Create Clamav Docker-Compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ clamav_folder }}/docker-compose.yml"
+    mode: "0600"
+    owner: "{{ clamav_folder_owner }}"
+    group: "{{ clamav_folder_group }}"
+
+- name: Docker-compose up
+  community.docker.docker_compose:
+    project_src: "{{ clamav_folder }}"
+    remove_orphans: true
+

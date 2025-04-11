@@ -1,0 +1,5 @@
+tls_server_config:
+    cert_file: /etc/letsencrypt/live/{{ inventory_hostname }}/fullchain.pem
+    key_file: /etc/letsencrypt/live/{{ inventory_hostname }}/privkey.pem
+basic_auth_users:
+    {{ metrics_basic_auth_user }}: {{ metrics_basic_auth_password | password_hash('bcrypt') }}

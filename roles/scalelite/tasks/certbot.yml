@@ -1,0 +1,50 @@
+---
+- name: Create certificates folder
+  file:
+    state: directory
+    path: "{{ scalelite_letsencrypt_folder }}"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+    mode: "750"
+
+- name: Copy Certbot Terraform files
+  template:
+    src: certbot/terraform/main.tf.j2
+    dest: "{{ scalelite_docker_volumes_folder }}/certbot/terraform/main.tf"
+    mode: "0700"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+
+- name: Change Owner for update Certbot
+  file:
+    state: directory
+    path: "{{ scalelite_docker_volumes_folder }}/certbot"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}" 
+    recurse: true
+
+- name: Copy Certbot post hook script
+  copy:
+    src: "certbot/post-hook.sh"
+    dest: "{{ scalelite_docker_volumes_folder }}/certbot/post-hook.sh"
+    mode: "0700"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+
+- name: Copy Certbot manual update script
+  template:
+    src: "certbot/manual-update.sh.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/certbot/manual-update.sh"
+    mode: "0700"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+
+- name: Copy certbot config
+  copy:
+    content: |
+      logs-dir = /certbot/logs
+      work-dir = /certbot/work
+    dest: "{{ scalelite_letsencrypt_folder }}/cli.ini"
+    mode: "0750"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"

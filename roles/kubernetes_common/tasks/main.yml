@@ -2,10 +2,11 @@
 - import_tasks: network-policy.yml
 - import_tasks: ingress-controller.yml
 - import_tasks: cert-manager.yml
-  when: cert_manager_enabled is true
+  when: cert_manager_enabled
 - import_tasks: otc-cert-manager.yml
-  when: cert_manager_enabled is true
+  when: cert_manager_enabled
 - import_tasks: coredns.yml
 - import_tasks: fluentbit.yml
+  when: fluentbit_enabled
 - import_tasks: nfs-provider.yml
 - import_tasks: kubernetes-event-exporter.yml

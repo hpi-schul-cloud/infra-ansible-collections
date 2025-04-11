@@ -1,0 +1,10 @@
+#!/bin/bash
+START="$1"
+END="$2"
+
+for (( i=$START; i<=$END; i++ ))
+do
+ docker exec scalelite-api ./bin/rake servers | grep -e "bbb-$i\." -B 1 | grep id | cut -d " " -f2 > id
+ docker exec scalelite-api ./bin/rake servers:cordon[$(cat id)]
+done
+

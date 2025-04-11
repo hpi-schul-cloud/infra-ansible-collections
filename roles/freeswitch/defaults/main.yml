@@ -2,3 +2,43 @@
 freeswitch_enabled_modules: []
 freeswitch_disabled_modules:
   - applications/mod_signalwire
+  - endpoint/mod_verto
+  - dialplan/mod_dialplan_asterisk
+  - application/mod_valet_parking
+  - application/mod_voicemail
+  - application/mod_httapi
+  - application/mod_conference
+  - languages/mod_lua
+  - fileformat/mod_av
+  - fileformat/mod_png
+  - fileformat/mod_local_stream
+  - fileformat/mod_tone_stream
+  - fileformat/mod_native_file
+  - say/mod_say_en
+  - codec/mod_b64
+  - codec/mod_opus
+  - application/mod_db
+  - application/mod_fifo
+  - application/mod_hash
+  - application/mod_esf
+  - application/mod_fsv
+  - endpoint/mod_rtc
+  - multi-faceted/mod_enum
+  - event_handler/mod_cdr_csv
+  - endpoint/mod_loopback
+
+# Expects a tar.gz file:
+#   freeswitch_binaries_download_url
+# Optional:
+#   freeswitch_binaries_additional_headers
+#   freeswitch_binaries_checksum
+
+freeswitch_logrotate_config: |
+  /var/log/freeswitch.log {
+    rotate 14
+    daily
+    compress
+    missingok
+    delaycompress
+    copytruncate
+  }
