@@ -9,7 +9,7 @@
    /usr/share/ca-certificates/mozilla/** r,
 
    /usr/local/freeswitch/mod/** mr,
-   /usr/local/freeswitch/certs/** r,
+   /usr/local/freeswitch/certs/** rw,
    /usr/local/freeswitch/conf/** r,
    /usr/local/freeswitch/log/** wr,
    /usr/local/freeswitch/lib/** mr,
@@ -17,7 +17,7 @@
    /usr/local/freeswitch/sounds/** r,
    /usr/local/freeswitch/run/freeswitch.pid wk,
 
-   /var/log/** wr,
+   /var/log/freeswitch.* wr,
    
    /etc/ssl/openssl.cnf r,
    /etc/ssl/certs/** r,

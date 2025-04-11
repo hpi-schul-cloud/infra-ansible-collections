@@ -77,6 +77,15 @@
       loop: "{{ freeswitch_disabled_modules }}"
       notify: Restart freeswitch
 
+    - name: Set Logfile for freeswitch
+      copy:
+        dest: /usr/local/freeswitch/conf/autoload_configs/logfile.conf.xml
+        src: logfile.conf.xml
+        owner: freeswitch
+        group: freeswitch
+        mode: 0644
+      notify: Restart freeswitch
+
     - name: Create freeswitch systemd file
       copy:
         src: usr.local.freeswitch.bin.freeswitch
