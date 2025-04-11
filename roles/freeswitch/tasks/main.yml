@@ -93,18 +93,18 @@
         dest: /etc/logrotate.d/freeswitch
         mode: "0644"
 
-    - name: Create freeswitch systemd file
+    - name: Create freeswitch AppArmor file
       copy:
         src: usr.local.freeswitch.bin.freeswitch
         dest: /etc/apparmor.d/usr.local.freeswitch.bin.freeswitch
-      register: freeswitch_systemd
+      register: freeswitch_apparmor
       notify: Restart freeswitch
 
-    - name: Create freeswitch AppArmor file
+    - name: Create freeswitch systmed file
       copy:
         src: freeswitch.service
         dest: /etc/systemd/system/freeswitch.service
-      register: freeswitch_apparmor
+      register: freeswitch_systemd
       notify: Restart freeswitch
 
     - name: Systemctl daemon reload
