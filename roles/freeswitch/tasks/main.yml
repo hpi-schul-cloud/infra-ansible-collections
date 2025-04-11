@@ -98,7 +98,6 @@
         src: usr.local.freeswitch.bin.freeswitch
         dest: /etc/apparmor.d/usr.local.freeswitch.bin.freeswitch
       register: freeswitch_apparmor
-      notify: Restart freeswitch
 
     - name: Create freeswitch systmed file
       copy:
@@ -120,3 +119,4 @@
     - name: Reread AppArmor
       ansible.builtin.command: /usr/sbin/apparmor_parser -r /etc/apparmor.d/usr.local.freeswitch.bin.freeswitch
       when: freeswitch_apparmor.changed
+      notify: Restart freeswitch
