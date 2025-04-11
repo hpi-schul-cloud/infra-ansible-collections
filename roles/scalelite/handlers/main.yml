@@ -24,6 +24,11 @@
     name: scalelite-nginx
     restart: true
 
+- name: Restart postgres
+  community.docker.docker_container:
+    name: db
+    restart: true
+
 - name: Restart Redis redis_data
   community.docker.docker_container:
     name: redis

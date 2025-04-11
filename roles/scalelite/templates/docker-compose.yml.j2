@@ -15,11 +15,19 @@ services:
     user: {{ scalelite_postgres_user_id }}:{{ scalelite_postgres_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/postgres_data/:/var/lib/postgresql/data
+      - {{ scalelite_docker_volumes_folder }}/postgres_init/:/docker-entrypoint-initdb.d/
     tmpfs:
       - /var/run:rw,mode=777
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_SCALELITE_PASSWORD: ${POSTGRES_SCALELITE_PASSWORD}
+      POSTGRES_GREENLIGHT_V3_PASSWORD: ${POSTGRES_GREENLIGHT_V3_PASSWORD}
+      POSTGRES_EXPORTER_PASSWORD: ${POSTGRES_EXPORTER_PASSWORD}
+{% for instance in scalelite_greenlight_extra_instances %}
+      POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD: ${POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD}
+{% endfor %}
       PGDATA: /var/lib/postgresql/data
       POSTGRES_HOST: db
     healthcheck:
@@ -179,8 +187,8 @@ services:
     environment:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - LOADBALANCER_SECRET=${LOADBALANCER_SECRET}
+      - DATABASE_URL=postgresql://scalelite:${POSTGRES_SCALELITE_PASSWORD}@db:5432/scalelite?pool=5
       - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis:6379
-      - DATABASE_URL=postgresql://postgres:{{ scalelite_postgres_password }}@db:5432/scalelite?pool=5
       - WEB_CONCURRENCY={{ scalelite_web_concurrency }}
       - RAILS_MAX_THREADS={{ scalelite_rails_max_threads }}
       - RECORDING_DISABLED=true
@@ -266,8 +274,8 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
+      - DATABASE_URL=postgres://greenlight-v3:${POSTGRES_GREENLIGHT_V3_PASSWORD}@db:5432/greenlight-v3
       - REDIS_URL=redis://${GREENLIGHT_REDIS_USER}:${GREENLIGHT_REDIS_SECRET}@redis-greenlight:6379
-      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-v3
 {% if scalelite_greenlight_phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ scalelite_greenlight_phone_number }}
 {% endif %}
@@ -326,8 +334,8 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
+      - DATABASE_URL=postgres://greenlight-{{ instance.name }}-v3:${POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
       - REDIS_URL=redis://${GREENLIGHT_REDIS_{{ instance.name | upper }}_USER}:${GREENLIGHT_REDIS_{{ instance.name | upper }}_SECRET}@redis-{{ instance.name}}:6379
-      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
 {% if instance.phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ instance.phone_number }}
 {% endif %}
@@ -361,7 +369,7 @@ services:
     ports:
       - 9187:9187
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://exporter:${POSTGRES_EXPORTER_PASSWORD}@db:5432/postgres?sslmode=disable"
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9187"]
       interval: 30s
