@@ -26,6 +26,10 @@
       mode: "0700"
       owner: "{{ scalelite_postgres_user_id }}"
       group: "{{ scalelite_postgres_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/postgres_init"
+      mode: "0700"
+      owner: "{{ scalelite_postgres_user_id }}"
+      group: "{{ scalelite_postgres_group_id }}"
     - path: "{{ scalelite_docker_volumes_folder }}/redis_data"
       mode: "0700"
       owner: "{{ scalelite_redis_user_id }}"
@@ -56,6 +60,18 @@
       mode: "0750"
       owner: "{{ scalelite_nginx_user_id }}"
       group: "{{ scalelite_certbot_group_id }}"
+
+- name: Create Postgres DBs and permissions script
+  vars:
+    base_dbs: ["scalelite", "greenlight-v3"]
+    additional_dbs: "{{ ['greenlight-'] | product(scalelite_greenlight_extra_instances | map(attribute='name'), ['-v3']) | map('join') | list }}"
+    dbs: "{{ base_dbs + additional_dbs }}"
+  template:
+    src: "postgres/db_permissions.sh.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/postgres_init/db_permissions.sh"
+    owner: "{{ scalelite_postgres_user_id }}"
+    group: "{{ scalelite_postgres_group_id }}"
+    mode: "0500"
 
 - name: Create Redis data folders for extra Greenlight instances
   file:
@@ -139,6 +155,9 @@
 
 - name: Docker-Compose
   include_tasks: docker-compose.yml
+
+- name: Postgres config
+  include_tasks: postgres.yml
 
 - name: Certificates
   include_tasks: certificates.yml
