@@ -1,6 +1,0 @@
-[sshd]
-enabled = true
-port = ssh
-logpath = %(sshd_log)s
-maxfailures = 5
-bantime = 3600

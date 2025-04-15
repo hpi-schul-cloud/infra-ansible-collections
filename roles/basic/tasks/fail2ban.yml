@@ -17,16 +17,16 @@
     lineinfile:
       path: /etc/fail2ban/jail.conf
       regexp: "^ignoreip"
-      line: "ignoreip = 127.0.0.1/8"
+      line: "ignoreip = {{ fail2ban_ignoreip }}"
     notify: Restart fail2ban
     tags: molecule-notest
 
-  - name: Copy ssh-jail for fail2ban
+  - name: Create jail file for fail2ban
     copy:
-      src: sshd.local
-      dest: /etc/fail2ban/jail.d/sshd.local
+      content: "{{ fail2ban_jail_configuration }}"
+      dest: "{{ fail2ban_jail_path }}"
       owner: root
       group: root
-      mode: 0744
+      mode: 0644
     notify: Restart fail2ban
     tags: molecule-notest
