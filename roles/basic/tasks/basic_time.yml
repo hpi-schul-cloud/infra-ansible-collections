@@ -1,0 +1,20 @@
+---
+# basic settings for timezone and ntp servers
+
+  # ansible output always yellow
+  - name: Set timezone
+    ansible.builtin.command: timedatectl set-timezone UTC
+
+  - name: Set ntp server
+    ansible.builtin.lineinfile:
+      path: /etc/systemd/timesyncd.conf
+      regexp: '^#NTP=.*'
+      line: NTP=0.de.pool.ntp.org {{ '#' }} this value was automatically set via ansible
+    notify: restart timesyncd
+
+  - name: Set fallback ntp servers
+    ansible.builtin.lineinfile:
+      path: /etc/systemd/timesyncd.conf
+      regexp: '^#FallbackNTP=.*'
+      line: FallbackNTP=1.de.pool.ntp.org 2.de.pool.ntp.org 3.de.pool.ntp.org {{ '#' }} this value was automatically set via ansible
+    notify: restart timesyncd
