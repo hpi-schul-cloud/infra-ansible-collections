@@ -7,3 +7,6 @@
 
   - name: reload sysctl
     command: /usr/sbin/sysctl -p
+
+  - name: restart timesyncd
+    command: systemctl start systemd-timesyncd
