@@ -80,7 +80,7 @@ services:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
 
   certbot:
-    image: {{ scalelite_certbot_image_repository }}:{{ scalelite_certbot_image_tag }}
+    image: {{ scalelite_certbot_image_repository }}@{{ scalelite_certbot_image_digest }}
     container_name: certbot
     read_only: true
     restart: unless-stopped
@@ -240,7 +240,7 @@ services:
         {{ scalelite_poller_resources | to_nice_yaml | indent(8) }}
 
   bbb-autoscaler:
-    image: {{ scalelite_autoscaler_image_repository }}:{{ scalelite_autoscaler_image_tag }}
+    image: {{ scalelite_autoscaler_image_repository }}@{{ scalelite_autoscaler_image_digest }}
     read_only: true
     container_name: bbb-autoscaler
     restart: unless-stopped
