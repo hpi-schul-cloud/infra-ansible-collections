@@ -1,12 +1,12 @@
 ---
-  - name: restart sshd
+  - name: Restart sshd
     service: name=sshd state=restarted
   
-  - name: restart fail2ban
+  - name: Restart fail2ban
     service: name=fail2ban state=restarted
 
-  - name: reload sysctl
+  - name: Reload sysctl
     command: /usr/sbin/sysctl -p
 
-  - name: restart timesyncd
+  - name: Restart timesyncd
     command: systemctl start systemd-timesyncd

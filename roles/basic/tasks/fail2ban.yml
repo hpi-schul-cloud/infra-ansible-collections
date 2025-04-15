@@ -1,32 +1,32 @@
 ---
-  - name: install fail2ban
+  - name: Install fail2ban
     apt:
       name: ['fail2ban']
       state: latest
   
   # following tasks(3) will throw errors when tested with molecule (service restart and handler cmd not compatible with container)
   # used the molecule-notest tag to skip this in molecule
-  - name: enable fail2ban
+  - name: Enable fail2ban
     service:
       name: fail2ban
       enabled: true
       state: started
     tags: molecule-notest
 
-  - name: set ignoreip for fail2ban 
+  - name: Set ignoreip for fail2ban 
     lineinfile:
       path: /etc/fail2ban/jail.conf
       regexp: "^ignoreip"
       line: "ignoreip = 127.0.0.1/8"
-    notify: restart fail2ban
+    notify: Restart fail2ban
     tags: molecule-notest
 
-  - name: copy ssh-jail for fail2ban
+  - name: Copy ssh-jail for fail2ban
     copy:
       src: sshd.local
       dest: /etc/fail2ban/jail.d/sshd.local
       owner: root
       group: root
       mode: 0744
-    notify: restart fail2ban
+    notify: Restart fail2ban
     tags: molecule-notest

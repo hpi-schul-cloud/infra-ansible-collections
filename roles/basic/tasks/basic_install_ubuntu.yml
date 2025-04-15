@@ -11,19 +11,19 @@
       upgrade: dist
       autoremove: true
 
-  - name: install python3
+  - name: Install python3
     apt:
       name: ['python3', 'python3-pip']
       state: latest
 
-  - name: kernel.panic = 20, reboot 20 seconds after kernel panic
+  - name: Kernel.panic = 20, reboot 20 seconds after kernel panic
     lineinfile:
       path: /etc/sysctl.d/99-sysctl.conf
       line: "kernel.panic = 20"
-    notify: reload sysctl
+    notify: Reload sysctl
 
-  - name: kernel.pid_max = 100000, allow 100.000 Processes at the system
+  - name: Kernel.pid_max = 100000, allow 100.000 Processes at the system
     lineinfile:
       path: /etc/sysctl.d/99-sysctl.conf
       line: "kernel.pid_max = 100000"
-    notify: reload sysctl
+    notify: Reload sysctl
