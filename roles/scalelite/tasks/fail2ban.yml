@@ -19,7 +19,7 @@
     mode: "0644"
   notify: Restart Fail2ban
 
-- name: Create filter file for fail2ban, greenlight login errors
+- name: Create filter file for fail2ban greenlight login errors
   copy:
     content: "{{ scalelite_fail2ban_filter_greenlight }}"
     dest: "{{ scalelite_fail2ban_filter_path_greenlight }}"
@@ -28,7 +28,7 @@
     mode: "0644"
   notify: Restart Fail2ban
 
-- name: Create jail file for fail2ban
+- name: Create nginx jail file for fail2ban
   copy:
     content: "{{ scalelite_fail2ban_jail_nginx }}"
     dest: "{{ scalelite_fail2ban_jail_path_nginx }}"
@@ -37,7 +37,7 @@
     mode: "0644"
   notify: Restart Fail2ban
 
-- name: Create jail file for fail2ban
+- name: Create greenlight jail file for fail2ban
   copy:
     content: "{{ scalelite_fail2ban_jail_greenlight }}"
     dest: "{{ scalelite_fail2ban_jail_path_greenlight }}"
