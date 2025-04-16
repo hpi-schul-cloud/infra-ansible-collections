@@ -203,3 +203,39 @@ scalelite_autoscaler_environment: []
 scalelite_node_exporter_textfile_directory: /node-exporter-textfiles/
 scalelite_node_exporter_user_id: 65534
 scalelite_node_exporter_group_id: 65534
+
+scalelite_fail2ban_filter_nginx: |
+  [Definition]
+  failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d).+$
+  ignoreregex =
+scalelite_fail2ban_filter_path_nginx: /etc/fail2ban/filter.d/nginx-errors.conf
+scalelite_fail2ban_filter_greenlight: |
+  [Definition]
+  failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d) .*\/greenlight\/signin" ".*"$
+  ignoreregex =
+scalelite_fail2ban_filter_path_greenlight: /etc/fail2ban/filter.d/greenlight-signin-errors.conf
+scalelite_fail2ban_jail_nginx: |
+  [nginx-http-auth]
+  enabled = true
+  port = {{ scalelite_nginx_metrics_endpoints | map(attribute='public_port') | join(",") }}
+  logpath = {{ scalelite_nginx_logs_folder }}/*.log
+  maxretry = 3
+  bantime = 3600
+  [nginx-errors]
+  enabled    = true
+  port       = http,https
+  filter     = nginx-errors
+  logpath    = {{ scalelite_nginx_logs_folder }}/*.log
+  maxretry   = 100
+  bantime    = 3600
+  findtime   = 600
+scalelite_fail2ban_jail_path_nginx: /etc/fail2ban/jail.d/nginx_jail.local
+scalelite_fail2ban_jail_greenlight: |
+  [greenlight-signin-errors]
+  enabled    = true
+  port       = http,https
+  filter     = greenlight-signin-errors
+  logpath    = {{ scalelite_nginx_logs_folder }}/*.log
+  maxretry   = 5
+  bantime    = 3600
+scalelite_fail2ban_jail_path_greenlight: /etc/fail2ban/jail.d/greenlight_jail.local
