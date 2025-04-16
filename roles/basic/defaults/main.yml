@@ -1,10 +1,10 @@
 ---
-fail2ban_ignoreip: 127.0.0.1/8
-fail2ban_jail_configuration: |
+basic_fail2ban_ignoreip: 127.0.0.1/8
+basic_fail2ban_jail_sshd: |
   [sshd]
   enabled = true
   port = ssh
   logpath = %(sshd_log)s
   maxfailures = 5
   bantime = 3600
-fail2ban_jail_path: /etc/fail2ban/jail.d/jail.local
+basic_fail2ban_jail_sshd_path: /etc/fail2ban/jail.d/sshd_jail.local
