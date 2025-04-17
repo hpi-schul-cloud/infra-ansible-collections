@@ -4,8 +4,9 @@
       name: ['fail2ban']
       state: latest
   
-  # following tasks(3) will throw errors when tested with molecule (service restart and handler cmd not compatible with container)
-  # used the molecule-notest tag to skip this in molecule
+  # Following tasks(3) will throw errors when tested with molecule 
+  # (service restart and handler cmd not compatible with container)
+  # Used the molecule-notest tag to skip this in molecule
   - name: Enable fail2ban
     service:
       name: fail2ban
@@ -13,11 +14,13 @@
       state: started
     tags: molecule-notest
 
-  - name: Set ignoreip for fail2ban 
-    lineinfile:
-      path: /etc/fail2ban/jail.conf
-      regexp: "^ignoreip"
-      line: "ignoreip = {{ basic_fail2ban_ignoreip }}"
+  - name: Create default jail file for fail2ban
+    copy:
+      content: "{{ basic_fail2ban_jail_default }}"
+      dest: "{{ basic_fail2ban_jail_default_path }}"
+      owner: root
+      group: root
+      mode: 0644
     notify: Restart fail2ban
     tags: molecule-notest
 
