@@ -1,16 +1,16 @@
 ---
-- name: Install fail2ban
+- name: Install coturn fail2ban
   apt:
     name: ['fail2ban']
     state: present
 
-- name: Enable fail2ban
+- name: Enable coturn fail2ban
   service:
     name: fail2ban
     enabled: true
     state: started
 
-- name: Create filter file for fail2ban
+- name: Create coturn filter file for fail2ban
   copy:
     content: "{{ coturn_fail2ban_filter }}"
     dest: "{{ coturn_fail2ban_filter_path }}"
