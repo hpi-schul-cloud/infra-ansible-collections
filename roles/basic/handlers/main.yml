@@ -9,4 +9,4 @@
     command: /usr/sbin/sysctl -p
 
   - name: Restart timesyncd
-    command: systemctl start systemd-timesyncd
+    command: systemctl restart systemd-timesyncd
