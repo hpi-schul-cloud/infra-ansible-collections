@@ -4,7 +4,7 @@ server{
     # Hide original header first.
     proxy_hide_header 'Access-Control-Allow-Origin';
     # Re-add the header with calling origin.
-    add_header 'Access-Control-Allow-Origin' $http_origin;
+    add_header 'Access-Control-Allow-Origin' $http_origin always;
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
     # Hide original CSP Headers
@@ -32,7 +32,7 @@ server{
     # Hide original header first.
     proxy_hide_header 'Access-Control-Allow-Origin';
     # Re-add the header with calling origin.
-    add_header 'Access-Control-Allow-Origin' $http_origin;
+    add_header 'Access-Control-Allow-Origin' $http_origin always;
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
     # Hide original CSP Headers
@@ -61,7 +61,7 @@ server{
     # Hide original header first.
     proxy_hide_header 'Access-Control-Allow-Origin';
     # Re-add the header with calling origin.
-    add_header 'Access-Control-Allow-Origin' $http_origin;
+    add_header 'Access-Control-Allow-Origin' $http_origin always;
     proxy_hide_header 'Access-Control-Allow-Credentials';
     add_header 'Access-Control-Allow-Credentials' true;
     # Hide original CSP Headers

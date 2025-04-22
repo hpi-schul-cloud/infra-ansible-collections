@@ -1,11 +1,10 @@
 version: '3'
 
-volumes:
-  postgres-data:
-  redis-data:
-{% for instance in scalelite_greenlight_extra_instances %}
-  redis-{{ instance.name }}-data:
-{% endfor %}
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: {{ scalelite_docker_net }}
 
 services:
   db:
@@ -16,11 +15,19 @@ services:
     user: {{ scalelite_postgres_user_id }}:{{ scalelite_postgres_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/postgres_data/:/var/lib/postgresql/data
+      - {{ scalelite_docker_volumes_folder }}/postgres_init/:/docker-entrypoint-initdb.d/
     tmpfs:
       - /var/run:rw,mode=777
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_SCALELITE_PASSWORD: ${POSTGRES_SCALELITE_PASSWORD}
+      POSTGRES_GREENLIGHT_V3_PASSWORD: ${POSTGRES_GREENLIGHT_V3_PASSWORD}
+      POSTGRES_EXPORTER_PASSWORD: ${POSTGRES_EXPORTER_PASSWORD}
+{% for instance in scalelite_greenlight_extra_instances %}
+      POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD: ${POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD}
+{% endfor %}
       PGDATA: /var/lib/postgresql/data
       POSTGRES_HOST: db
     healthcheck:
@@ -41,8 +48,29 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_data:/data
+      - {{ scalelite_docker_volumes_folder }}/redis_data/redis.conf:/usr/local/etc/redis.conf
+    command: ["/usr/local/etc/redis.conf"]
     healthcheck:
-      test:  ["CMD", "redis-cli", "ping"]
+      test:  ["CMD-SHELL", "redis-cli --user '${REDIS_USER}' --pass '${REDIS_SECRET}' ping | grep 'PONG' || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # start_period: 60s
+    deploy:
+      resources:
+        {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
+
+  redis-greenlight:
+    image: {{ scalelite_redis_image }}
+    container_name: redis-greenlight
+    restart: unless-stopped
+    user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
+    volumes:
+      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data:/data
+      - {{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf:/usr/local/etc/redis.conf
+    command: ["/usr/local/etc/redis.conf"]
+    healthcheck:
+      test:  ["CMD-SHELL", "redis-cli --user '${GREENLIGHT_REDIS_USER}' --pass '${GREENLIGHT_REDIS_SECRET}' ping | grep 'PONG' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -52,7 +80,7 @@ services:
         {{ scalelite_redis_resources | to_nice_yaml | indent(8) }}
 
   certbot:
-    image: {{ scalelite_certbot_image_repository }}:{{ scalelite_certbot_image_tag }}
+    image: {{ scalelite_certbot_image_repository }}@{{ scalelite_certbot_image_digest }}
     container_name: certbot
     read_only: true
     restart: unless-stopped
@@ -115,7 +143,6 @@ services:
       - "host.docker.internal:host-gateway"
     tmpfs:
       - /tmp:rw,mode=777
-#      - /opt/owasp-crs:rw,mode=777 
       - /var/cache/nginx:rw,mode=777 
     volumes:
       - {{ scalelite_docker_volumes_folder }}/owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/opt/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
@@ -160,8 +187,8 @@ services:
     environment:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - LOADBALANCER_SECRET=${LOADBALANCER_SECRET}
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=postgresql://postgres:{{ scalelite_postgres_password }}@db:5432/scalelite?pool=5
+      - DATABASE_URL=postgresql://scalelite:${POSTGRES_SCALELITE_PASSWORD}@db:5432/scalelite?pool=5
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis:6379
       - WEB_CONCURRENCY={{ scalelite_web_concurrency }}
       - RAILS_MAX_THREADS={{ scalelite_rails_max_threads }}
       - RECORDING_DISABLED=true
@@ -193,7 +220,7 @@ services:
     restart: unless-stopped
     environment:
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
-      - REDIS_URL=redis://redis:6379
+      - REDIS_URL=redis://${REDIS_USER}:${REDIS_SECRET}@redis:6379
       - WEB_CONCURRENCY={{ scalelite_web_concurrency }}
       - RAILS_MAX_THREADS={{ scalelite_rails_max_threads }}
       - SERVER_ID_IS_HOSTNAME=true
@@ -201,6 +228,7 @@ services:
       - RAILS_LOG_LEVEL={{ scalelite_log_level }}
     depends_on:
       - scalelite-api
+      - redis
     healthcheck:
       test: rake liveness
       interval: 30s
@@ -212,7 +240,7 @@ services:
         {{ scalelite_poller_resources | to_nice_yaml | indent(8) }}
 
   bbb-autoscaler:
-    image: {{ scalelite_autoscaler_image_repository }}:{{ scalelite_autoscaler_image_tag }}
+    image: {{ scalelite_autoscaler_image_repository }}@{{ scalelite_autoscaler_image_digest }}
     read_only: true
     container_name: bbb-autoscaler
     restart: unless-stopped
@@ -246,10 +274,10 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://redis:6379
-      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-v3
-{% if greenlight_phone_number is defined %}
-      - VOICE_BRIDGE_PHONE_NUMBER={{ greenlight_phone_number }}
+      - DATABASE_URL=postgres://greenlight-v3:${POSTGRES_GREENLIGHT_V3_PASSWORD}@db:5432/greenlight-v3
+      - REDIS_URL=redis://${GREENLIGHT_REDIS_USER}:${GREENLIGHT_REDIS_SECRET}@redis-greenlight:6379
+{% if scalelite_greenlight_phone_number is defined %}
+      - VOICE_BRIDGE_PHONE_NUMBER={{ scalelite_greenlight_phone_number }}
 {% endif %}
 {% if scalelite_greenlight_allow_mail_notifications %}
       - SMTP_SERVER=${SMTP_SERVER}
@@ -269,7 +297,7 @@ services:
       # start_period: 60s
     depends_on:
       - db
-      - redis
+      - redis-greenlight
     deploy:
       resources:
         {{ scalelite_greenlight_resources | to_nice_yaml | indent(8) }}
@@ -284,8 +312,10 @@ services:
     user: {{ scalelite_redis_user_id }}:{{ scalelite_redis_group_id }}
     volumes:
       - {{ scalelite_docker_volumes_folder }}/redis_{{ instance.name }}_data:/data
+      - {{ scalelite_docker_volumes_folder }}/redis_{{ instance.name }}_data/redis.conf:/usr/local/etc/redis.conf
+    command: ["/usr/local/etc/redis.conf"]
     healthcheck:
-      test:  ["CMD", "redis-cli", "ping"]
+      test:  ["CMD-SHELL", "redis-cli --user '${GREENLIGHT_REDIS_{{ instance.name| upper }}_USER}' --pass '${GREENLIGHT_REDIS_{{ instance.name| upper }}_SECRET}' ping | grep 'PONG' || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -304,8 +334,8 @@ services:
       - RELATIVE_URL_ROOT=/greenlight
       - DEFAULT_LOCALE={{ scalelite_greenlight_default_locale }}
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
-      - REDIS_URL=redis://redis-{{ instance.name}}:6379
-      - DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
+      - DATABASE_URL=postgres://greenlight-{{ instance.name }}-v3:${POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
+      - REDIS_URL=redis://${GREENLIGHT_REDIS_{{ instance.name | upper }}_USER}:${GREENLIGHT_REDIS_{{ instance.name | upper }}_SECRET}@redis-{{ instance.name}}:6379
 {% if instance.phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ instance.phone_number }}
 {% endif %}
@@ -339,7 +369,7 @@ services:
     ports:
       - 9187:9187
     environment:
-      DATA_SOURCE_NAME: "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/?sslmode=disable"
+      DATA_SOURCE_NAME: "postgresql://exporter:${POSTGRES_EXPORTER_PASSWORD}@db:5432/postgres?sslmode=disable"
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "9187"]
       interval: 30s

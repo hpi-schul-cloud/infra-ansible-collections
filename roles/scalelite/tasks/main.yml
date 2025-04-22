@@ -26,7 +26,15 @@
       mode: "0700"
       owner: "{{ scalelite_postgres_user_id }}"
       group: "{{ scalelite_postgres_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/postgres_init"
+      mode: "0700"
+      owner: "{{ scalelite_postgres_user_id }}"
+      group: "{{ scalelite_postgres_group_id }}"
     - path: "{{ scalelite_docker_volumes_folder }}/redis_data"
+      mode: "0700"
+      owner: "{{ scalelite_redis_user_id }}"
+      group: "{{ scalelite_redis_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data"
       mode: "0700"
       owner: "{{ scalelite_redis_user_id }}"
       group: "{{ scalelite_redis_group_id }}"
@@ -53,6 +61,18 @@
       owner: "{{ scalelite_nginx_user_id }}"
       group: "{{ scalelite_certbot_group_id }}"
 
+- name: Create Postgres DBs and permissions script
+  vars:
+    base_dbs: ["scalelite", "greenlight-v3"]
+    additional_dbs: "{{ ['greenlight-'] | product(scalelite_greenlight_extra_instances | map(attribute='name'), ['-v3']) | map('join') | list }}"
+    dbs: "{{ base_dbs + additional_dbs }}"
+  template:
+    src: "postgres/db_permissions.sh.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/postgres_init/db_permissions.sh"
+    owner: "{{ scalelite_postgres_user_id }}"
+    group: "{{ scalelite_postgres_group_id }}"
+    mode: "0500"
+
 - name: Create Redis data folders for extra Greenlight instances
   file:
     state: directory
@@ -61,6 +81,48 @@
     owner: "{{ scalelite_redis_user_id }}"
     group: "{{ scalelite_redis_group_id }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control: 
+    label: "{{ item.name }}"
+
+
+- name: Create Redis Configuration for main redis instance
+  vars: 
+    template_user: "{{ scalelite_redis_user }}"
+    template_secret: "{{ scalelite_redis_password }}"
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_data/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
+  notify: Restart Redis redis_data
+
+- name: Create Redis Configuration for greenlight redis instance
+  vars: 
+    template_user: "{{ scalelite_greenlight_redis_user }}"
+    template_secret: "{{ scalelite_greenlight_redis_password }}"
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
+  notify: Restart Redis redis_greenlight_data
+
+- name: Create Redis Configuration for extra redis instances
+  vars:
+    template_user: "Redis_{{ item.name }}"
+    template_secret: "{{ item.redis_secret }}"
+  template:
+    src: "templates/redis/redis.conf.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/redis.conf"
+    mode: '0400'
+    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id }}"
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control: 
+    label: "{{ item.name }}"
+  notify: Restart Redis Instaces
 
 - name: Certbot
   include_tasks: certbot.yml
@@ -93,6 +155,9 @@
 
 - name: Docker-Compose
   include_tasks: docker-compose.yml
+
+- name: Postgres config
+  include_tasks: postgres.yml
 
 - name: Certificates
   include_tasks: certificates.yml

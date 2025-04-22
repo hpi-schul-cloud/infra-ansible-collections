@@ -2,7 +2,7 @@ server{
   listen 8080;
   location ~ ^/(help|assets|api) {
     proxy_hide_header 'Access-Control-Allow-Origin';
-    add_header 'Access-Control-Allow-Origin' $http_origin;
+    add_header 'Access-Control-Allow-Origin' $http_origin always;
     # Hide original CSP Headers
     proxy_hide_header 'Content-Security-Policy';
     proxy_hide_header 'Content-Security-Policy-Report-Only';
