@@ -104,11 +104,11 @@ LocalSocket /run/clamav/clamd.sock
 
 # Sets the group ownership on the unix socket.
 # Default: disabled (the primary group of the user running clamd)
-#LocalSocketGroup virusgroup
+LocalSocketGroup clamav
 
 # Sets the permissions on the unix socket to the specified mode.
 # Default: disabled (socket is world accessible)
-#LocalSocketMode 660
+LocalSocketMode 660
 
 # Remove stale socket after unclean shutdown.
 # Default: yes
