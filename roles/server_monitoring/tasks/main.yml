@@ -211,3 +211,10 @@
     job: "{{ server_monitoring_folder }}/collect-version.sh"
     cron_file: ansible_version_collecter
  
+- name: Create Node Exporter textfile collector directory
+  file:
+    path: "{{ server_monitoring_node_exporter_textfile_directory }}"
+    state: directory
+    mode: "0700"
+    owner: "{{ server_monitoring_node_exporter_user_id }}"
+    group: "{{ server_monitoring_node_exporter_group_id }}"
