@@ -93,6 +93,12 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
+- name: Install Python Passlib
+  pip:
+    name:
+      - passlib
+  when: server_monitoring_install_docker
+
 - name: Copy basic auth user
   community.general.htpasswd:
     path: "{{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd"
@@ -186,3 +192,22 @@
     mode: "0644"
   when: server_monitoring_create_fail2ban_jail
   notify: Restart Fail2ban
+
+- name: Copy Version collect script
+  ansible.builtin.template:
+    src: /collect-packet-servsions.sh.j2
+    dest: "{{ server_monitoring_folder }}/collect-version.sh"
+    mode: "0750"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+
+- name: Create cronjob to collect versions
+  ansible.builtin.cron:
+    name: Collect Versions
+    weekday: "*"
+    minute: "0"
+    hour: "0"
+    user: root
+    job: "{{ server_monitoring_folder }}/collect-version.sh"
+    cron_file: ansible_version_collecter
+ 

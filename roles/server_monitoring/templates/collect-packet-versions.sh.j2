@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# See Ubuntu version format
+# https://semver.org/ and https://wiki.ubuntuusers.de/Versionsnummern_von_Ubuntu-Paketen
+
+dpkg-query -W -f='${Package} ${Version}\n' | while read pkg version; do
+    cleaned_version=${version}
+
+# Remove Ubuntu-specific suffixes
+#    cleaned_version=$(echo "$cleaned_version" | sed -E 's/[-+~]ubuntu[0-9.]+//')
+
+    # Remove leading epoch numbers
+    cleaned_version=$(echo "$cleaned_version" | sed -E 's/^[0-9]+://')
+
+    echo "package_info{name=\"$pkg\", version=\"$cleaned_version\"} 1"
+done > {{ server_monitoring_node_exporter_textfile_directory }}/packages.prom
