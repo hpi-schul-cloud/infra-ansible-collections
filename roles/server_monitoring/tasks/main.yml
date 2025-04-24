@@ -200,6 +200,7 @@
     mode: "0750"
     owner: "{{ server_monitoring_folder_owner }}"
     group: "{{ server_monitoring_folder_group }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
 
 - name: Create cronjob to collect versions
   ansible.builtin.cron:
@@ -210,6 +211,7 @@
     user: root
     job: "{{ server_monitoring_folder }}/collect-version.sh"
     cron_file: ansible_version_collecter
+  when: server_monitoring_node_exporter_textfile_collector_enabled
  
 - name: Create Node Exporter textfile collector directory
   file:
@@ -218,3 +220,4 @@
     mode: "0700"
     owner: "{{ server_monitoring_node_exporter_user_id }}"
     group: "{{ server_monitoring_node_exporter_group_id }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
