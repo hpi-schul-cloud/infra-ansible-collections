@@ -6,6 +6,8 @@ bbb_instance_name: "bbb-{{ bbb_tenant }}"
 bbb_domain_name: bbb.example.com
 # Address of the scalelite server
 scalelite_host: "{{ bbb_domain_name }}"
+# Address of the freeswitch server
+freeswitch_host: "freeswitch.{{ bbb_domain_name }}"
 # True if using the exporters from the EBBBA BBB role with metrics under /mon/node
 # and /mon/bbb otherwise /metrics on port 9100 is used
 bbb_ebbba_exporters: true
