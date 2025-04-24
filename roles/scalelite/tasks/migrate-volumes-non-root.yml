@@ -15,11 +15,11 @@
     group: "{{ item.group }}"
   loop:
     - name: postgres
-      owner: "{{ scalelite_postgres_user_id }}"
-      group: "{{ scalelite_postgres_group_id }}"
+      owner: "{{ scalelite_postgres_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_postgres_group_id + scalelite_rootless_docker_offset }}"
     - name: redis
-      owner: "{{ scalelite_redis_user_id }}"
-      group: "{{ scalelite_redis_group_id }}"
+      owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
 
 - name: Migrate volume content for extra Greenlight instances
   copy:
@@ -27,6 +27,6 @@
     dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/"
     remote_src: true
     mode: "0700"
-    owner: "{{ scalelite_redis_user_id }}"
-    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
   loop: "{{ extra_greenlight_instances }}"

@@ -4,16 +4,16 @@
     src: nginx/scalelite/acme-challenge.nginx
     dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/acme-challenge.nginx"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
 
 - name: Copy Nginx config (templates)
   template:
     src: "{{ item }}.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
   loop:
     - nginx/nginx.conf
     - nginx/scalelite.conf
@@ -23,8 +23,8 @@
     src: "{{ item }}.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
   loop:
     - owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
     - owasp/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
@@ -39,16 +39,16 @@
     path: "{{ scalelite_docker_volumes_folder }}/nginx/dhparam.pem"
     size: "{{ scalelite_nginx_dhparam_size }}"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
 
 - name: Copy Greenlight Nginx config
   template:
     src: nginx/scalelite/greenlight.nginx.j2
     dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
   when: scalelite_greenlight_enabled
 
 - name: Delete Greenlight Nginx config
@@ -62,8 +62,8 @@
     src: nginx/nodeexporter.conf.j2
     dest: "{{ scalelite_docker_volumes_folder }}/nginx/nodeexporter.conf"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
 
 - name: Install python-passlib
   package:
@@ -81,16 +81,16 @@
     name: "{{ scalelite_metrics_basic_auth_username }}"
     password: "{{ scalelite_metrics_basic_auth_password }}"
     mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_nginx_group_id  + scalelite_rootless_docker_offset }}"
 
 - name: Create nginx log directory
   file:
     path: "{{ scalelite_nginx_logs_folder }}"
     mode: "0750"
     state: directory
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_certbot_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_certbot_group_id + scalelite_rootless_docker_offset }}"
     recurse: true
 
 - name: Create log directory if it does not exist for modsecurity
@@ -98,8 +98,8 @@
     path: "{{ scalelite_modsec_logs_folder }}"
     state: directory
     mode: "0750"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_certbot_group_id }}"
+    owner: "{{ scalelite_nginx_user_id  + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_certbot_group_id + scalelite_rootless_docker_offset }}"
  
 - name: Set nginx log file permissions
   command: find {{ scalelite_nginx_logs_folder }} -type f -exec chmod 0640 {} \;

@@ -11,8 +11,8 @@
   copy:
     src: "postgres/pg_hba.conf"
     dest: "{{ scalelite_docker_volumes_folder }}/postgres_data/pg_hba.conf"
-    owner: "{{ scalelite_postgres_user_id }}"
-    group: "{{ scalelite_postgres_group_id }}"
+    owner: "{{ scalelite_postgres_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_postgres_group_id + scalelite_rootless_docker_offset }}"
     mode: "0600"
   notify: Restart postgres
 

@@ -10,56 +10,58 @@
   loop:
     - path: "{{ scalelite_docker_volumes_folder }}"
       mode: "0700"
+      owner: "rootless-docker"
     - path: "{{ scalelite_docker_volumes_folder }}/certbot"
       mode: "0750"
-      owner: "{{ scalelite_certbot_user_id }}"
-      group: "{{ ssl_certs_group_id }}"
+      owner: "{{ scalelite_certbot_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ ssl_certs_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/certbot/terraform/"
       mode: "0750"
-      owner: "{{ scalelite_certbot_user_id }}"
-      group: "{{ ssl_certs_group_id }}"
+      owner: "{{ scalelite_certbot_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ ssl_certs_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/webroot/"
       mode: "0770"
-      owner: "{{ scalelite_certbot_user_id }}"
-      group: "{{ ssl_certs_group_id }}"
+      owner: "{{ scalelite_certbot_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ ssl_certs_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/postgres_data"
       mode: "0700"
-      owner: "{{ scalelite_postgres_user_id }}"
-      group: "{{ scalelite_postgres_group_id }}"
+      owner: "{{ scalelite_postgres_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_postgres_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/postgres_init"
       mode: "0700"
-      owner: "{{ scalelite_postgres_user_id }}"
-      group: "{{ scalelite_postgres_group_id }}"
+      owner: "{{ scalelite_postgres_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_postgres_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/redis_data"
       mode: "0700"
-      owner: "{{ scalelite_redis_user_id }}"
-      group: "{{ scalelite_redis_group_id }}"
+      owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data"
       mode: "0700"
-      owner: "{{ scalelite_redis_user_id }}"
-      group: "{{ scalelite_redis_group_id }}"
+      owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/nginx"
       mode: "0750"
-      owner: "{{ scalelite_nginx_user_id }}"
-      group: "{{ scalelite_nginx_group_id }}"
+      owner: "{{ scalelite_nginx_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_nginx_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/owasp"
       mode: "0750"
-      owner: "{{ scalelite_nginx_user_id }}"
-      group: "{{ scalelite_nginx_group_id }}"
+      owner: "{{ scalelite_nginx_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_nginx_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite"
       mode: "0750"
-      owner: "{{ scalelite_nginx_user_id }}"
-      group: "{{ scalelite_nginx_group_id }}"
+      owner: "{{ scalelite_nginx_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_nginx_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_docker_volumes_folder }}/autoscaler"
       mode: "0750"
+      owner: "rootless-docker"
     - path: "{{ scalelite_docker_volumes_folder }}/scalelite"
       mode: "0700"
-      owner: "{{ scalelite_user_id }}"
-      group: "{{ scalelite_group_id }}"
+      owner: "{{ scalelite_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_group_id + scalelite_rootless_docker_offset }}"
     - path: "{{ scalelite_nginx_logs_folder }}"
       mode: "0750"
-      owner: "{{ scalelite_nginx_user_id }}"
-      group: "{{ scalelite_certbot_group_id }}"
+      owner: "{{ scalelite_nginx_user_id + scalelite_rootless_docker_offset }}"
+      group: "{{ scalelite_certbot_group_id + scalelite_rootless_docker_offset }}"
 
 - name: Create Postgres DBs and permissions script
   vars:
@@ -69,8 +71,8 @@
   template:
     src: "postgres/db_permissions.sh.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/postgres_init/db_permissions.sh"
-    owner: "{{ scalelite_postgres_user_id }}"
-    group: "{{ scalelite_postgres_group_id }}"
+    owner: "{{ scalelite_postgres_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_postgres_group_id + scalelite_rootless_docker_offset }}"
     mode: "0500"
 
 - name: Create Redis data folders for extra Greenlight instances
@@ -78,8 +80,8 @@
     state: directory
     path: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data"
     mode: "0700"
-    owner: "{{ scalelite_redis_user_id }}"
-    group: "{{ scalelite_redis_group_id }}"
+    owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
   loop_control: 
     label: "{{ item.name }}"
@@ -93,8 +95,8 @@
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_data/redis.conf"
     mode: '0400'
-    group: "{{ scalelite_redis_group_id }}"
-    owner: "{{ scalelite_redis_user_id }}"
+    group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
+    owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
   notify: Restart Redis redis_data
 
 - name: Create Redis Configuration for greenlight redis instance
@@ -105,8 +107,8 @@
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_greenlight_data/redis.conf"
     mode: '0400'
-    group: "{{ scalelite_redis_group_id }}"
-    owner: "{{ scalelite_redis_user_id }}"
+    group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
+    owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
   notify: Restart Redis redis_greenlight_data
 
 - name: Create Redis Configuration for extra redis instances
@@ -117,8 +119,8 @@
     src: "templates/redis/redis.conf.j2"
     dest: "{{ scalelite_docker_volumes_folder }}/redis_{{ item.name }}_data/redis.conf"
     mode: '0400'
-    group: "{{ scalelite_redis_group_id }}"
-    owner: "{{ scalelite_redis_user_id }}"
+    group: "{{ scalelite_redis_group_id + scalelite_rootless_docker_offset }}"
+    owner: "{{ scalelite_redis_user_id + scalelite_rootless_docker_offset }}"
   loop: "{{ scalelite_greenlight_extra_instances }}"
   loop_control: 
     label: "{{ item.name }}"
@@ -135,8 +137,8 @@
     src: "scalelite/{{ item }}"
     dest: "{{ scalelite_docker_volumes_folder }}/scalelite/{{ item }}"
     mode: "0440"
-    owner: "{{ scalelite_user_id }}"
-    group: "{{ scalelite_group_id }}"
+    owner: "{{ scalelite_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_group_id + scalelite_rootless_docker_offset }}"
   when: scalelite_bbb_dialin_enabled | bool
   loop:
     - bridge.xml.builder
@@ -148,8 +150,8 @@
   copy:
     content: "{{ scalelite_autoscaler_config | to_nice_yaml }}"
     dest: "{{ scalelite_docker_volumes_folder }}/autoscaler/scaler_config.yml"
-    owner: "{{ scalelite_autoscaler_user_id }}"
-    group: "{{ scalelite_autoscaler_group_id }}"
+    owner: "{{ scalelite_autoscaler_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_autoscaler_group_id + scalelite_rootless_docker_offset }}"
     mode: "0400"
   notify: Restart bbb-autoscaler
 
@@ -177,8 +179,8 @@
     path: "{{ scalelite_node_exporter_textfile_directory }}"
     state: directory
     mode: "0700"
-    owner: "{{ scalelite_node_exporter_user_id }}"
-    group: "{{ scalelite_node_exporter_group_id }}"
+    owner: "{{ scalelite_node_exporter_user_id + scalelite_rootless_docker_offset }}"
+    group: "{{ scalelite_node_exporter_group_id + scalelite_rootless_docker_offset }}"
 
 - name: Fail2ban
   include_tasks: fail2ban.yml

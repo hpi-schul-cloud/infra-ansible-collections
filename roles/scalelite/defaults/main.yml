@@ -1,4 +1,6 @@
 ---
+# Todo: Get the offset from /etc/subuid
+scalelite_rootless_docker_offset: "{{ 493216-1 }}"
 scalelite_docker_volumes_folder: /docker_volumes
 scalelite_docker_compose_folder: /scalelite
 scalelite_docker_compose_owner: root
