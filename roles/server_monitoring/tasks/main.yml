@@ -195,7 +195,7 @@
 
 - name: Copy Version collect script
   ansible.builtin.template:
-    src: collect-packet-servsions.sh.j2
+    src: collect-packet-versions.sh.j2
     dest: "{{ server_monitoring_folder }}/collect-version.sh"
     mode: "0750"
     owner: "{{ server_monitoring_folder_owner }}"
