@@ -16,7 +16,7 @@ server_monitoring_create_ufw_rules: false
 server_monitoring_create_fail2ban_jail: true
 server_monitoring_exporter_private_ports:
   - "{{ [server_monitoring_node_exporter_private_port] }}"
-  - "{{ server_monitoring_cadvisor_enabled and server_monitoring_cadvisor_expose_port | ternary([server_monitoring_cadvisor_private_port], []) }}"
+  - "{{ (server_monitoring_cadvisor_enabled and server_monitoring_cadvisor_expose_port) | ternary([server_monitoring_cadvisor_private_port], []) }}"
   - "{{ (server_monitoring_extra_exporters | map(attribute='private_port')) }}"
 server_monitoring_exporter_public_ports:
   - "{{ [server_monitoring_node_exporter_public_port] }}"
