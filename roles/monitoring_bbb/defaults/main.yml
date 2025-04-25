@@ -13,6 +13,8 @@ freeswitch_host: "freeswitch.{{ bbb_domain_name }}"
 bbb_ebbba_exporters: true
 # True if the coturn exporter is enabled on port 9642 /metrics
 bbb_turn_server_exporter_enabled: true
+# True if the freeswitch node exporter is enabled
+bbb_freeswitch_server_exporter_enabled: true
 # true if cAdvisor is enabled on the Scalelite server on port 9300 /metrics
 scalelite_cadvisor_enabled: false
 # true if postgresexporter is enabled on the Scalelite server on port 9188 /metrics
