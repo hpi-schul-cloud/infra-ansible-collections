@@ -118,6 +118,7 @@
     owner: "{{ server_monitoring_nginx_user_id }}"
     group: "{{ server_monitoring_nginx_group_id }}"
     mode: "0750"
+  when: server_monitoring_nginx_enabled
 
 - name: Create Node-Exporter AppArmor profile
   template:
