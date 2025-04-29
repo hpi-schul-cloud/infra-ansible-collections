@@ -34,7 +34,24 @@
             itemPath: "vaults/{{ vault }}/items/sshd-host-keys"
       tags:
         - sshd
-    
+
+    - name: Create docker token secret
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: Opaque
+          metadata:
+            name: docker-token
+            namespace: "{{ sshd_namespace }}"
+          data:
+            .dockerconfigjson: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='dockerhub-schulcloudci-docker-pull', vault='Infrastructure', field='.dockerconfigjson', session_shorthand='ansible-run', credentials=op_credentials) | b64encode }}"
+      tags: sshd
+
     - name: Add dbildungsplattform chart repo
       kubernetes.core.helm_repository:
         name: dbildungsplattform
