@@ -54,10 +54,8 @@
 
     - name: Add dbildungsplattform chart repo
       kubernetes.core.helm_repository:
-        # name: dbildungsplattform
-        name: dbildungsplattform-branch
-        # repo_url: https://dbildungsplattform.github.io/helm-charts-registry/
-        repo_url: https://dbildungsplattform.github.io/helm-charts-registry@OPS-8387-sc-admin-add-docker-token
+        name: dbildungsplattform
+        repo_url: https://dbildungsplattform.github.io/helm-charts-registry/
       check_mode: false
       changed_when: false
       tags: sshd
