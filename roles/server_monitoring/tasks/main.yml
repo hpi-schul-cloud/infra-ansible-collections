@@ -213,12 +213,12 @@
 - name: Create cronjob to collect versions
   ansible.builtin.cron:
     name: Collect Versions
-    weekday: "*"
-    minute: "0"
-    hour: "0"
-    user: root
+    weekday: {{ package_collector_cron_weekday }}
+    minute: {{ package_collector_cron_minute }}
+    hour: {{ package_collector_cron_hour }}
+    user: {{ package_collector_cron_user }}
     job: "{{ server_monitoring_folder }}/collect-version.sh"
-    cron_file: ansible_version_collecter
+    cron_file: {{ package_collector_cron_filename }}
   when: server_monitoring_node_exporter_textfile_collector_enabled
  
 - name: Create Node Exporter textfile collector directory
