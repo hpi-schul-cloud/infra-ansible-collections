@@ -11,6 +11,13 @@
     name: geerlingguy.docker
   when: server_monitoring_install_docker
 
+- name: Get Docker group ID
+  getent:
+    database: group
+    key: docker
+- ansible.builtin.set_fact:
+     docker_group_id: "{{ getent_group['docker'][1] }}"    
+
 - name: Install python3-pip
   apt:
     name: python3-pip
