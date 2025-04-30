@@ -106,6 +106,14 @@ services:
       - "{{ server_monitoring_cadvisor_private_port }}:8080"
 {% endif %}
     privileged: {{ server_monitoring_cadvisor_privileged }}
+    command:
+      - "--store_container_labels=false"
+      - "--docker_only=true"
+      - "--disable_root_cgroup_stats=false"
+      - "--enable_load_reader=false"
+      - "--v=1"
+      - "--disable_metrics=app,cpu,cpuLoad,disk,diskIO,memory,network,oom_event,percpu,perf_event"
+      - "--disable_root_cgroup_stats=false"     
     devices:
       - /dev/kmsg
     volumes:
@@ -113,7 +121,7 @@ services:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+#      - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     deploy:
       resources:

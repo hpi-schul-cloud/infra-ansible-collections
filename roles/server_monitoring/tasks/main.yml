@@ -229,3 +229,12 @@
     owner: "{{ server_monitoring_node_exporter_user_id }}"
     group: "{{ server_monitoring_node_exporter_group_id }}"
   when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name:  Allow kmsg access
+  ansible.posix.sysctl:
+    name: "kernel.dmesg_restrict"
+    value: "0"
+    state: "present"
+    reload: true
+    sysctl_set: true
+  when: server_monitoring_cadvisor_enabled and ansible_facts['lsb']['release'] >= "22.04"
