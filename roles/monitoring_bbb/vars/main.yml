@@ -207,7 +207,7 @@ bbb_prometheus_turn_coturn_exporter_job:
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
-  bbb_prometheus_turn_coturn_cadvisor_job:
+bbb_prometheus_turn_coturn_cadvisor_job:
   job_name: "{{ bbb_instance_name }}-turn-coturn-cadvisor"
   scheme: https
   metrics_path: /metrics
