@@ -119,7 +119,7 @@ server_monitoring_extra_exporters: []
 delete_old_nginx_logrotate: true
 
 package_collector_cron_weekday: "*"
-package_collector_cron_hour: "0"
-package_collector_cron_minute: "0"
+package_collector_cron_hour: 0
+package_collector_cron_minute: 0
 package_collector_cron_user: root
 package_collector_cron_filename: ansible_version_collecter 
