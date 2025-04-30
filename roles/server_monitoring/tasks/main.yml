@@ -218,7 +218,7 @@
     hour: "{{ package_collector_cron_hour }}"
     user: "{{ package_collector_cron_user }}"
     job: "{{ server_monitoring_folder }}/collect-version.sh"
-    cron_file: {{ package_collector_cron_filename }}
+    cron_file: "{{ package_collector_cron_filename }}"
   when: server_monitoring_node_exporter_textfile_collector_enabled
  
 - name: Create Node Exporter textfile collector directory
