@@ -220,6 +220,26 @@
     job: "{{ server_monitoring_folder }}/collect-version.sh"
     cron_file: "{{ package_collector_cron_filename }}"
   when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name: Copy Image Names collect script
+  ansible.builtin.template:
+    src: collect-image-names.sh.j2
+    dest: "{{ server_monitoring_folder }}/collect-image-names.sh"
+    mode: "0750"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name: Create cronjob to collect image names
+  ansible.builtin.cron:
+    name: Collect Image Names
+    weekday: "{{ image_collector_cron_weekday }}"
+    minute: "{{ image_collector_cron_minute }}"
+    hour: "{{ image_collector_cron_hour }}"
+    user: "{{ image_collector_cron_user }}"
+    job: "{{ server_monitoring_folder }}/collect-image-names.sh"
+    cron_file: "{{ image_collector_cron_filename }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled  
  
 - name: Create Node Exporter textfile collector directory
   file:

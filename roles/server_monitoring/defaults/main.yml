@@ -123,3 +123,9 @@ package_collector_cron_hour: 0
 package_collector_cron_minute: 0
 package_collector_cron_user: root
 package_collector_cron_filename: ansible_version_collecter 
+
+image_collector_cron_weekday: "*"
+image_collector_cron_hour: 0
+image_collector_cron_minute: 1
+image_collector_cron_user: root
+image_collector_cron_filename: image_collecter 
