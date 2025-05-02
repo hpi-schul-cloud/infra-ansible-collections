@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 # Collect a cadvisor look alike image name metric as cadvisor is missing the rights to gather image name
-{% raw %}docker ps --format="container_last_seen{ id=\"{{.Names}}\",image=\"{{.Image}}\",crafted_by=\"$0\" } $(date +%s)" {% endraw %}> {{ server_monitoring_node_exporter_textfile_directory }}container_images.prom
+#{% raw %}docker ps --format="container_last_seen{ id=\"{{.Names}}\",image=\"{{.Image}}\",crafted_by=\"$0\" } $(date +%s)" {% endraw %}> {{ server_monitoring_node_exporter_textfile_directory }}container_images.prom
+{% raw %}docker inspect --format="container_last_seen{ id=\"{{.Name}}\",image=\"{{.Config.Image}}\",crafted_by=\"$0\" } $(date +%s)" $(docker ps -aq) {% endraw %}> {{ server_monitoring_node_exporter_textfile_directory }}container_images.prom
