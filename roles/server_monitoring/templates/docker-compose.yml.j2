@@ -112,7 +112,7 @@ services:
       - "--disable_root_cgroup_stats=false"
       - "--enable_load_reader=false"
       - "--v=1"
-      - "--disable_metrics=app,cpu,cpuLoad,disk,diskIO,memory,network,oom_event,percpu,perf_event"
+      - "--disable_metrics=app,cpu,cpuLoad,disk,diskIO,memory,network,oom_event,percpu,perf_event,referenced_memory"
       - "--disable_root_cgroup_stats=false"     
     devices:
       - /dev/kmsg
