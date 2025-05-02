@@ -1,2 +1,4 @@
-#!/bin/bash
-docker ps --format="container_last_seen{ id=\"{{.Names}}\",image=\"{{.Image}}\",crafted_by=\"$0\" } $(date +%s)" > {{ server_monitoring_node_exporter_textfile_directory }}container_images.prom
+#!/usr/bin/env bash
+# Collect a cadvisor lie 
+#{% raw %} docker ps --format="container_last_seen{ id=\"{{.Names}}\",image=\"{{.Image}}\",crafted_by=\"$0\" } $(date +%s)" {% endraw %}> {{ server_monitoring_node_exporter_textfile_directory }}container_images.prom
+#{{ 'docker ps --format="container_last_seen{ id=\"{{.Names}}\",image=\"{{.Image}}\",crafted_by=\"$0\" } $(date +%s)" ' }} > {{ server_monitoring_node_exporter_textfile_directory }}container_images.prom
