@@ -55,14 +55,10 @@
     - name: Add dbildungsplattform chart repo
       kubernetes.core.helm_repository:
         name: dbildungsplattform
+        # repo_url: https://dbildungsplattform.github.io/helm-charts-registry/
         repo_url: https://dbildungsplattform.github.io/helm-charts-registry/
       check_mode: false
       changed_when: false
-      tags: sshd
-
-    - name: debug sshd_values
-      ansible.builtin.debug:
-        msg: "{{ sshd_values }}"
       tags: sshd
 
     - name: Deploy latest version of SSHD chart to update user keys on Cluster
