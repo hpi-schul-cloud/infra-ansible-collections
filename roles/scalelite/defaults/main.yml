@@ -60,7 +60,7 @@ scalelite_greenlight_resources:
 scalelite_postgres_user_id: 70
 scalelite_postgres_group_id: 70
 # postgres:14.8-alpine
-scalelite_postgres_image: postgres:sha256:fa48198f8c88d5563e7ff3f6d5d269be58a7571e4464d70e4cb6c0987d903ba3
+scalelite_postgres_image: postgres@sha256:fa48198f8c88d5563e7ff3f6d5d269be58a7571e4464d70e4cb6c0987d903ba3
 scalelite_postgres_resources:
   reservations:
     cpus: '0.2'
@@ -160,10 +160,10 @@ scalelite_rails_max_threads: 4
 scalelite_log_level: warn
 scalelite_multitenancy_enabled: true
 # v1.5.1.7-focal260-alpine
-scalelite_version: sha256:2dbffceb9731e9ec0c2ab41f53332efdbbf73c31cdb3688b77bb52b8ef627582
+scalelite_poller_image: "blindsidenetwks/scalelite@sha256:f534cb09f14a43f4581d899c0b4efe8ff69dcb851fd670ab90901c3620674d8f"
+scalelite_api_image: "blindsidenetwks/scalelite@sha256:2dbffceb9731e9ec0c2ab41f53332efdbbf73c31cdb3688b77bb52b8ef627582"
 # scalelite_secret_key_base:
 # scalelite_api_key
-scalelite_poller_image: "blindsidenetwks/scalelite@{{ scalelite_version }}-poller"
 scalelite_poller_resources:
   reservations:
     cpus: '0.1'
@@ -171,7 +171,6 @@ scalelite_poller_resources:
   limits:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
-scalelite_api_image: "blindsidenetwks/scalelite:{{ scalelite_version }}-api"
 scalelite_api_resources:
   reservations:
     cpus: '0.1'
