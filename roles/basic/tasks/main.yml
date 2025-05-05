@@ -3,7 +3,7 @@
     when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   - import_tasks: basic_install_ubuntu.yml
     when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-  - import_tasks: configure_motd.yml
-    when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  # - import_tasks: configure_motd.yml
+  #   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   - import_tasks: fail2ban.yml
     when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
