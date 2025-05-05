@@ -245,7 +245,7 @@
   file:
     path: "{{ server_monitoring_node_exporter_textfile_directory }}"
     state: directory
-    mode: "0700"
+    mode: "0770"
     owner: "{{ server_monitoring_node_exporter_user_id }}"
     group: "{{ server_monitoring_node_exporter_group_id }}"
   when: server_monitoring_node_exporter_textfile_collector_enabled
