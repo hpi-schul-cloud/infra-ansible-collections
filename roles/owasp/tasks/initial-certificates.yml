@@ -8,7 +8,7 @@
     dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite.conf"
 
 - name: Docker-compose up
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ scalelite_docker_compose_folder }}"
   register: certificates_compose_output
 

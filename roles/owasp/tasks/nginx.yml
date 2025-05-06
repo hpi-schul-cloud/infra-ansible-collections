@@ -70,11 +70,6 @@
     name: python-passlib
     state: present
 
-- name: Pip install passlib
-  pip:
-    executable: /usr/bin/pip3
-    name: passlib
-
 - name: Copy basic auth user
   community.general.htpasswd:
     path: "{{ scalelite_docker_volumes_folder }}/nginx/.htpasswd"
