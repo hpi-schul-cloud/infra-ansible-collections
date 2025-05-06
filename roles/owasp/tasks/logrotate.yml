@@ -1,0 +1,42 @@
+---
+- name: Create Docker logrotate config
+  copy:
+    content: |
+      /var/lib/docker/containers/*/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/docker
+    mode: "0644"
+
+- name: Create Scalelite Nginx logrotate config
+  copy:
+    content: |
+      {{ scalelite_nginx_logs_folder }}/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/scalelite-nginx
+    mode: "0644"
+
+- name: Create Scalelite Modsec logrotate config
+  copy:
+    content: |
+      {{ scalelite_modsec_logs_folder }}/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/scalelite-modsec
+    mode: "0644"

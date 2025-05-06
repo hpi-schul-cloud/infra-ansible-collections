@@ -1,0 +1,105 @@
+---
+- name: Copy Nginx acme-challenge config
+  copy:
+    src: nginx/scalelite/acme-challenge.nginx
+    dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/acme-challenge.nginx"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+
+- name: Copy Nginx config (templates)
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+  loop:
+    - nginx/nginx.conf
+    - nginx/scalelite.conf
+
+- name: Copy OWASP config (templates)
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ scalelite_docker_volumes_folder }}/{{ item }}"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+  loop:
+    - owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+    - owasp/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+  notify: Restart OWASP
+
+- name: Creating Nginx DH parameters next, this can take some time
+  debug:
+    msg: ""
+
+- name: Create Nginx DH parameters
+  openssl_dhparam:
+    path: "{{ scalelite_docker_volumes_folder }}/nginx/dhparam.pem"
+    size: "{{ scalelite_nginx_dhparam_size }}"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+
+- name: Copy Greenlight Nginx config
+  template:
+    src: nginx/scalelite/greenlight.nginx.j2
+    dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+  when: scalelite_greenlight_enabled
+
+- name: Delete Greenlight Nginx config
+  file:
+    path: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx"
+    state: absent
+  when: not scalelite_greenlight_enabled
+
+- name: Copy Nginx metrics configuration
+  template:
+    src: nginx/nodeexporter.conf.j2
+    dest: "{{ scalelite_docker_volumes_folder }}/nginx/nodeexporter.conf"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+
+- name: Install python-passlib
+  package:
+    name: python-passlib
+    state: present
+
+- name: Pip install passlib
+  pip:
+    executable: /usr/bin/pip3
+    name: passlib
+
+- name: Copy basic auth user
+  community.general.htpasswd:
+    path: "{{ scalelite_docker_volumes_folder }}/nginx/.htpasswd"
+    name: "{{ scalelite_metrics_basic_auth_username }}"
+    password: "{{ scalelite_metrics_basic_auth_password }}"
+    mode: "0600"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_nginx_group_id }}"
+
+- name: Create nginx log directory
+  file:
+    path: "{{ scalelite_nginx_logs_folder }}"
+    mode: "0750"
+    state: directory
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+    recurse: true
+
+- name: Create log directory if it does not exist for modsecurity
+  ansible.builtin.file:
+    path: "{{ scalelite_modsec_logs_folder }}"
+    state: directory
+    mode: "0750"
+    owner: "{{ scalelite_nginx_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+ 
+- name: Set nginx log file permissions
+  command: find {{ scalelite_nginx_logs_folder }} -type f -exec chmod 0640 {} \;
