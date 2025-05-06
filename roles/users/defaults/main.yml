@@ -32,4 +32,5 @@ technicaluser_sshkey: "{{ lookup('file', 'sshkeys/technicaluser.pub') }}"
 # Timeout of shell in seconds for auto logout
 shell_timeout: 3000
 
-sshd_config_source: sshd_config
+# extra_sshd_config: |
+#   ####someconfig

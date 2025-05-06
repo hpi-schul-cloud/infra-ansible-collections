@@ -115,7 +115,7 @@
 
   - name: set sshd_config 
     ansible.builtin.copy:
-      src: "{{ sshd_config_source }}"
+      src: sshd_config.j2
       dest: /etc/ssh/sshd_config
       owner: root
       group: root

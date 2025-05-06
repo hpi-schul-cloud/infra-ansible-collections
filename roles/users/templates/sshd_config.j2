@@ -127,3 +127,6 @@ Match User tunneluser
   X11Forwarding no
   AllowAgentForwarding no
   ForceCommand /bin/false
+{% if extra_sshd_config is defined %}
+{{ extra_sshd_config }}
+{% endif %}
