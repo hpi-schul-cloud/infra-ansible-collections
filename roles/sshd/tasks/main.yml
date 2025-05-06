@@ -49,7 +49,8 @@
             name: docker-token
             namespace: "{{ sshd_namespace }}"
           data:
-            .dockerconfigjson: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='dockerhub-schulcloudci-docker-pull', vault='Infrastructure', field='.dockerconfigjson', session_shorthand='ansible-run', credentials=op_credentials) | b64encode }}"
+            .dockerconfigjson: "{{ image_pull_token_secret }}"
+      when: image_pull_token_enabled is defined and image_pull_token_enabled
       tags: sshd
 
     - name: Add dbildungsplattform chart repo
