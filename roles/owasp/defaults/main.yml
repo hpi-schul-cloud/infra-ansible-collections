@@ -4,6 +4,7 @@ owasp_docker_compose_folder: /etc/owasp
 owasp_docker_compose_owner: root
 owasp_docker_compose_group: root
 
+owasp_certbot_installed: false
 owasp_certbot_image_repository: certbot/certbot
 # v2.11.0
 owasp_certbot_image_digest: sha256:ddf9e5d226a56e886986838fa0ebedc0237511c78664352e8d0f4346ee022cd8

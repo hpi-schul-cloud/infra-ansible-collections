@@ -4,47 +4,8 @@
     name: fail2ban
     state: restarted
 
-- name: Restart Scalelite
-  community.docker.docker_container:
-    name: scalelite-api
-    restart: true
-
-- name: Restart scalelite-nginx
-  community.docker.docker_container:
-    name: scalelite-nginx
-    restart: true
-
-- name: Restart bbb-autoscaler
-  community.docker.docker_container:
-    name: bbb-autoscaler
-    restart: true
-
 - name: Restart OWASP
   community.docker.docker_container:
     name: scalelite-nginx
     restart: true
 
-- name: Restart postgres
-  community.docker.docker_container:
-    name: db
-    restart: true
-
-- name: Restart Redis redis_data
-  community.docker.docker_container:
-    name: redis
-    restart: true
-
-- name: Restart Redis redis_greenlight_data
-  community.docker.docker_container:
-    name: redis-greenlight
-    restart: true
-
-- name: Restart Redis Instaces
-  community.docker.docker_container:
-    name: redis-{{ item.name }}
-    restart: true
-  loop: "{{ scalelite_greenlight_extra_instances }}"
-  loop_control: 
-    label: "{{ item.name }}"
-  
-  
