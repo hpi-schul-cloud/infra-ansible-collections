@@ -1,12 +1,12 @@
 ---
 - name: Check for certificates fullchain
   stat:
-    path: "{{ owasp_letsencrypt_folder }}/live/{{ scalelite_hostname }}/fullchain.pem"
+    path: "{{ owasp_letsencrypt_folder }}/live/{{ scalelite_host }}/fullchain.pem"
   register: fullchain
 
 - name: Check for certificates privkey
   stat:
-    path: "{{ owasp_letsencrypt_folder }}/live/{{ scalelite_hostname }}/privkey.pem"
+    path: "{{ owasp_letsencrypt_folder }}/live/{{ scalelite_host }}/privkey.pem"
   register: privkey
 
 - name: Create Letsencrypt certificates
