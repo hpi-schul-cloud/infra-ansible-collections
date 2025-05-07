@@ -36,7 +36,11 @@
       group: "{{ owasp_certbot_group_id }}"
     - path: "{{ owasp_docker_compose_folder }}"
       mode: "0700"
-   
+    - path: "{{ owasp_nginx_logs_folder }}"
+      mode: "0750"
+      owner: "{{ owasp_nginx_user_id }}"
+      group: "{{ owasp_certbot_group_id }}"
+      
 - name: Certbot
   include_tasks: certbot.yml
   when: owasp_certbot_installed
