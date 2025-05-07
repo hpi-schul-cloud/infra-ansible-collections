@@ -16,7 +16,7 @@ server_monitoring_create_ufw_rules: false
 server_monitoring_create_fail2ban_jail: true
 server_monitoring_exporter_private_ports:
   - "{{ [server_monitoring_node_exporter_private_port] }}"
-  - "{{ server_monitoring_cadvisor_enabled and server_monitoring_cadvisor_expose_port | ternary([server_monitoring_cadvisor_private_port], []) }}"
+  - "{{ (server_monitoring_cadvisor_enabled and server_monitoring_cadvisor_expose_port) | ternary([server_monitoring_cadvisor_private_port], []) }}"
   - "{{ (server_monitoring_extra_exporters | map(attribute='private_port')) }}"
 server_monitoring_exporter_public_ports:
   - "{{ [server_monitoring_node_exporter_public_port] }}"
@@ -117,3 +117,15 @@ server_monitoring_extra_exporters: []
 # server_monitoring_extra_docker_services: {}
 
 delete_old_nginx_logrotate: true
+
+package_collector_cron_weekday: "*"
+package_collector_cron_hour: 0
+package_collector_cron_minute: 0
+package_collector_cron_user: root
+package_collector_cron_filename: ansible_version_collector 
+
+image_collector_cron_weekday: "*"
+image_collector_cron_hour: 0
+image_collector_cron_minute: 1
+image_collector_cron_user: root
+image_collector_cron_filename: image_collector 
