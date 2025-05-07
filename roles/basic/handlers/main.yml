@@ -5,8 +5,5 @@
   - name: Restart fail2ban
     service: name=fail2ban state=restarted
 
-  - name: Reload sysctl
-    command: /usr/sbin/sysctl -p
-
   - name: Restart timesyncd
     command: systemctl restart systemd-timesyncd
