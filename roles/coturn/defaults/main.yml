@@ -59,6 +59,7 @@ coturn_fail2ban_filter: |
   failregex = ^.*: INFO: handle_udp_packet: .* remote addr <HOST>:\d+\n.*: INFO: .* error 401: Unauthorized$
               ^.*: INFO: handle_udp_packet: .* remote addr <HOST>:\d+\n.*ERROR: check_stun_auth: Cannot find credentials of user <.*>$
   ignoreregex =
+coturn_fail2ban_filter_path: /etc/fail2ban/filter.d/turn-auth-fail.conf
 coturn_fail2ban_jail: |
   [turn-auth-fail]
   enabled = true
@@ -66,3 +67,4 @@ coturn_fail2ban_jail: |
   logpath = /var/log/turnserver/turn.log
   maxretry = 3
   bantime = 3600
+coturn_fail2ban_jail_path: /etc/fail2ban/jail.d/coturn_jail.local

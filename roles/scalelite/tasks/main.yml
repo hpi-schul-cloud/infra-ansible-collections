@@ -84,7 +84,6 @@
   loop_control: 
     label: "{{ item.name }}"
 
-
 - name: Create Redis Configuration for main redis instance
   vars: 
     template_user: "{{ scalelite_redis_user }}"
