@@ -1,19 +1,19 @@
 terraform {
 
-  required_version = ">= {{ scalelite_certbot_terraform_version }}"
+  required_version = ">= {{ owasp_certbot_terraform_version }}"
   required_providers {
     opentelekomcloud = {
       source = "opentelekomcloud/opentelekomcloud"
     }
   }
-{% if scalelite_aws_access_key_id is defined %}
+{% if owasp_aws_access_key_id is defined %}
 
   backend "s3" {
-    bucket = "{{ scalelite_certbot_terraform_state_bucket }}"
-    key    = "{{ scalelite_certbot_terraform_state_key }}"
+    bucket = "{{ owasp_certbot_terraform_state_bucket }}"
+    key    = "{{ owasp_certbot_terraform_state_key }}"
 
-    region   = "{{ scalelite_certbot_terraform_state_region }}"
-    endpoint = "{{ scalelite_certbot_terraform_state_endpoint }}"
+    region   = "{{ owasp_certbot_terraform_state_region }}"
+    endpoint = "{{ owasp_certbot_terraform_state_endpoint }}"
 
     skip_region_validation      = true
     skip_credentials_validation = true
@@ -29,14 +29,14 @@ provider "opentelekomcloud" {
   # export OS_ACCESS_KEY ="T-Systems Access Key"
   # export OS_SECRET_KEY ="T-Systems Secret Key"
 
-  domain_name = "{{ scalelite_certbot_terraform_telekom_domain }}"
-  tenant_name = "{{ scalelite_certbot_terraform_telekom_tenant }}"
+  domain_name = "{{ owasp_certbot_terraform_telekom_domain }}"
+  tenant_name = "{{ owasp_certbot_terraform_telekom_tenant }}"
   auth_url    = "https://iam.eu-de.otc.t-systems.com/v3"
 }
 
 resource "opentelekomcloud_dns_recordset_v2" "a_records" {
-  zone_id     = "{{ scalelite_certbot_terraform_telekom_dns_zone_id }}"
-  name        = "_acme-challenge.{{ scalelite_hostname }}."
+  zone_id     = "{{ owasp_certbot_terraform_telekom_dns_zone_id }}"
+  name        = "_acme-challenge.{{ owasp_hostname }}."
   ttl         = 300
   type        = "TXT"
   records = [""]
