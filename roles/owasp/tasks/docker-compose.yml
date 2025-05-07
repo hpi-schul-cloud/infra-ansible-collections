@@ -2,25 +2,20 @@
 - name: Copy docker-compose.yml
   template:
     src: docker-compose.yml.j2
-    dest: "{{ scalelite_docker_compose_folder }}/docker-compose.yaml"
-    owner: "{{ scalelite_docker_compose_owner }}"
-    group: "{{ scalelite_docker_compose_group }}"
+    dest: "{{ owasp_docker_compose_folder }}/docker-compose.yaml"
+    owner: "{{ owasp_docker_compose_owner }}"
+    group: "{{ owasp_docker_compose_group }}"
     mode: "0600"
 
 - name: Copy .env
   template:
     src: env.j2
-    dest: "{{ scalelite_docker_compose_folder }}/.env"
-    owner: "{{ scalelite_docker_compose_owner }}"
-    group: "{{ scalelite_docker_compose_group }}"
+    dest: "{{ owasp_docker_compose_folder }}/.env"
+    owner: "{{ owasp_docker_compose_owner }}"
+    group: "{{ owasp_docker_compose_group }}"
     mode: "0600"
 
-- name: Migrate old Postgres and Redis data for non-root containers
-  include_tasks:
-    file: migrate-volumes-non-root.yml
-  when: scalelite_migrate_volumes_non_root | default(false)
-
 - name: Docker-compose up
-  community.docker.docker_compose:
-    project_src: "{{ scalelite_docker_compose_folder }}"
+  community.docker.docker_compose_v2:
+    project_src: "{{ owasp_docker_compose_folder }}"
     remove_orphans: true
