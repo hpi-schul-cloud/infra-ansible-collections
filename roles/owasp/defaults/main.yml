@@ -48,9 +48,6 @@ owasp_nginx_metrics_endpoints:
   - name: node-exporter
     public_port: 9100
     private_port: 9099
-  - name: bbb-autoscaler
-    public_port: 9200
-    private_port: "{{ owasp_autoscaler_config.metrics_exporter_port }}"
   - name: cadvisor
     public_port: 9300
     private_port: 9299
