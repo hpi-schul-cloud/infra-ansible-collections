@@ -40,7 +40,7 @@ services:
     container_name: owasp-nginx
     # read_only: true #currently not supported by modsecurity
     restart: unless-stopped
-    user: {{ owasp_nginx_user_id }}:{{ owasp_certbot_group_id }}
+    user: {{ owasp_nginx_user_id }}:{{ owasp_nginx_group_id }}
     ports:
       - "80:8080"
       - "443:8443"
