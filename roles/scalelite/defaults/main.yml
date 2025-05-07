@@ -180,6 +180,7 @@ scalelite_api_resources:
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
 
 scalelite_hostname: "{{ inventory_hostname }}"
+scalelite_access_name: "{{ scalelite_hostname }}"
 scalelite_letsencrypt_folder: /etc/letsencrypt
 scalelite_terraform_workspace: prod
 scalelite_bbb_dialin_enabled: false
