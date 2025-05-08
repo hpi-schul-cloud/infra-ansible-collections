@@ -114,7 +114,7 @@
       mode: 0440
 
   - name: set sshd_config 
-    ansible.builtin.copy:
+    ansible.builtin.template:
       src: sshd_config.j2
       dest: /etc/ssh/sshd_config
       owner: root
