@@ -5,11 +5,11 @@
     scalelite_nginx_ssl: false
   template:
     src: nginx/scalelite.conf.j2
-    dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite.conf"
+    dest: "{{ owasp_docker_volumes_folder }}/nginx/scalelite.conf"
 
 - name: Docker-compose up
   community.docker.docker_compose_v2:
-    project_src: "{{ scalelite_docker_compose_folder }}"
+    project_src: "{{ owasp_docker_compose_folder }}"
   register: certificates_compose_output
 
 - name: Generate certificates
@@ -24,5 +24,5 @@
 - name: Copy original Nginx Scalelite config after creating certificates
   template:
     src: nginx/scalelite.conf.j2
-    dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite.conf"
+    dest: "{{ owasp_docker_volumes_folder }}/nginx/scalelite.conf"
   notify: Restart scalelite-nginx

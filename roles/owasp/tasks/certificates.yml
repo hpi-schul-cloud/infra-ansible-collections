@@ -12,4 +12,4 @@
 - name: Create Letsencrypt certificates
   import_tasks:
     file: initial-certificates.yml
-  when: not fullchain.stat.exists or not privkey.stat.exists
+  when: owasp_certbot_installed and (not fullchain.stat.exists or not privkey.stat.exists)
