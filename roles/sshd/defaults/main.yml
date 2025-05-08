@@ -1,5 +1,5 @@
 ---
 ## sshd pulls its image from dockerhub, to prevent the pull limit we use a docker pull secret token
 image_pull_token_enabled: true
-## image_pull_token_secret secret value is handed over by playbook on deployment
-# image_pull_token_secret: []
+## image_pull_token_secret secret value is added via playbook on deployment, secret needs to be base64 encoded.
+# image_pull_token_secret:
