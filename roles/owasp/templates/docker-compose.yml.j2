@@ -5,6 +5,7 @@ networks:
         - subnet: {{ owasp_docker_net }}
 
 services:
+{% if owasp_certbot_installed %}
   certbot:
     image: {{ owasp_certbot_image_repository }}@{{ owasp_certbot_image_digest }}
     container_name: certbot
@@ -34,6 +35,7 @@ services:
     deploy:
       resources:
         {{ owasp_certbot_resources | to_nice_yaml | indent(8) }}
+{% endif %}
 
   owasp-nginx:
     image: {{ owasp_nginx_image }}
