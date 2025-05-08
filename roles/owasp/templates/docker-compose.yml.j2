@@ -46,11 +46,11 @@ services:
     ports:
       - "8080:8080"
       - "8443:8443"
-{% for server in owasp_nginx_metrics_endpoints %}
+{% for server in owasp_nginx_metrics_endpoints | list %}
       - "{{ server.public_port }}:{{ server.public_port }}"
 {% endfor %}
-{% for port in owasp_target_ports %}
-      - "{{ port }}:{{ port }}"
+{% for svc in owasp_target_ports %}
+      - "{{ svc.port }}:{{ svc.port }}"
 {% endfor %}
     environment:
 #      PORT: "8080"
@@ -88,8 +88,8 @@ services:
       - {{ owasp_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
       - {{ owasp_docker_volumes_folder }}/nginx/owasp/acme-challenge.nginx:/etc/nginx/http.d/owasp/acme-challenge.nginx
       - {{ owasp_docker_volumes_folder }}/nginx/dhparam.pem:/etc/nginx/dhparam.pem
-    depends_on:
 {% if owasp_certbot_installed %}
+    depends_on:
       - certbot
 {% endif %}
     healthcheck:

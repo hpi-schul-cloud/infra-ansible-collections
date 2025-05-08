@@ -31,7 +31,8 @@ owasp_certbot_resources:
 # owasp_letsencrypt_email:
 
 owasp_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
-owasp_nginx_user_id: "{{ owasp_certbot_user_id }}"
+# Image requires 101 or /etc/nginx must be remounted
+owasp_nginx_user_id: 101
 owasp_nginx_group_id: "{{ owasp_certbot_group_id }}"
 owasp_nginx_logs_folder: /var/log/nginx
 owasp_nginx_dhparam_size: 4096
