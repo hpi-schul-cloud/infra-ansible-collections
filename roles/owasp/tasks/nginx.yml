@@ -16,6 +16,28 @@
     group: "{{ owasp_nginx_group_id }}"
   loop:
     - nginx/nginx.conf
+    - nginx/nodeexporter.conf.j2
+
+- name: Copy Nginx config (templates)
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ owasp_docker_volumes_folder }}/{{ item }}"
+    mode: "0600"
+    owner: "{{ owasp_nginx_user_id }}"
+    group: "{{ owasp_nginx_group_id }}"
+  loop:
+    - nginx/nginx.conf
+    - nginx/nodeexporter.conf.j2
+
+- name: Copy Proxy config templates
+  template:
+    src: "nginx/{{ item }}.j2"
+    dest: "{{ owasp_docker_volumes_folder }}/server/{{ item }}"
+    mode: "0600"
+    owner: "{{ owasp_nginx_user_id }}"
+    group: "{{ owasp_nginx_group_id }}"
+  loop:
+    - proxy.conf
 
 - name: Copy OWASP config (templates)
   template:

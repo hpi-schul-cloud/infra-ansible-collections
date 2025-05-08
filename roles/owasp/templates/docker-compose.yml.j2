@@ -44,18 +44,16 @@ services:
     restart: unless-stopped
     user: {{ owasp_nginx_user_id }}:{{ owasp_nginx_group_id }}
     ports:
-      - "8080:8080"
-      - "8443:8443"
 {% for server in owasp_nginx_metrics_endpoints | list %}
       - "{{ server.public_port }}:{{ server.public_port }}"
 {% endfor %}
-{% for svc in owasp_target_ports %}
-      - "{{ svc.port }}:{{ svc.port }}"
+{% for svc in owasp_nginx_https_endpoints %}
+      - "{{ svc.orig_port }}:{{ svc.proxy_port }}"
+{% endfor %}
+{% for svc in owasp_nginx_http_endpoints %}
+      - "{{ svc.orig_port }}:{{ svc.proxy_port }}"
 {% endfor %}
     environment:
-#      PORT: "8080"
-#      SSL_PORT: "8443"
-      BACKEND: {{ owasp_target_host }} 
       MODSEC_RULE_ENGINE: {{ owasp_modsec_mode }}
       BLOCKING_PARANOIA: {{ owasp_modsec_level }}
       DETECTION_PARANOIA: {{ owasp_modsec_level }}
@@ -83,10 +81,10 @@ services:
       - {{ owasp_nginx_logs_folder }}:/var/log/nginx
       - {{ owasp_letsencrypt_folder }}:/etc/letsencrypt
       - {{ owasp_docker_volumes_folder }}/webroot:/var/www/certbot
-#      - {{ owasp_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template
-#      - {{ owasp_docker_volumes_folder }}/nginx/nodeexporter.conf:/etc/nginx/http.d/nodeexporter.conf
+      - {{ owasp_docker_volumes_folder }}/nginx/nginx.conf:/etc/nginx/templates/nginx.conf.template
+      - {{ owasp_docker_volumes_folder }}/nginx/server:/etc/nginx/http.d
       - {{ owasp_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
-      - {{ owasp_docker_volumes_folder }}/nginx/owasp/acme-challenge.nginx:/etc/nginx/http.d/owasp/acme-challenge.nginx
+#      - {{ owasp_docker_volumes_folder }}/nginx/owasp/acme-challenge.nginx:/etc/nginx/http.d/owasp/acme-challenge.nginx
       - {{ owasp_docker_volumes_folder }}/nginx/dhparam.pem:/etc/nginx/dhparam.pem
 {% if owasp_certbot_installed %}
     depends_on:

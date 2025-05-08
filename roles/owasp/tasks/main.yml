@@ -53,6 +53,7 @@
 
 - name: Certificates
   include_tasks: certificates.yml
+  when: owasp_certbot_installed
 
 - name: Create Node Exporter textfile collector directory
   file:
