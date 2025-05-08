@@ -21,7 +21,7 @@
 - name: Copy Proxy config templates
   template:
     src: "nginx/{{ item }}.j2"
-    dest: "{{ owasp_docker_volumes_folder }}/server/{{ item }}"
+    dest: "{{ owasp_docker_volumes_folder }}/nginx/server/{{ item }}"
     mode: "0600"
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
