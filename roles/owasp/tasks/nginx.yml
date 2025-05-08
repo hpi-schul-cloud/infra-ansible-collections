@@ -16,9 +16,8 @@
     group: "{{ owasp_nginx_group_id }}"
   loop:
     - nginx/nginx.conf
-    - nginx/nodeexporter.conf
 
-- name: Copy Proxy config templates
+- name: Copy Server config templates
   template:
     src: "nginx/{{ item }}.j2"
     dest: "{{ owasp_docker_volumes_folder }}/nginx/server/{{ item }}"
@@ -27,6 +26,7 @@
     group: "{{ owasp_nginx_group_id }}"
   loop:
     - proxy.conf
+    - nodeexporter.conf
 
 - name: Copy OWASP config (templates)
   template:
