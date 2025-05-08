@@ -6,6 +6,6 @@
 
 - name: Restart OWASP
   community.docker.docker_container:
-    name: scalelite-nginx
+    name: owasp-nginx
     restart: true
 
