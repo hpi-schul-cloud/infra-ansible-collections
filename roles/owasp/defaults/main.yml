@@ -44,16 +44,14 @@ owasp_nginx_resources:
   limits:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+# Our local endpoints should be different from our proxied endpoints
 owasp_nginx_metrics_endpoints:
   - name: node-exporter
-    public_port: 9100
+    public_port: 9101
     private_port: 9099
   - name: cadvisor
-    public_port: 9300
+    public_port: 9301
     private_port: 9299
-  - name: postgres-exporter
-    public_port: 9188
-    private_port: 9187
 
 owasp_docker_net: "192.168.64.0/24"
 owasp_modsec_mode: DetectionOnly  # Either DetectionOnly or '"ON"'

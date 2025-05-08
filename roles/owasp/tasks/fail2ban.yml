@@ -46,15 +46,15 @@
     content: |
       [nginx-http-auth]
       enabled = true
-      port = {{ scalelite_nginx_metrics_endpoints | map(attribute='public_port') | join(",") }}
-      logpath = {{ scalelite_nginx_logs_folder }}/*.log
+      port = {{ owasp_nginx_metrics_endpoints | map(attribute='public_port') | join(",") }}
+      logpath = {{ owasp_nginx_logs_folder }}/*.log
       maxretry = 3
       bantime = 3600
       [nginx-errors]
       enabled    = true
       port       = http,https
       filter     = nginx-errors
-      logpath    = {{ scalelite_nginx_logs_folder }}/*.log
+      logpath    = {{ owasp_nginx_logs_folder }}/*.log
       maxretry   = 100
       bantime    = 3600
       findtime   = 600
@@ -62,7 +62,7 @@
       enabled    = true
       port       = http,https
       filter     = greenlight-signin-errors
-      logpath    = {{ scalelite_nginx_logs_folder }}/*.log
+      logpath    = {{ owasp_nginx_logs_folder }}/*.log
       maxretry   = 5
       bantime    = 3600
     dest: /etc/fail2ban/jail.d/jail.local
