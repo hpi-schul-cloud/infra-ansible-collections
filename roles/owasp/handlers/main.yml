@@ -5,7 +5,8 @@
     state: restarted
 
 - name: Restart OWASP
-  community.docker.docker_container:
-    name: owasp-nginx
-    restart: true
-
+  community.docker.docker_compose_v2:
+    project_src: "{{ owasp_docker_compose_folder }}"
+    services: 
+      - "owasp-nginx"
+    state: restarted

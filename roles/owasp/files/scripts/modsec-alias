@@ -13,3 +13,5 @@ alias meltags='tr "]" "\n" | tr "[" "\n" | grep "tag \"" | cut -b6- | tr -d "\""
 alias meltimestamp='cut -b2-25'
 alias melunique_id='grep -ao "\[unique_id [^]]*" | cut -d\" -f2'
 alias meluri='grep -ao "\[uri [^]]*" | cut -d\" -f2'
+alias sucs='sort | uniq -c | sort -n'
+alias charts='cat /var/log/nginx/error.log | melidmsg | sucs'
