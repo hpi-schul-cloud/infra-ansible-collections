@@ -15,7 +15,8 @@
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
   loop:
-    - nginx/nginx.conf
+    - nginx/nginx.conf.template
+    - nginx/default.conf.template
 
 - name: Copy Server config templates
   template:
