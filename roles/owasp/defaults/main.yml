@@ -69,17 +69,6 @@ owasp_modsec_before: |
   # Dummy comment
 
 owasp_modsec_after: |
-  SecRule REMOTE_ADDR "@ipMatch {{ owasp_docker_net }}"                     "id:1001, phase:1, pass, nolog,   allow"    
-  SecRule REQUEST_URI "@beginsWith /fsapi"                                      "id:1002, phase:1, pass, nolog,   ctl:ruleRemoveById=932230"  
-  SecRule REQUEST_URI "@beginsWith /fsapi"                                      "id:1003, phase:1, pass, nolog,   ctl:ruleRemoveById=932250"
-  SecRule REQUEST_URI "@beginsWith /fsapi"                                      "id:1004, phase:1, pass, nolog,   ctl:ruleRemoveById=949110"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/rooms"                      "id:1005, phase:1, pass, nolog,   allow"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/room_settings"              "id:1006, phase:1, pass, nolog,   allow"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/sessions/signout.json"      "id:1007, phase:1, pass, nolog,   allow"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/users"                      "id:1008, phase:1, pass, nolog,   allow"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/admin/site_settings"        "id:1009, phase:1, pass, nolog,   allow"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/admin/rooms_configurations" "id:1010, phase:1, pass, nolog,   allow"
-  SecRule REQUEST_URI "@contains /greenlight/api/v1/admin/users"                "id:1011, phase:1, pass, nolog,   allow"
   SecAction "id:980145,phase:5,pass,t:none,log,noauditlog, msg:'Incoming and Outgoing Score: %{TX.ANOMALY_SCORE} %{TX.OUTBOUND_ANOMALY_SCORE}'"
   SecRuleRemoveById 980130
 
