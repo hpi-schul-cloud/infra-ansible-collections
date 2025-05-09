@@ -72,3 +72,10 @@
 
 - name: Logrotate
   include_tasks: logrotate.yml
+
+- name: Copy useful aliases
+  copy:
+    src: scripts/modsec-alias
+    dest: "/root/.bash_aliases"
+    mode: "0640"
+    
