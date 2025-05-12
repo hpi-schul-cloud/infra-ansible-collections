@@ -1,10 +1,10 @@
 ---
-- name: Check if file exists
+- name: Check if certificates exists for "{{ server_name }}"
   stat:
     path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
   register: result
 
-- name: Create Cert folder
+- name: Create Cert folder for "{{ server_name }}"
   file:
     state: directory
     path: "/etc/letsencrypt/live/{{ server_name }}"
@@ -12,14 +12,14 @@
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
 
-- name: Create private key (RSA, 4096 bits)
+- name: Create private key (RSA, 4096 bits) for "{{ server_name }}"
   community.crypto.openssl_privatekey:
     path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
   when: not result.stat.exists
 
-- name: Create simple self-signed certificate
+- name: Create simple self-signed certificate for "{{ server_name }}"
   community.crypto.x509_certificate:
     path: "/etc/letsencrypt/live/{{ server_name }}/fullchain.pem"
     privatekey_path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
