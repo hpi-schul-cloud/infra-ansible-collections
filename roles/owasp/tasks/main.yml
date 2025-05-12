@@ -41,13 +41,13 @@
   vars: 
     server_name: "{{ item.name }}"
   include_tasks: self_signed.yml
-  loop: owasp_nginx_https_endpoints
+  loop: "{{ owasp_nginx_https_endpoints }}"
 
 - name: Generate Self Signed Certificates for extra instances
   vars: 
     server_name: "{{ item.hostname }}"
   include_tasks: self_signed.yml
-  loop: scalelite_greenlight_extra_instances
+  loop: "{{ scalelite_greenlight_extra_instances }}"
 
 - name: Docker-Compose
   include_tasks: docker_compose.yml
