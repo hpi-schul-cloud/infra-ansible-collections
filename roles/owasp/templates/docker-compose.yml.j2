@@ -53,12 +53,7 @@ services:
       - {{ owasp_docker_volumes_folder }}/nginx/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template
       - {{ owasp_docker_volumes_folder }}/nginx/server:/etc/nginx/http.d
       - {{ owasp_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
-#      - {{ owasp_docker_volumes_folder }}/nginx/owasp/acme-challenge.nginx:/etc/nginx/http.d/owasp/acme-challenge.nginx
       - {{ owasp_docker_volumes_folder }}/nginx/dhparam.pem:/etc/nginx/dhparam.pem
-{% if owasp_certbot_installed %}
-    depends_on:
-      - certbot
-{% endif %}
     healthcheck:
       test: curl --fail http://localhost:8080/ || exit 1
       interval: 30s
