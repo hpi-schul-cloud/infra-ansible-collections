@@ -11,6 +11,7 @@
     mode: "0750"
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
+  when: not result.stat.exists
 
 - name: Create private key (RSA, 4096 bits) for "{{ server_name }}"
   community.crypto.openssl_privatekey:
