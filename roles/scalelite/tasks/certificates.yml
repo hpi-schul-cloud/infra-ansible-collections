@@ -1,13 +1,15 @@
 ---
 - name: Check for certificates fullchain
   stat:
-    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_hostname }}/fullchain.pem"
+    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_basedomain }}/fullchain.pem"
   register: fullchain
 
 - name: Check for certificates privkey
   stat:
-    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_hostname }}/privkey.pem"
+    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_basedomain }}/privkey.pem"
   register: privkey
+
+# TODO: Ggf. auch noch andere prüfen prüfen ?
 
 - name: Create Letsencrypt certificates
   import_tasks:
