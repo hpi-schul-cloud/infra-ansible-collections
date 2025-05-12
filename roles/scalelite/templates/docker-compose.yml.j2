@@ -145,9 +145,11 @@ services:
       - /tmp:rw,mode=777
       - /var/cache/nginx:rw,mode=777 
     volumes:
+{% if scalelite_modsec_enabled | bool %}
       - {{ scalelite_docker_volumes_folder }}/owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/opt/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
       - {{ scalelite_docker_volumes_folder }}/owasp/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/opt/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
       - {{ scalelite_modsec_logs_folder }}:/var/log/modsecurity
+{% endif %}
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
@@ -157,7 +159,6 @@ services:
 {% if scalelite_greenlight_enabled | bool %}
       - {{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx:/etc/nginx/http.d/scalelite/greenlight.nginx
 {% endif %}
-      - {{ scalelite_docker_volumes_folder }}/nginx/scalelite/acme-challenge.nginx:/etc/nginx/http.d/scalelite/acme-challenge.nginx
       - {{ scalelite_docker_volumes_folder }}/nginx/scalelite.conf:/etc/nginx/http.d/scalelite.conf
       - {{ scalelite_docker_volumes_folder }}/nginx/dhparam.pem:/etc/nginx/dhparam.pem
     depends_on:
@@ -204,7 +205,7 @@ services:
       - db
       - redis
     healthcheck:
-      test: curl -sS --connect-to {{ scalelite_hostname }}:80:localhost:3000 http://{{ scalelite_hostname }}/health_check | grep -c success > /dev/null
+      test: curl -sS --connect-to {{ scalelite_host }}:80:localhost:3000 http://{{ scalelite_host }}/health_check | grep -c success > /dev/null
       interval: 30s
       timeout: 10s
       retries: 5
@@ -268,7 +269,7 @@ services:
     container_name: greenlight
     restart: unless-stopped
     environment:
-      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_hostname }}/bigbluebutton
+      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_host }}/bigbluebutton
       - BIGBLUEBUTTON_SECRET=${GREENLIGHT_BBB_API_TOKEN}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - RELATIVE_URL_ROOT=/greenlight
@@ -328,7 +329,7 @@ services:
     container_name: greenlight-{{ instance.name }}
     restart: unless-stopped
     environment:
-      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_hostname }}/bigbluebutton
+      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_host }}/bigbluebutton
       - BIGBLUEBUTTON_SECRET=${GREENLIGHT_BBB_API_TOKEN}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - RELATIVE_URL_ROOT=/greenlight
