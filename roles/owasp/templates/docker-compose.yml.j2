@@ -5,38 +5,6 @@ networks:
         - subnet: {{ owasp_docker_net }}
 
 services:
-{% if owasp_certbot_installed %}
-  certbot:
-    image: {{ owasp_certbot_image_repository }}@{{ owasp_certbot_image_digest }}
-    container_name: certbot
-    read_only: true
-    restart: unless-stopped
-    user: {{ owasp_certbot_user_id }}:{{ owasp_certbot_group_id }}
-    volumes:
-      - {{ owasp_letsencrypt_folder }}:/etc/letsencrypt
-      - {{ owasp_docker_volumes_folder }}/certbot/:/certbot
-      - {{ owasp_docker_volumes_folder }}/webroot:/var/www/certbot
-    tmpfs:
-      - /tmp:rw,mode=777
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; sleep 12h & wait $${!}; done;'"
-    environment:
-{% if owasp_aws_access_key_id is defined %}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-{% endif %}
-      - OS_ACCESS_KEY=${OS_ACCESS_KEY}
-      - OS_SECRET_KEY=${OS_SECRET_KEY}
-    healthcheck:
-      test:  ["CMD", "certbot", "certificates"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      # start_period: 60s
-    deploy:
-      resources:
-        {{ owasp_certbot_resources | to_nice_yaml | indent(8) }}
-{% endif %}
-
   owasp-nginx:
     image: {{ owasp_nginx_image }}
     container_name: owasp-nginx
