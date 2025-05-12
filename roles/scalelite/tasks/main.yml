@@ -154,7 +154,7 @@
   notify: Restart bbb-autoscaler
 
 - name: Docker-Compose
-  include_tasks: docker-compose.yml
+  include_tasks: docker_compose.yml
 
 - name: Postgres config
   include_tasks: postgres.yml

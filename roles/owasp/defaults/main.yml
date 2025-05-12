@@ -4,37 +4,11 @@ owasp_docker_compose_folder: /etc/owasp
 owasp_docker_compose_owner: root
 owasp_docker_compose_group: root
 
-owasp_certbot_installed: false
-owasp_certbot_image_repository: certbot/certbot
-# v2.11.0
-owasp_certbot_image_digest: sha256:ddf9e5d226a56e886986838fa0ebedc0237511c78664352e8d0f4346ee022cd8
-# Custom UID to run certbot as
-owasp_certbot_user_id: 9999
-# Group must have read access to certs
-owasp_certbot_group_id: 1800
-# owasp_certbot_terraform_telekom_os_access_key:
-# owasp_certbot_terraform_telekom_os_secret_key:
-# owasp_certbot_terraform_telekom_domain:
-# owasp_certbot_terraform_telekom_tenant:
-# owasp_certbot_terraform_telekom_dns_zone_id:
-# owasp_certbot_terraform_state_bucket:
-# owasp_certbot_terraform_state_key:
-# owasp_certbot_terraform_state_region:
-# owasp_certbot_terraform_state_endpoint:
-owasp_certbot_terraform_version: 1.5.4
-owasp_certbot_resources:
-  reservations:
-    cpus: '0.1'
-    memory: 10M
-  limits:
-    cpus: '0.3'
-    memory: 70M
-# owasp_letsencrypt_email:
-
 owasp_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
 # Image requires 101 or /etc/nginx must be remounted
 owasp_nginx_user_id: 101
-owasp_nginx_group_id: "{{ owasp_certbot_group_id }}"
+# Group must have read access to certs
+owasp_nginx_group_id: 1800
 owasp_nginx_logs_folder: /var/log/nginx
 owasp_nginx_dhparam_size: 4096
 owasp_nginx_worker_processes: auto
