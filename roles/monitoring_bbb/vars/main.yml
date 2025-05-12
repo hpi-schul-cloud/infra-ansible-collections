@@ -32,6 +32,16 @@ bbb_prometheus_scalelite_relabel_configs:
   - target_label: tenant
     replacement: "{{ tenant }}"
 
+bbb_prometheus_owasp_relabel_configs:
+  # Rewrite hostname:port to hostname
+  - source_labels: [__address__]
+    target_label: instance
+    regex: "([^:]+)(:[0-9]+)?"
+    replacement: "${1}"
+  # Add the tenant label
+  - target_label: tenant
+    replacement: "{{ tenant }}"
+
 bbb_prometheus_freeswitch_relabel_configs:
   # Rewrite hostname:port to hostname
   - source_labels: [__address__]
@@ -100,6 +110,19 @@ bbb_prometheus_scalelite_node_exporter_job:
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
+bbb_prometheus_owasp_node_exporter_job:
+  job_name: "{{ bbb_instance_name }}-owasp"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - "{{ scalelite_host }}:9101"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_owasp_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
+
+
 bbb_prometheus_scalelite_autoscaler_job:
   job_name: "{{ bbb_instance_name }}-scalelite-autoscaler"
   scheme: https
@@ -121,6 +144,18 @@ bbb_prometheus_scalelite_cadvisor_job:
         - "{{ scalelite_host }}:9300"
   basic_auth: "{{ bbb_prometheus_basic_auth }}"
   relabel_configs: "{{ bbb_prometheus_scalelite_relabel_configs }}"
+  scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
+  scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
+
+bbb_prometheus_owasp_cadvisor_job:
+  job_name: "{{ bbb_instance_name }}-owasp-cadvisor"
+  scheme: https
+  metrics_path: /metrics
+  static_configs:
+    - targets:
+        - "{{ scalelite_host }}:9301"
+  basic_auth: "{{ bbb_prometheus_basic_auth }}"
+  relabel_configs: "{{ bbb_prometheus_owasp_relabel_configs }}"
   scrape_interval: "{{ bbb_monitoring_scrape_interval }}"
   scrape_timeout: "{{ bbb_monitoring_scrape_timeout }}"
 
@@ -231,6 +266,7 @@ bbb_prometheus_turn_node_exporter_job:
 bbb_prometheus_scrape_config: "{{ bbb_prometheus_servers_only_scrape_config + (bbb_prometheus_scalelite_scrape_config if not bbb_servers_only else []) +\
  ([bbb_prometheus_turn_coturn_exporter_job] if bbb_turn_server_exporter_enabled else []) + ([bbb_prometheus_turn_coturn_cadvisor_job] if bbb_turn_server_cadvisor_enabled else []) +\
  ([bbb_prometheus_scalelite_cadvisor_job] if scalelite_cadvisor_enabled else []) + ([bbb_prometheus_scalelite_postgresexporter_job] if scalelite_postgresexporter_enabled else []) +\
+ ([bbb_prometheus_owasp_cadvisor_job] if owasp_cadvisor_enabled else []) +\
  ([bbb_prometheus_freeswitch_node_exporter_job] if bbb_freeswitch_server_node_exporter_enabled else []) + ([bbb_prometheus_freeswitch_cadvisor_job] if bbb_freeswitch_server_cadvisor_enabled else []) }}"
 
 bbb_prometheus_servers_only_scrape_config:
@@ -241,6 +277,7 @@ bbb_prometheus_servers_only_scrape_config:
 bbb_prometheus_scalelite_scrape_config:
   - "{{ bbb_prometheus_scalelite_node_exporter_job }}"
   - "{{ bbb_prometheus_scalelite_autoscaler_job }}"
+  - "{{ bbb_prometheus_owasp_node_exporter_job }}"
   - "{{ bbb_prometheus_turn_node_exporter_job }}"
 
 bbb_prometheus_basic_auth_secret_mount_path: "/etc/bbb/{{ bbb_instance_name }}"
