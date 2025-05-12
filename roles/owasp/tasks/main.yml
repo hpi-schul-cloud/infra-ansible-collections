@@ -1,5 +1,4 @@
 ---
-
 - name: Create folders
   file:
     state: directory
@@ -30,20 +29,28 @@
       mode: "0750"
       owner: "{{ owasp_nginx_user_id }}"
       group: "{{ owasp_nginx_group_id }}"
+    - path: "{{ owasp_node_exporter_textfile_directory }}"
+      mode: "0700"
+      owner: "{{ owasp_node_exporter_user_id }}"
+      group: "{{ owasp_node_exporter_group_id }}"      
       
 - name: Nginx
   include_tasks: nginx.yml
 
+- name: Generate Self Signed Certificates
+  vars: 
+    server_name: "{{ item.name }}"
+  include_tasks: self_signed.yml
+  loop: owasp_nginx_https_endpoints
+
+- name: Generate Self Signed Certificates for extra instances
+  vars: 
+    server_name: "{{ item.hostname }}"
+  include_tasks: self_signed.yml
+  loop: scalelite_greenlight_extra_instances
+
 - name: Docker-Compose
   include_tasks: docker_compose.yml
-
-- name: Create Node Exporter textfile collector directory
-  file:
-    path: "{{ owasp_node_exporter_textfile_directory }}"
-    state: directory
-    mode: "0700"
-    owner: "{{ owasp_node_exporter_user_id }}"
-    group: "{{ owasp_node_exporter_group_id }}"
 
 - name: Fail2ban
   include_tasks: fail2ban.yml

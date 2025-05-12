@@ -1,0 +1,29 @@
+---
+- name: Check if file exists
+  stat:
+    path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
+  register: result
+
+- name: Create Cert folder
+  file:
+    state: directory
+    path: "/etc/letsencrypt/live/{{ server_name }}"
+    mode: "0750"
+    owner: "{{ owasp_nginx_user_id }}"
+    group: "{{ owasp_nginx_group_id }}"
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
+    owner: "{{ owasp_nginx_user_id }}"
+    group: "{{ owasp_nginx_group_id }}"
+  when: not result.stat.exists
+
+- name: Create simple self-signed certificate
+  community.crypto.x509_certificate:
+    path: "/etc/letsencrypt/live/{{ server_name }}/fullchain.pem"
+    privatekey_path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
+    provider: selfsigned
+    owner: "{{ owasp_nginx_user_id }}"
+    group: "{{ owasp_nginx_group_id }}"
+  when: not result.stat.exists
