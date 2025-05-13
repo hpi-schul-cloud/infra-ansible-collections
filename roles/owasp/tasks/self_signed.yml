@@ -9,15 +9,15 @@
     state: directory
     path: "/etc/letsencrypt/live/{{ server_name }}"
     mode: "0750"
-    owner: "{{ owasp_nginx_user_id }}"
-    group: "{{ owasp_nginx_group_id }}"
+    owner: "{{ owasp_certificates_user }}"
+    group: "{{ owasp_certificates_group }}"
   when: not result.stat.exists
 
 - name: Create private key (RSA, 4096 bits) for "{{ server_name }}"
   community.crypto.openssl_privatekey:
     path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
-    owner: "{{ owasp_nginx_user_id }}"
-    group: "{{ owasp_nginx_group_id }}"
+    owner: "{{ owasp_certificates_user }}"
+    group: "{{ owasp_certificates_group }}"
   when: not result.stat.exists
 
 - name: Create simple self-signed certificate for "{{ server_name }}"
@@ -25,6 +25,6 @@
     path: "/etc/letsencrypt/live/{{ server_name }}/fullchain.pem"
     privatekey_path: "/etc/letsencrypt/live/{{ server_name }}/privkey.pem"
     provider: selfsigned
-    owner: "{{ owasp_nginx_user_id }}"
-    group: "{{ owasp_nginx_group_id }}"
+    owner: "{{ owasp_certificates_user }}"
+    group: "{{ owasp_certificates_group }}"
   when: not result.stat.exists
