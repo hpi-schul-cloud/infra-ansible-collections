@@ -17,6 +17,7 @@
   loop:
     - nginx/nginx.conf.template
     - nginx/default.conf.template
+  notify: Restart OWASP
 
 - name: Copy Server config templates
   template:
@@ -28,6 +29,7 @@
   loop:
     - proxy.conf
     - nodeexporter.conf
+  notify: Restart OWASP
 
 - name: Copy OWASP config (templates)
   template:
