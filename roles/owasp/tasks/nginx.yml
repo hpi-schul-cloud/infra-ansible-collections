@@ -67,7 +67,7 @@
 - name: Create nginx log directory
   file:
     path: "{{ owasp_nginx_logs_folder }}"
-    mode: "0750"
+    mode: u=rwX,g=rX,o=
     state: directory
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
@@ -81,5 +81,5 @@
     owner: "{{ owasp_nginx_user_id }}"
     group: "{{ owasp_nginx_group_id }}"
  
-- name: Set nginx log file permissions
+- name: Ensure nginx log file permissions
   command: find {{ owasp_nginx_logs_folder }} -type f -exec chmod 0640 {} \;

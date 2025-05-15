@@ -175,7 +175,7 @@
   file:
     path: "{{ scalelite_node_exporter_textfile_directory }}"
     state: directory
-    mode: "0700"
+    mode: "0770"
     owner: "{{ scalelite_node_exporter_user_id }}"
     group: "{{ scalelite_node_exporter_group_id }}"
 

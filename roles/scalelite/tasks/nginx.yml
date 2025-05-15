@@ -80,7 +80,7 @@
 - name: Create nginx log directory
   file:
     path: "{{ scalelite_nginx_logs_folder }}"
-    mode: "0750"
+    mode: u=rwX,g=rX,o=
     state: directory
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_certbot_group_id }}"
@@ -95,5 +95,5 @@
     group: "{{ scalelite_certbot_group_id }}"
   when: scalelite_modsec_enabled
  
-- name: Set nginx log file permissions
+- name: Ensure nginx log file permissions
   command: find {{ scalelite_nginx_logs_folder }} -type f -exec chmod 0640 {} \;
