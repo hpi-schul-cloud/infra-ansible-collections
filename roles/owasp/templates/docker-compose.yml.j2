@@ -1,0 +1,64 @@
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: {{ owasp_docker_net }}
+
+services:
+  owasp-nginx:
+    image: {{ owasp_nginx_image }}
+    container_name: owasp-nginx
+    # read_only: true #currently not supported by modsecurity
+    restart: unless-stopped
+    user: {{ owasp_nginx_user_id }}:{{ owasp_nginx_group_id }}
+    ports:
+{% for server in owasp_nginx_metrics_endpoints | list %}
+      - "{{ server.public_port }}:{{ server.public_port }}"
+{% endfor %}
+{% for svc in owasp_nginx_https_endpoints %}
+      - "{{ svc.orig_port }}:{{ svc.proxy_port }}"
+{% endfor %}
+{% for svc in owasp_nginx_http_endpoints %}
+      - "{{ svc.orig_port }}:{{ svc.proxy_port }}"
+{% endfor %}
+    environment:
+      MODSEC_RULE_ENGINE: {{ owasp_modsec_mode }}
+      BLOCKING_PARANOIA: {{ owasp_modsec_level }}
+      DETECTION_PARANOIA: {{ owasp_modsec_level }}
+      MODSEC_AUDIT_LOG: "/var/log/modsecurity/mod_sec_audit.log"
+      MODSEC_DEBUG_LOG: "/var/log/modsecurity/mod_sec_debug.log"
+      MODSEC_DEBUG_LOGLEVEL: {{ owasp_modsec_debuglevel }}
+      MODSEC_AUDIT_LOG_FORMAT: Native
+      MODSEC_AUDIT_LOG_TYPE: Serial
+      MODSEC_TMP_DIR: "/tmp"
+      MODSEC_RESP_BODY_ACCESS: "On"
+      MODSEC_RESP_BODY_MIMETYPE: "text/plain text/html text/xml application/json"
+      ANOMALY_INBOUND: {{ owasp_modsec_inbound_anomaly }}
+      ANOMALY_OUTBOUND: {{ owasp_modsec_outbound_anomaly }}      
+      REPORTING_LEVEL:  {{ owasp_modsec_reportlevel }}
+      COMBINED_FILE_SIZES: "65535"      
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    tmpfs:
+      - /tmp:rw,mode=777
+      - /var/cache/nginx:rw,mode=777 
+    volumes:
+      - {{ owasp_docker_volumes_folder }}/owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/opt/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+      - {{ owasp_docker_volumes_folder }}/owasp/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/opt/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+      - {{ owasp_modsec_logs_folder }}:/var/log/modsecurity
+      - {{ owasp_nginx_logs_folder }}:/var/log/nginx
+      - {{ owasp_letsencrypt_folder }}:/etc/letsencrypt
+      - {{ owasp_docker_volumes_folder }}/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+      - {{ owasp_docker_volumes_folder }}/nginx/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template
+      - {{ owasp_docker_volumes_folder }}/nginx/server:/etc/nginx/http.d
+      - {{ owasp_docker_volumes_folder }}/nginx/.htpasswd:/etc/nginx/.htpasswd
+      - {{ owasp_docker_volumes_folder }}/nginx/dhparam.pem:/etc/nginx/dhparam.pem
+    healthcheck:
+      test: curl --fail http://localhost:8080/ || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      # start_period: 60s
+    deploy:
+      resources:
+        {{ owasp_nginx_resources | to_nice_yaml | indent(8) }}

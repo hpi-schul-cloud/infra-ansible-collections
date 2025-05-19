@@ -1,0 +1,42 @@
+---
+- name: Create Docker logrotate config
+  copy:
+    content: |
+      /var/lib/docker/containers/*/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/docker
+    mode: "0644"
+
+- name: Create OWASP Nginx logrotate config
+  copy:
+    content: |
+      {{ owasp_nginx_logs_folder }}/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/owasp-nginx
+    mode: "0644"
+
+- name: Create OWASP Modsec logrotate config
+  copy:
+    content: |
+      {{ owasp_modsec_logs_folder }}/*.log {
+        rotate 14
+        daily
+        compress
+        missingok
+        delaycompress
+        copytruncate
+      }
+    dest: /etc/logrotate.d/owasp-modsec
+    mode: "0644"

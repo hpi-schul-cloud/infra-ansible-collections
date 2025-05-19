@@ -11,3 +11,4 @@ basic_fail2ban_jail_sshd: |
   maxretry = 3
   bantime = 3600
 basic_fail2ban_jail_sshd_path: /etc/fail2ban/jail.d/sshd_jail.local
+basic_install_python: true
