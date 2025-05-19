@@ -31,6 +31,23 @@
       data:
         1password-credentials.json: "{{ onepassword_connector_credentials_json | b64encode | b64encode }}"
 
+- name: Create Image pull secret token
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: "{{ image_pull_secrets_name }}"
+        namespace: default
+      data:
+        .dockerconfigjson: "{{ image_pull_token_secret }}"
+  when: image_pull_token_enabled
+
 # The onepassword token is used by the operator to retrieve the secrets from the connector
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html
 - name: Create onepassword servicecenter token secret
