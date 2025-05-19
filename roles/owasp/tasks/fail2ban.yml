@@ -10,13 +10,6 @@
     enabled: true
     state: started
 
-- name: Set ignoreip for fail2ban
-  lineinfile:
-    path: /etc/fail2ban/jail.conf
-    regexp: "^ignoreip"
-    line: "ignoreip = 127.0.0.1/8"
-  notify: Restart Fail2ban
-
 - name: Create filter file for fail2ban general nginx errors
   copy:
     content: |
