@@ -9,7 +9,7 @@
     path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_basedomain }}/privkey.pem"
   register: privkey
 
-# TODO: Ggf. auch noch andere prüfen prüfen ?
+# TODO: Ggf. auch noch andere prüfen ?
 
 - name: Create Letsencrypt certificates
   import_tasks:
