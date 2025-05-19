@@ -1,12 +1,4 @@
 ---
-- name: Copy Nginx acme-challenge config
-  copy:
-    src: nginx/scalelite/acme-challenge.nginx
-    dest: "{{ owasp_docker_volumes_folder }}/nginx/acme-challenge.nginx"
-    mode: "0600"
-    owner: "{{ owasp_nginx_user_id }}"
-    group: "{{ owasp_nginx_group_id }}"
-
 - name: Copy Nginx config (templates)
   template:
     src: "{{ item }}.j2"
