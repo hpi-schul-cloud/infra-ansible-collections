@@ -48,7 +48,6 @@ services:
       - {{ owasp_modsec_logs_folder }}:/var/log/modsecurity
       - {{ owasp_nginx_logs_folder }}:/var/log/nginx
       - {{ owasp_letsencrypt_folder }}:/etc/letsencrypt
-      - {{ owasp_docker_volumes_folder }}/webroot:/var/www/certbot
       - {{ owasp_docker_volumes_folder }}/nginx/nginx.conf.template:/etc/nginx/templates/nginx.conf.template
       - {{ owasp_docker_volumes_folder }}/nginx/default.conf.template:/etc/nginx/templates/conf.d/default.conf.template
       - {{ owasp_docker_volumes_folder }}/nginx/server:/etc/nginx/http.d
