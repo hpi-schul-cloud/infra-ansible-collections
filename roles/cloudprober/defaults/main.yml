@@ -3,6 +3,10 @@
 cloudprober_namespace: "monitoring"
 
 # Name of secret used for Cloudprober access tokens and other "secret" stuff
+# Here all secrets required in the environment should be defined.
+# E.g. with the config below we will need:
+# env "loki_secret"   so loki_secret should be contained
+# same for vmagent_secret
 cloudprober_secret: "cloudprobersecrets"
 
 #default is to fetch data from 1Password to access Loki and vmagent
