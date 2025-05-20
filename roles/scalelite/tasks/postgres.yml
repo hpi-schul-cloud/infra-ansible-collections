@@ -1,0 +1,22 @@
+---
+- name: Make sure the postgres is up
+  community.docker.docker_container_info:
+    name: db
+  until: "container_info.container.State.Health.Status == 'healthy'"
+  register: container_info
+  retries: 15
+  delay: 10
+
+- name: Prevent external connection as postgres user
+  copy:
+    src: "postgres/pg_hba.conf"
+    dest: "{{ scalelite_docker_volumes_folder }}/postgres_data/pg_hba.conf"
+    owner: "{{ scalelite_postgres_user_id }}"
+    group: "{{ scalelite_postgres_group_id }}"
+    mode: "0600"
+  notify: Restart postgres
+
+- name: Ensure the correct permissions for the DBs
+  community.docker.docker_container_exec:
+    container: db
+    command: "/docker-entrypoint-initdb.d/db_permissions.sh"

@@ -34,7 +34,25 @@
             itemPath: "vaults/{{ vault }}/items/sshd-host-keys"
       tags:
         - sshd
-    
+
+    - name: Create docker token secret
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        definition:
+          apiVersion: v1
+          kind: Secret
+          type: Opaque
+          metadata:
+            name: docker-token
+            namespace: "{{ sshd_namespace }}"
+          data:
+            .dockerconfigjson: "{{ image_pull_token_secret }}"
+      when: image_pull_token_enabled
+      tags: sshd
+
     - name: Add dbildungsplattform chart repo
       kubernetes.core.helm_repository:
         name: dbildungsplattform
@@ -42,7 +60,7 @@
       check_mode: false
       changed_when: false
       tags: sshd
-      
+
     - name: Deploy latest version of SSHD chart to update user keys on Cluster
       kubernetes.core.helm:
         kubeconfig: "{{ kubeconfig }}"

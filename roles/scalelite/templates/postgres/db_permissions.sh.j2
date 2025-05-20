@@ -1,0 +1,21 @@
+#!/bin/sh
+{% for db in dbs %}
+echo "SELECT 'CREATE USER \"{{ db }}\"' WHERE NOT EXISTS (SELECT FROM pg_user WHERE usename = '{{ db }}')\gexec" | psql -d postgres -w
+echo "GRANT \"{{ db }}\" TO $POSTGRES_USER;" | psql -d postgres -w
+echo "ALTER USER \"{{ db }}\" WITH ENCRYPTED PASSWORD '$POSTGRES_{{ db|upper|replace("-", "_") }}_PASSWORD';" | psql -d postgres -w
+echo "SELECT 'CREATE DATABASE \"{{ db }}\"' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '{{ db }}')\gexec" | psql -d postgres -w
+echo "ALTER DATABASE \"{{ db }}\" OWNER TO \"{{ db }}\";" | psql -d postgres -w
+echo "REVOKE ALL ON DATABASE \"{{ db }}\" FROM PUBLIC;" | psql -d postgres -w
+echo "REVOKE ALL ON SCHEMA public FROM PUBLIC;" | psql -d {{ db }} -w
+# Some steps of greenlight/scalelite fail without the permission even if the DB already exists
+# See https://github.com/bigbluebutton/greenlight/issues/1740
+echo "ALTER USER \"{{ db }}\" CREATEDB;" | psql -d postgres -w
+# Needed to migrate existing DB
+echo "ALTER SCHEMA public OWNER TO \"{{ db }}\";" | psql -d {{ db }} -w
+echo "SELECT 'ALTER TABLE ' || tablename || ' OWNER TO \"{{ db }}\";' FROM pg_tables WHERE schemaname = 'public'\gexec" | psql -d {{ db }} -w
+echo "SELECT 'ALTER SEQUENCE ' || sequencename || ' OWNER TO \"{{ db }}\";' FROM pg_sequences WHERE schemaname = 'public'\gexec" | psql -d {{ db }} -w
+echo "SELECT 'ALTER VIEW ' || viewname || ' OWNER TO \"{{ db }}\";' FROM pg_views WHERE schemaname = 'public'\gexec" | psql -d {{ db }} -w
+{% endfor %}
+echo "SELECT 'CREATE USER exporter' WHERE NOT EXISTS (SELECT FROM pg_user WHERE usename = 'exporter')\gexec" | psql -d postgres -w
+echo "ALTER USER exporter WITH ENCRYPTED PASSWORD '$POSTGRES_EXPORTER_PASSWORD';" | psql -d postgres -w
+echo "GRANT pg_monitor TO exporter;" | psql -d postgres -w

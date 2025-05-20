@@ -1,0 +1,90 @@
+---
+    - name: Create kyverno namespace
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        api_version: v1
+        name: "{{ kyverno_namespace }}"
+        kind: Namespace
+
+    - name: Add kyverno chart repo
+      kubernetes.core.helm_repository:
+        name: kyverno
+        repo_url: https://kyverno.github.io/kyverno/
+      check_mode: false
+      changed_when: false
+
+    - name: Install kyverno
+      kubernetes.core.helm:
+        name: "kyverno"
+        create_namespace: yes
+        chart_ref: kyverno/kyverno
+        wait: yes
+        chart_version: "{{ kyverno_chart_version }}"
+        kubeconfig: "{{ kubeconfig }}"
+        release_namespace: "kyverno"
+        values: "{{ kyverno_values }}"
+
+    - name: Get all namespaces in cluster
+      kubernetes.core.k8s_info:
+        kind: Namespace
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+      register: cluster_namespaces
+
+    - name: Create docker token secret in each namespace
+      kubernetes.core.k8s:
+        state: present
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        definition:
+          apiVersion: onepassword.com/v1
+          kind: OnePasswordItem
+          metadata:
+            name: docker-token
+            namespace: "{{ item }}"
+          spec:
+            itemPath: "vaults/{{ vault }}/items/dockerhub-schulcloudci-docker-pull"
+      loop: "{{ cluster_namespaces.resources | map(attribute='metadata.name') | list }}"
+
+    - name: Apply Kyverno Policy
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kubeconfig }}"
+        proxy: "{{ proxy_url | default(omit, true) }}"
+        proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+        state: present
+        definition:
+          apiVersion: kyverno.io/v1
+          kind: ClusterPolicy
+          metadata:
+            name: add-docker-token
+          spec:
+            rules:
+            - name: add-imagepullsecret-docker-domain
+              match:
+                resources:
+                  kinds:
+                  - Pod
+              mutate:
+                patchStrategicMerge:
+                  spec:
+                    containers:
+                    - (image): "docker.io/*"
+                    imagePullSecrets:
+                    - name: docker-token
+            - name: add-imagepullsecret-docker-repo
+              match:
+                resources:
+                  kinds:
+                  - Pod
+              mutate:
+                patchStrategicMerge:
+                  spec:
+                    containers:
+                    - (image): "*/*"
+                    imagePullSecrets:
+                    - name: docker-token

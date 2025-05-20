@@ -1,0 +1,240 @@
+---
+scalelite_docker_volumes_folder: /docker_volumes
+scalelite_docker_compose_folder: /scalelite
+scalelite_docker_compose_owner: root
+scalelite_docker_compose_group: root
+
+scalelite_certbot_image_repository: certbot/certbot
+# v2.11.0
+scalelite_certbot_image_digest: sha256:ddf9e5d226a56e886986838fa0ebedc0237511c78664352e8d0f4346ee022cd8
+# Custom UID to run certbot as
+scalelite_certbot_user_id: 9999
+scalelite_certbot_group_id: 9999
+# scalelite_certbot_terraform_telekom_os_access_key:
+# scalelite_certbot_terraform_telekom_os_secret_key:
+# scalelite_certbot_terraform_telekom_domain:
+# scalelite_certbot_terraform_telekom_tenant:
+# scalelite_certbot_terraform_telekom_dns_zone_id:
+# scalelite_certbot_terraform_state_bucket:
+# scalelite_certbot_terraform_state_key:
+# scalelite_certbot_terraform_state_region:
+# scalelite_certbot_terraform_state_endpoint:
+scalelite_certbot_terraform_version: 1.5.4
+scalelite_certbot_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 10M
+  limits:
+    cpus: '0.3'
+    memory: 70M
+# scalelite_letsencrypt_email:
+
+
+
+scalelite_greenlight_enabled: false
+scalelite_greenlight_image_repository: greenlight
+scalelite_greenlight_image_tag: v3.1.0.2
+scalelite_greenlight_extra_instances: []
+scalelite_greenlight_default_locale: de
+scalelite_greenlight_log_level: warn
+scalelite_greenlight_allow_mail_notifications: true
+# scalelite_greenlight_smtp_server:
+# scalelite_greenlight_smtp_port:
+# scalelite_greenlight_smtp_domain:
+# scalelite_greenlight_smtp_username:
+# scalelite_greenlight_smtp_password:
+# scalelite_greenlight_smtp_auth:
+# scalelite_greenlight_smtp_sender
+# scalelite_bbb_tenant_api_key:
+scalelite_greenlight_smtp_auth: plain
+scalelite_greenlight_smtp_starttls_auto: true
+scalelite_greenlight_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 150M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+# Postgres Docker image runs as postgres:postgres (70:70)
+scalelite_postgres_user_id: 70
+scalelite_postgres_group_id: 70
+# postgres:14.8-alpine
+scalelite_postgres_image: postgres@sha256:fa48198f8c88d5563e7ff3f6d5d269be58a7571e4464d70e4cb6c0987d903ba3
+scalelite_postgres_resources:
+  reservations:
+    cpus: '0.2'
+    memory: 50M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+# prometheuscommunity/postgres-exporter:v0.17.1
+scalelite_postgres_exporter_image: prometheuscommunity/postgres-exporter@sha256:38606faa38c54787525fb0ff2fd6b41b4cfb75d455c1df294927c5f611699b17
+scalelite_postgres_exporter_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 10M
+  limits:
+    cpus: "0.5"
+    memory: "20M"
+# redis:7.2.4-alpine
+scalelite_redis_image: redis@sha256:c8bb255c3559b3e458766db810aa7b3c7af1235b204cfdb304e79ff388fe1a5a
+# Redis Docker image runs as redis:redis (999:1000)
+scalelite_redis_user_id: 999
+scalelite_redis_group_id: 1000
+scalelite_redis_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 10M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+# Connection redis-user
+scalelite_redis_user: "worker"
+# scalelite_redis_password: "1_SomeSecretPassword_!"  
+scalelite_greenlight_redis_user: "greenlight"
+# scalelite_greenlight_redis_password: "2_SomeSecretPassword_!"  
+
+
+scalelite_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
+scalelite_nginx_user_id: 101
+scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
+scalelite_nginx_logs_folder: /var/log/nginx
+scalelite_nginx_dhparam_size: 4096
+scalelite_nginx_worker_processes: auto
+scalelite_nginx_ssl: true
+scalelite_nginx_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 15M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+scalelite_nginx_metrics_endpoints:
+  - name: node-exporter
+    public_port: 9100
+    private_port: 9099
+  - name: bbb-autoscaler
+    public_port: 9200
+    private_port: "{{ scalelite_autoscaler_config.metrics_exporter_port }}"
+  - name: cadvisor
+    public_port: 9300
+    private_port: 9299
+  - name: postgres-exporter
+    public_port: 9188
+    private_port: 9187
+
+scalelite_docker_net: "192.168.64.0/24"
+scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or '"ON"'
+# Paranoia level for ModSecurity 
+scalelite_modsec_level: 1
+# Debug Level for logging
+scalelite_modsec_debuglevel: 1 
+scalelite_modsec_reportlevel: 1
+scalelite_modsec_logs_folder: /var/log/modsec
+scalelite_modsec_outbound_anomaly: 4
+scalelite_modsec_inbound_anomaly: 5
+scalelite_modsec_before: |
+  # Dummy comment
+
+scalelite_modsec_after: |
+  SecRule REMOTE_ADDR "@ipMatch {{ scalelite_docker_net }}"                     "id:1001, phase:1, pass, nolog,   allow"    
+  SecRule REQUEST_URI "@beginsWith /fsapi"                                      "id:1002, phase:1, pass, nolog,   ctl:ruleRemoveById=932230"  
+  SecRule REQUEST_URI "@beginsWith /fsapi"                                      "id:1003, phase:1, pass, nolog,   ctl:ruleRemoveById=932250"
+  SecRule REQUEST_URI "@beginsWith /fsapi"                                      "id:1004, phase:1, pass, nolog,   ctl:ruleRemoveById=949110"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/rooms"                      "id:1005, phase:1, pass, nolog,   allow"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/room_settings"              "id:1006, phase:1, pass, nolog,   allow"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/sessions/signout.json"      "id:1007, phase:1, pass, nolog,   allow"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/users"                      "id:1008, phase:1, pass, nolog,   allow"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/admin/site_settings"        "id:1009, phase:1, pass, nolog,   allow"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/admin/rooms_configurations" "id:1010, phase:1, pass, nolog,   allow"
+  SecRule REQUEST_URI "@contains /greenlight/api/v1/admin/users"                "id:1011, phase:1, pass, nolog,   allow"
+  SecAction "id:980145,phase:5,pass,t:none,log,noauditlog, msg:'Incoming and Outgoing Score: %{TX.ANOMALY_SCORE} %{TX.OUTBOUND_ANOMALY_SCORE}'"
+  SecRuleRemoveById 980130
+
+scalelite_user_id: 1000
+scalelite_group_id: 1000
+scalelite_web_concurrency: 4
+scalelite_rails_max_threads: 4
+scalelite_log_level: warn
+scalelite_multitenancy_enabled: true
+# v1.5.1.7-focal260-alpine
+scalelite_poller_image: "blindsidenetwks/scalelite@sha256:f534cb09f14a43f4581d899c0b4efe8ff69dcb851fd670ab90901c3620674d8f"
+scalelite_api_image: "blindsidenetwks/scalelite@sha256:2dbffceb9731e9ec0c2ab41f53332efdbbf73c31cdb3688b77bb52b8ef627582"
+# scalelite_secret_key_base:
+# scalelite_api_key
+scalelite_poller_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 100M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+scalelite_api_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 250M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+
+scalelite_hostname: "{{ inventory_hostname }}"
+scalelite_letsencrypt_folder: /etc/letsencrypt
+scalelite_terraform_workspace: prod
+scalelite_bbb_dialin_enabled: false
+scalelite_metrics_basic_auth_username: metrics-user
+# scalelite_metrics_basic_auth_password:
+scalelite_security_txt: |
+  # Security.txt content
+
+scalelite_autoscaler_user_id: 65534
+scalelite_autoscaler_group_id: 65534
+scalelite_autoscaler_image_repository: ghcr.io/dbildungsplattform/infra-autoscaler
+# 2.0.0
+scalelite_autoscaler_image_digest: sha256:95cf770296448cea86e775f6622a5caa9d09fa02e5b0ce29ceeadc59cf1ed531
+scalelite_autoscaler_metrics_private_port: 9199
+# Autoscaler config as YAML
+scalelite_autoscaler_config: {}
+# Autoscaler environment variables in name=value format, gets written to the docker-compose file
+scalelite_autoscaler_environment: []
+
+scalelite_node_exporter_textfile_directory: /node-exporter-textfiles/
+scalelite_node_exporter_user_id: 65534
+scalelite_node_exporter_group_id: 65534
+
+scalelite_fail2ban_filter_nginx: |
+  [Definition]
+  failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d).+$
+  ignoreregex =
+scalelite_fail2ban_filter_path_nginx: /etc/fail2ban/filter.d/nginx-errors.conf
+scalelite_fail2ban_filter_greenlight: |
+  [Definition]
+  failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d) .*\/greenlight\/signin" ".*"$
+  ignoreregex =
+scalelite_fail2ban_filter_path_greenlight: /etc/fail2ban/filter.d/greenlight-signin-errors.conf
+scalelite_fail2ban_jail_nginx: |
+  [nginx-http-auth]
+  enabled = true
+  port = {{ scalelite_nginx_metrics_endpoints | map(attribute='public_port') | join(",") }}
+  logpath = {{ scalelite_nginx_logs_folder }}/*.log
+  maxretry = 3
+  bantime = 3600
+  [nginx-errors]
+  enabled    = true
+  port       = http,https
+  filter     = nginx-errors
+  logpath    = {{ scalelite_nginx_logs_folder }}/*.log
+  maxretry   = 100
+  bantime    = 3600
+  findtime   = 600
+scalelite_fail2ban_jail_path_nginx: /etc/fail2ban/jail.d/nginx_jail.local
+scalelite_fail2ban_jail_greenlight: |
+  [greenlight-signin-errors]
+  enabled    = true
+  port       = http,https
+  filter     = greenlight-signin-errors
+  logpath    = {{ scalelite_nginx_logs_folder }}/*.log
+  maxretry   = 5
+  bantime    = 3600
+scalelite_fail2ban_jail_path_greenlight: /etc/fail2ban/jail.d/greenlight_jail.local

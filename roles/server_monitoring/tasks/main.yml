@@ -9,16 +9,26 @@
 - name: Install Docker
   import_role:
     name: geerlingguy.docker
+  when: server_monitoring_install_docker
+
+- name: Get Docker group ID
+  getent:
+    database: group
+    key: docker
+- ansible.builtin.set_fact:
+     docker_group_id: "{{ getent_group['docker'][1] }}"    
 
 - name: Install python3-pip
   apt:
     name: python3-pip
+  when: server_monitoring_install_docker
 
 - name: Install Python Docker SDK
   pip:
     name:
       - docker=={{ server_monitoring_docker_python_sdk_version }}
       - docker-compose=={{ server_monitoring_docker_compose_version }}
+  when: server_monitoring_install_docker
 
 - name: Create monitoring folder
   file:
@@ -90,6 +100,12 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
+- name: Install Python Passlib
+  pip:
+    name:
+      - passlib
+  when: server_monitoring_install_docker
+
 - name: Copy basic auth user
   community.general.htpasswd:
     path: "{{ server_monitoring_docker_volumes_folder }}/nginx/.htpasswd"
@@ -100,14 +116,46 @@
     group: "{{ server_monitoring_nginx_group_id }}"
   when: server_monitoring_nginx_enabled
 
-- name: Set log permissions
+
+- name: Create server monitoring nginx container logs directory 
+  become: true
   file:
     path: "{{ server_monitoring_nginx_logs_folder }}"
-    mode: "0750"
+    state: directory
     owner: "{{ server_monitoring_nginx_user_id }}"
     group: "{{ server_monitoring_nginx_group_id }}"
-    recurse: true
+    mode: "0750"
   when: server_monitoring_nginx_enabled
+
+- name: Create Node-Exporter AppArmor profile
+  template:
+    src: node-exporter-apparmor.j2
+    dest: "/etc/apparmor.d/{{ server_monitoring_node_exporter_apparmor_profile }}"
+    mode: "0600"
+    owner: root
+    group: root
+  register: create_node_exporter_apparmor
+  when: server_monitoring_node_exporter_create_apparmor_profile
+
+- name: Load Node-Exporter AppArmor profile
+  command:
+    cmd: "apparmor_parser -r /etc/apparmor.d/{{ server_monitoring_node_exporter_apparmor_profile }}"
+  when: create_node_exporter_apparmor.changed
+
+# once executed this task can get deleted
+- name: Ensure /etc/logrotate/file is removed
+  file:
+    path: /etc/logrotate.d/nginx
+    state: absent
+  when: delete_old_nginx_logrotate
+
+# once executed this task can get deleted
+- name: Change ownership of files in /var/log/nginx
+  file:
+    path: /var/log/nginx
+    recurse: yes
+    owner: systemd-resolve
+    group: ssl-certs
 
 - name: Copy docker-compose.yml
   template:
@@ -134,5 +182,79 @@
     port: "{{ item }}"
     from_ip: "{{ network_info.network.IPAM.Config[0].Subnet }}"
     proto: tcp
-  loop: "{{ server_monitoring_exporter_ports | flatten }}"
+  loop: "{{ server_monitoring_exporter_private_ports | flatten }}"
   when: server_monitoring_create_ufw_rules
+
+- name: Create Fail2ban jail
+  copy:
+    content: |
+      [nginx-http-auth]
+      enabled = true
+      port = {{ server_monitoring_exporter_public_ports | flatten | join(",") }}
+      logpath = {{ server_monitoring_nginx_logs_folder }}/error.log
+      maxretry = 3
+      bantime = 3600
+    dest: /etc/fail2ban/jail.d/server-monitoring.local
+    owner: root
+    group: root
+    mode: "0644"
+  when: server_monitoring_create_fail2ban_jail
+  notify: Restart Fail2ban
+
+- name: Copy Version collect script
+  ansible.builtin.template:
+    src: collect-packet-versions.sh.j2
+    dest: "{{ server_monitoring_folder }}/collect-version.sh"
+    mode: "0750"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name: Create cronjob to collect versions
+  ansible.builtin.cron:
+    name: Collect Versions
+    weekday: "{{ package_collector_cron_weekday }}"
+    minute: "{{ package_collector_cron_minute }}"
+    hour: "{{ package_collector_cron_hour }}"
+    user: "{{ package_collector_cron_user }}"
+    job: "{{ server_monitoring_folder }}/collect-version.sh"
+    cron_file: "{{ package_collector_cron_filename }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name: Copy Image Names collect script
+  ansible.builtin.template:
+    src: collect-image-names.sh.j2
+    dest: "{{ server_monitoring_folder }}/collect-image-names.sh"
+    mode: "0750"
+    owner: "{{ server_monitoring_folder_owner }}"
+    group: "{{ server_monitoring_folder_group }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name: Create cronjob to collect image names
+  ansible.builtin.cron:
+    name: Collect Image Names
+    weekday: "{{ image_collector_cron_weekday }}"
+    minute: "{{ image_collector_cron_minute }}"
+    hour: "{{ image_collector_cron_hour }}"
+    user: "{{ image_collector_cron_user }}"
+    job: "{{ server_monitoring_folder }}/collect-image-names.sh"
+    cron_file: "{{ image_collector_cron_filename }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled  
+ 
+- name: Create Node Exporter textfile collector directory
+  file:
+    path: "{{ server_monitoring_node_exporter_textfile_directory }}"
+    state: directory
+    mode: "0770"
+    owner: "{{ server_monitoring_node_exporter_user_id }}"
+    group: "{{ server_monitoring_node_exporter_group_id }}"
+  when: server_monitoring_node_exporter_textfile_collector_enabled
+
+- name:  Allow kmsg access
+  ansible.posix.sysctl:
+    name: "kernel.dmesg_restrict"
+    value: "0"
+    state: "present"
+    reload: true
+    sysctl_set: true
+  when: server_monitoring_cadvisor_enabled and ansible_facts['lsb']['release'] >= "22.04"

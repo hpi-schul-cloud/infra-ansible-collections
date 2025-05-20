@@ -16,6 +16,7 @@ services:
 {% if server_monitoring_nginx_enabled %}
   nginx:
     image: {{ server_monitoring_nginx_image }}
+    read_only: true
     container_name: nginx
     restart: unless-stopped
     user: {{ server_monitoring_nginx_user_id }}:{{ server_monitoring_nginx_group_id }}
@@ -33,6 +34,8 @@ services:
 {% endfor %}
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    tmpfs:
+      - /tmp:rw,mode=777
     volumes:
       - {{ server_monitoring_nginx_logs_folder }}:/var/log/nginx
       - {{ server_monitoring_host_letsencrypt_folder }}:/etc/letsencrypt
@@ -53,6 +56,7 @@ services:
 
   node-exporter:
     image: {{ server_monitoring_node_exporter_image }}
+    read_only: true
     container_name: node-exporter
     restart: unless-stopped
     user: "{{ server_monitoring_node_exporter_user_id }}:{{ server_monitoring_node_exporter_group_id }}"
@@ -63,14 +67,24 @@ services:
 {% if server_monitoring_node_exporter_textfile_collector_enabled %}
       - "--collector.textfile.directory={{ server_monitoring_node_exporter_textfile_directory }}"
 {% endif %}
+{% if server_monitoring_node_exporter_systemd_collector_enabled %}
+      - "--collector.systemd"
+{% endif %}
 {% for command in server_monitoring_node_exporter_extra_commands %}
       - "{{ command }}"
 {% endfor %}
     pid: "host"
+{% if server_monitoring_node_exporter_create_apparmor_profile %}
+    security_opt:
+      - apparmor:{{ server_monitoring_node_exporter_apparmor_profile }}
+{% endif %}
     volumes:
       - /:/host:ro
 {% if server_monitoring_node_exporter_textfile_collector_enabled %}
       - {{ server_monitoring_node_exporter_textfile_directory }}:{{ server_monitoring_node_exporter_textfile_directory }}
+{% endif %}
+{% if server_monitoring_node_exporter_systemd_collector_enabled %}
+      - /run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket:ro
 {% endif %}
 {% if server_monitoring_node_exporter_healthcheck is defined %}
     healthcheck:
@@ -83,21 +97,31 @@ services:
 {% if server_monitoring_cadvisor_enabled %}
   cadvisor:
     image: {{ server_monitoring_cadvisor_image }}
+    read_only: true
     container_name: cadvisor
     restart: unless-stopped
-    user: "{{ server_monitoring_cadvisor_user_id }}:{{ server_monitoring_cadvisor_group_id }}"
+    user: "{{ server_monitoring_cadvisor_user_id }}:{{ docker_group_id }}"
 {% if server_monitoring_cadvisor_expose_port %}
     ports:
       - "{{ server_monitoring_cadvisor_private_port }}:8080"
 {% endif %}
-    privileged: true
+    privileged: {{ server_monitoring_cadvisor_privileged }}
+    command:
+      - "--store_container_labels=false"
+      - "--docker_only=true"
+      - "--disable_root_cgroup_stats=false"
+      - "--enable_load_reader=false"
+      - "--v=1"
+      - "--disable_metrics=app,cpu,cpuLoad,disk,diskIO,memory,network,oom_event,percpu,perf_event,referenced_memory"
+      - "--disable_root_cgroup_stats=false"     
     devices:
       - /dev/kmsg
     volumes:
+      - /etc/machine-id:/etc/machine-id:ro
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
+#      - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     deploy:
       resources:

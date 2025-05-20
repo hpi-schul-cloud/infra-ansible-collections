@@ -1,0 +1,4 @@
+---
+kyverno_chart_version: "3.3.7"
+kyverno_namespace: "kyverno"
+kyverno_values: {}

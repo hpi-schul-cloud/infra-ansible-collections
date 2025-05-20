@@ -1,0 +1,47 @@
+---
+- name: Install fail2ban
+  apt:
+    name: ['fail2ban']
+    state: present
+
+- name: Enable fail2ban
+  service:
+    name: fail2ban
+    enabled: true
+    state: started
+
+- name: Create filter file for fail2ban general nginx errors
+  copy:
+    content: "{{ scalelite_fail2ban_filter_nginx }}"
+    dest: "{{ scalelite_fail2ban_filter_path_nginx }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban
+
+- name: Create filter file for fail2ban greenlight login errors
+  copy:
+    content: "{{ scalelite_fail2ban_filter_greenlight }}"
+    dest: "{{ scalelite_fail2ban_filter_path_greenlight }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban
+
+- name: Create nginx jail file for fail2ban
+  copy:
+    content: "{{ scalelite_fail2ban_jail_nginx }}"
+    dest: "{{ scalelite_fail2ban_jail_path_nginx }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban
+
+- name: Create greenlight jail file for fail2ban
+  copy:
+    content: "{{ scalelite_fail2ban_jail_greenlight }}"
+    dest: "{{ scalelite_fail2ban_jail_path_greenlight }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban
