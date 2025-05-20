@@ -10,62 +10,37 @@
     enabled: true
     state: started
 
-- name: Set ignoreip for fail2ban
-  lineinfile:
-    path: /etc/fail2ban/jail.conf
-    regexp: "^ignoreip"
-    line: "ignoreip = 127.0.0.1/8"
-  notify: Restart Fail2ban
-
 - name: Create filter file for fail2ban general nginx errors
   copy:
-    content: |
-      [Definition]
-      failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d).+$
-      ignoreregex =
-    dest: /etc/fail2ban/filter.d/nginx-errors.conf
+    content: "{{ scalelite_fail2ban_filter_nginx }}"
+    dest: "{{ scalelite_fail2ban_filter_path_nginx }}"
     owner: root
     group: root
     mode: "0644"
   notify: Restart Fail2ban
 
-- name: Create filter file for fail2ban, greenlight login errors
+- name: Create filter file for fail2ban greenlight login errors
   copy:
-    content: |
-      [Definition]
-      failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d) .*\/greenlight\/signin" ".*"$
-      ignoreregex =
-    dest: /etc/fail2ban/filter.d/greenlight-signin-errors.conf
+    content: "{{ scalelite_fail2ban_filter_greenlight }}"
+    dest: "{{ scalelite_fail2ban_filter_path_greenlight }}"
     owner: root
     group: root
     mode: "0644"
   notify: Restart Fail2ban
 
-- name: Create jail file for fail2ban
+- name: Create nginx jail file for fail2ban
   copy:
-    content: |
-      [nginx-http-auth]
-      enabled = true
-      port = {{ scalelite_nginx_metrics_endpoints | map(attribute='public_port') | join(",") }}
-      logpath = {{ scalelite_nginx_logs_folder }}/*.log
-      maxretry = 3
-      bantime = 3600
-      [nginx-errors]
-      enabled    = true
-      port       = http,https
-      filter     = nginx-errors
-      logpath    = {{ scalelite_nginx_logs_folder }}/*.log
-      maxretry   = 100
-      bantime    = 3600
-      findtime   = 600
-      [greenlight-signin-errors]
-      enabled    = true
-      port       = http,https
-      filter     = greenlight-signin-errors
-      logpath    = {{ scalelite_nginx_logs_folder }}/*.log
-      maxretry   = 5
-      bantime    = 3600
-    dest: /etc/fail2ban/jail.d/jail.local
+    content: "{{ scalelite_fail2ban_jail_nginx }}"
+    dest: "{{ scalelite_fail2ban_jail_path_nginx }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart Fail2ban
+
+- name: Create greenlight jail file for fail2ban
+  copy:
+    content: "{{ scalelite_fail2ban_jail_greenlight }}"
+    dest: "{{ scalelite_fail2ban_jail_path_greenlight }}"
     owner: root
     group: root
     mode: "0644"
