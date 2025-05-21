@@ -1,4 +1,38 @@
 # Setup Cloudprober
+
+# Create OnePassword Item to store required info
+- name: Loki Data
+  set_fact:
+    loki_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='loki',vault=vault, field='password', credentials=op_credentials) }}"
+    loki_user: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='loki',vault=vault, field='username', credentials=op_credentials) }}"
+  when: cloudprober_fetch_from_loki
+  tags: cloudprober
+
+- name: Vmagent Data
+  set_fact:
+    vmagent_password: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='victoriametrics',vault=vault, field='password', credentials=op_credentials) }}"
+    vmagent_user: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='victoriametrics',vault=vault, field='username', credentials=op_credentials) }}"
+  when: cloudprober_fetch_from_loki
+  tags: cloudprober
+
+- name: Create cloudprober 1Password item
+  dbildungscloud.onepwd.item:
+    vault: "{{ vault }}"
+    category: "password"
+    name: "cloudprober"
+    state: present
+    credentials: "{{ op_credentials }}"
+    session_shorthand: ansible-run
+    fields:
+      - name: loki_secret
+        type: password
+        value: "{{ (loki_user, loki_password) | join(':') | b64encode }}"
+      - name: vmagent_secret
+        type: password
+        value: "{{ (vmagent_user , vmagent_password) | join(':') | b64encode }}"
+  when: cloudprober_fetch_from_loki        
+  tags: cloudprober        
+
 # Create Namespace
 - name: Create monitoring namespace
   kubernetes.core.k8s:
