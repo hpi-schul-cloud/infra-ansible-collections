@@ -30,6 +30,7 @@
       - name: vmagent_secret
         type: password
         value: "{{ (vmagent_user , vmagent_password) | join(':') | b64encode }}"
+  when: cloudprober_fetch_from_loki        
   tags: cloudprober        
 
 # Create Namespace
