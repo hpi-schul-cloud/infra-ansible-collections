@@ -7,6 +7,22 @@
   check_mode: false
   changed_when: false
 
+- name: Create kube-system Image pull secret token
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: "{{ image_pull_secrets_name }}"
+        namespace: kube-system
+      data:
+        .dockerconfigjson: "{{ image_pull_token_secret }}"
+
 # See https://docs.ansible.com/ansible/latest/collections/kubernetes/core/helm_module.html
 - name: Install Fluentbit (Loki)
   kubernetes.core.helm:
