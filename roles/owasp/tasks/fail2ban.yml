@@ -14,7 +14,7 @@
   copy:
     content: |
       [Definition]
-      failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d).+$
+      failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d) .+$
       ignoreregex =
     dest: /etc/fail2ban/filter.d/nginx-errors.conf
     owner: root

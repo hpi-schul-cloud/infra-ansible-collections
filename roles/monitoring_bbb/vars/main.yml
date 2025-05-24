@@ -27,7 +27,7 @@ bbb_prometheus_scalelite_relabel_configs:
   - source_labels: [__address__]
     target_label: instance
     regex: "([^:]+)(:[0-9]+)?"
-    replacement: "${1}"
+    replacement: "management.${1}"
   # Add the tenant label
   - target_label: tenant
     replacement: "{{ tenant }}"
