@@ -23,10 +23,10 @@ scalelite_certbot_terraform_version: 1.5.4
 scalelite_certbot_resources:
   reservations:
     cpus: '0.1'
-    memory: 10M
+    memory: 50M
   limits:
     cpus: '0.3'
-    memory: 70M
+    memory: 200M
 # scalelite_letsencrypt_email:
 
 
