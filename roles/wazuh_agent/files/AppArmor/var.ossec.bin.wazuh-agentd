@@ -34,7 +34,7 @@
   /var/ossec/var/run/wazuh-agentd.state wr,
   /var/ossec/queue/alerts/execq wr,
 
-  /var/ossec/queue/rids/005 wr,
+  /var/ossec/queue/rids/* wr,
   /var/ossec/queue/rids/sender_counter wr,
 
   /var/ossec/var/run/wazuh-agentd-@{pid}.pid wr,
