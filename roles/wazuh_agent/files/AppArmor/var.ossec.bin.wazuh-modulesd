@@ -70,8 +70,6 @@
   
   /sys/module/ipv6/parameters/disable r,
 
-  /proc/sys/kernel/ostype r,
-
   /var/ossec/var/run/wazuh-modulesd-@{pid}.pid wr,
   /var/ossec/bin/wazuh-modulesd mr,
 
@@ -86,7 +84,9 @@
   /proc/*/environ r,
   /proc/*/mountinfo r,
   /proc/@{pid}/net/** r,
+
   /proc/sys/kernel/osrelease r,
+  /proc/sys/kernel/ostype r,
 
   /dev/random r,
   /dev/null r,  
@@ -99,9 +99,9 @@
   capability dac_read_search,
   capability dac_override,
   capability chown,
-  capability chown,
   capability sys_ptrace,
   ptrace (r), 
+
   signal (send) set=(kill, term),
 
   /usr/bin/findmnt rUx,
