@@ -1,0 +1,72 @@
+---
+- name: Install Duply
+  apt:
+    pkg:
+      - duply
+      - python3-boto3
+      - gettext
+      - librsync-dev
+    update_cache: true
+
+- name: Install correct Duplicity version
+  pip:
+    name:
+      - duplicity==0.8.23
+
+- name: Create backup script
+  ansible.builtin.template:
+    src: PrivacyIdea-backup.sh.j2
+    dest: /root/PrivacyIdea-backup.sh
+    mode: "0700"
+
+- name: Create restore script
+  ansible.builtin.template:
+    src: PrivacyIdea-restore.sh.j2
+    dest: /root/PrivacyIdea-restore.sh
+    mode: "0700"
+
+- name: Create backup cronjob
+  copy:
+    content: |
+      0 1 * * * root /root/PrivacyIdea-backup.sh > /var/log/backup.log 2>&1 
+    dest: /etc/cron.d/privacyidea-backup
+    mode: "0600"
+  when: stage == "prod" or stage == "staging"
+
+- name: Create Duply folder
+  file:
+    path: /etc/duply/default
+    state: directory
+    mode: "0700"
+
+- name: Create GPG public keys
+  copy: 
+    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='backup.gpg.keys.' + item + '.public', vault=vault) }}"
+    dest: "/etc/duply/default/gpgkey.{{ item }}.pub"
+    mode: "0400"
+  loop: "{{ backup_gpg_key_names }}"
+  diff: false
+
+- name: Create GPG private keys
+  copy:  
+    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='backup.gpg.keys.' + item + '.secret', vault=vault) }}"
+    dest: "/etc/duply/default/gpgkey.{{ item }}.asc"
+    mode: "0400"
+  loop: "{{ backup_gpg_key_names }}"
+  diff: false
+
+- name: Create Duply config
+  ansible.builtin.template:
+    src: PrivacyIdea-duplyconf.j2
+    dest: /etc/duply/default/conf
+    mode: "0600"
+  diff: false
+
+- name: Create Duply exclude
+  copy:
+    content: |
+      + /backup
+      - **
+    dest: /etc/duply/default/exclude
+    mode: "0600"
+  diff: false

@@ -1,0 +1,12 @@
+---
+- name: Determine internal IP
+  set_fact:
+    internal_ip: "{{ ansible_all_ipv4_addresses | select('match', '10\\..*') | first }}"
+
+- name: Figure out network device of private network
+  set_fact:
+    private_interface: "{{ hostvars[inventory_hostname]['ansible_' + item]['device'] }}"
+  when:
+    - hostvars[inventory_hostname]['ansible_' + item].ipv4 is defined
+    - hostvars[inventory_hostname]['ansible_' + item]['ipv4']['address'] == hostvars[inventory_hostname].internal_ip
+  with_items: "{{ ansible_interfaces }}"

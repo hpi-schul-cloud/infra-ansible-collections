@@ -1,0 +1,54 @@
+---
+- name: Create ansible groups for the proxy clusters
+  changed_when: false
+  group_by:
+    key: "{{ galera_cluster_name }}_{{ project }}_{{ stage }}_{{ privacyidea_variant }}"
+
+- name: Check number of Nodes
+  assert:
+    that:
+      - groups[galera_cluster_nodes_group] | length >= 2
+    fail_msg: "Cluster Must use at least 3 nodes"
+
+- name: Show cluster group members
+  debug:
+    msg: "Group '{{ galera_cluster_nodes_group }}' has {{ groups[galera_cluster_nodes_group] | length }} members: {{ groups[galera_cluster_nodes_group] }}"
+
+- name: Secure and setup Galera Cluster
+  vars:
+    mariadb_mysql_root_password: "{{ privacyidea_mariadb_root_password }}"
+    galera_cluster_bind_address: "{{ internal_ip }}"
+    galera_cluster_bind_interface: "{{ private_interface }}"
+    galera_mysql_first_node: "{{ (groups[galera_cluster_nodes_group] | sort)[1] }}"
+  include_role:
+    name: mrlesmithjr.ansible-mariadb-galera-cluster
+
+- name: Set wsrep_auto_increment_control in galera-privacyidea.cnf
+  copy:
+    content: |
+      [galera]
+      wsrep_auto_increment_control=off
+    dest: /etc/mysql/conf.d/galera-privacyidea.cnf
+    owner: root
+    group: root
+    mode: 0644
+  register: wsrep_config_changed
+
+- name: Ensure 'wsrep_auto_increment_control' is not set in galera.cnf
+  lineinfile:
+    path: /etc/mysql/conf.d/galera.cnf
+    regexp: '^wsrep_auto_increment_control\s*=.*$'
+    state: absent
+  register: wsrep_remove_changed
+
+- name: Restart mariadb service
+  service:
+    name: mariadb
+    state: restarted
+  when: wsrep_config_changed.changed or wsrep_remove_changed.changed
+
+- name: Cleanup pacemaker resources
+  command: /usr/sbin/pcs resource cleanup
+  delegate_to: "{{ groups['privacyidea_test'] | first }}"
+  ignore_errors: true
+  when: wsrep_config_changed.changed or wsrep_remove_changed.changed
