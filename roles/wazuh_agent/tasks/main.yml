@@ -56,7 +56,7 @@
   with_items: "{{ apparmor_update.results | select('changed') | list }}"
   loop_control:
     label: "{{ item.item }}"    
-  when: wazuh_agent_apparmor_active
+  when:  not ansible_check_mode and wazuh_agent_apparmor_active
 
 - name: Enable and start wazuh service
   service:
