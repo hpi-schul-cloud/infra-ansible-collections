@@ -1,0 +1,30 @@
+# Last Modified: Mon May 26 08:43:09 2025
+#include <tunables/global>
+
+/var/ossec/bin/wazuh-execd {
+#/var/ossec/bin/wazuh-execd flags=(audit){
+#/var/ossec/bin/wazuh-execd flags=(complain){
+  #include <abstractions/base>
+
+  /var/ossec/logs/ossec.log wr,
+  /var/ossec/var/run/wazuh-execd-@{pid}.pid wr,
+  /var/ossec/etc/ossec.conf r,
+  /var/ossec/etc/local_internal_options.conf r,
+  /var/ossec/etc/internal_options.conf r,
+
+  /var/ossec/queue/sockets/com wr,
+  /var/ossec/queue/alerts/execq wr,
+
+  /etc/nsswitch.conf r,
+  /etc/group r,
+  
+  /var/ossec/bin/wazuh-execd mr,
+  /var/ossec/lib/lib*so* mr,
+
+
+  capability dac_read_search,
+  capability dac_override,
+  capability setuid,
+  capability setgid,
+
+}
