@@ -21,6 +21,6 @@
   when: scalelite_migrate_volumes_non_root | default(false)
 
 - name: Docker-compose up
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ scalelite_docker_compose_folder }}"
     remove_orphans: true

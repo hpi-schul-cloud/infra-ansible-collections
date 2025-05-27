@@ -1,0 +1,66 @@
+---
+- name: Create folders
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+  loop:
+    - path: "{{ owasp_docker_volumes_folder }}/nginx"
+      mode: "0750"
+      owner: "{{ owasp_nginx_user_id }}"
+      group: "{{ owasp_nginx_group_id }}"
+    - path: "{{ owasp_docker_volumes_folder }}/nginx/server"
+      mode: "0750"
+      owner: "{{ owasp_nginx_user_id }}"
+      group: "{{ owasp_nginx_group_id }}"
+    - path: "{{ owasp_docker_volumes_folder }}/owasp"
+      mode: "0750"
+      owner: "{{ owasp_nginx_user_id }}"
+      group: "{{ owasp_nginx_group_id }}"
+    - path: "{{ owasp_nginx_logs_folder }}"
+      mode: "0750"
+      owner: "{{ owasp_nginx_user_id }}"
+      group: "{{ owasp_nginx_group_id }}"
+    - path: "{{ owasp_docker_compose_folder }}"
+      mode: "0700"
+    - path: "{{ owasp_nginx_logs_folder }}"
+      mode: "0750"
+      owner: "{{ owasp_nginx_user_id }}"
+      group: "{{ owasp_nginx_group_id }}"
+    - path: "{{ owasp_node_exporter_textfile_directory }}"
+      mode: "0700"
+      owner: "{{ owasp_node_exporter_user_id }}"
+      group: "{{ owasp_node_exporter_group_id }}"      
+      
+- name: Nginx
+  include_tasks: nginx.yml
+
+- name: Generate Self Signed Certificates
+  vars: 
+    server_name: "{{ item.name }}"
+  include_tasks: self_signed.yml
+  loop: "{{ owasp_nginx_https_endpoints }}"
+
+- name: Generate Self Signed Certificates for extra instances
+  vars: 
+    server_name: "{{ item.hostname }}"
+  include_tasks: self_signed.yml
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+
+- name: Docker-Compose
+  include_tasks: docker_compose.yml
+
+- name: Fail2ban
+  include_tasks: fail2ban.yml
+
+- name: Logrotate
+  include_tasks: logrotate.yml
+
+- name: Copy useful aliases
+  copy:
+    src: scripts/modsec-alias
+    dest: "/root/.bash_aliases"
+    mode: "0640"
+    
