@@ -1,11 +1,14 @@
 ---
-galera_cluster_nodes_group: ""
 galera_cluster_name: ""
-privacyidea_variant: ""
+galera_cluster_nodes_group: ""
 project: ""
 stage: ""
+privacyidea_variant: ""
 
 privacyidea_mariadb_root_password: ""
-privacyidea_mariadb_name: ""
 privacyidea_mariadb_user: ""
+privacyidea_mariadb_name: ""
 privacyidea_db_user_password: ""
+
+private_network_cidr: 24
+

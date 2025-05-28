@@ -1,5 +1,4 @@
 ---
-- include_tasks: gather_facts.yml
 - include_tasks: galera_setup.yml
 - include_tasks: firewall.yml
 - include_tasks: system.yml

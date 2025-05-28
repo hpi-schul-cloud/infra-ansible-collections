@@ -16,6 +16,8 @@
   loop:
     - { protocol: tcp, port: 22,   name: "SSH" }
     - { protocol: tcp, port: 443,  name: "HTTPS" }
+    - { protocol: tcp, port: 9100, name: "Node exporter"}
+    - { protocol: tcp, port: 9101, name: "Custom exporter"}
     - { protocol: tcp, port: 9664, name: "ha_cluster_exporter" }
     - { protocol: tcp, port: 2224, name: "Pacemaker pcsd", from: "{{ internal_ip }}/{{ private_network_cidr }}"}
     - { protocol: tcp, port: 3121, name: "Pacemaker_remoted", from: "{{ internal_ip }}/{{ private_network_cidr }}"}

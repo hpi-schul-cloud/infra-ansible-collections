@@ -1,4 +1,5 @@
 ---
+
 - name: Cleanup pacemaker resources
   command:
     cmd: /usr/sbin/pcs resource cleanup

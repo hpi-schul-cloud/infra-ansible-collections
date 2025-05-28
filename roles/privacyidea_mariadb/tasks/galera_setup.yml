@@ -1,11 +1,23 @@
 ---
+- name: Determine internal IP
+  set_fact:
+    internal_ip: "{{ ansible_all_ipv4_addresses | select('match', '10\\..*') | first }}"
+
+- name: Figure out network device of private network
+  set_fact:
+    private_interface: "{{ hostvars[inventory_hostname]['ansible_' + item]['device'] }}"
+  when:
+    - hostvars[inventory_hostname]['ansible_' + item].ipv4 is defined
+    - hostvars[inventory_hostname]['ansible_' + item]['ipv4']['address'] == hostvars[inventory_hostname].internal_ip
+  with_items: "{{ ansible_interfaces }}"
+
 - name: Create ansible groups for the proxy clusters
   changed_when: false
   group_by:
     key: "{{ galera_cluster_name }}_{{ project }}_{{ stage }}_{{ privacyidea_variant }}"
 
-- name: Check number of Nodes
-  assert:
+- name: Check number of Nodes 
+  ansible.builtin.assert:
     that:
       - groups[galera_cluster_nodes_group] | length >= 2
     fail_msg: "Cluster Must use at least 3 nodes"
@@ -16,15 +28,15 @@
 
 - name: Secure and setup Galera Cluster
   vars:
-    mariadb_mysql_root_password: "{{ privacyidea_mariadb_root_password }}"
+    mariadb_mysql_root_password:  "{{ privacyidea_mariadb_root_password }}"
     galera_cluster_bind_address: "{{ internal_ip }}"
     galera_cluster_bind_interface: "{{ private_interface }}"
-    galera_mysql_first_node: "{{ (groups[galera_cluster_nodes_group] | sort)[1] }}"
+    galera_mysql_first_node: "{{ (groups[galera_cluster_nodes_group]|sort)[1]}}"
   include_role:
-    name: mrlesmithjr.ansible-mariadb-galera-cluster
+    name: mrlesmithjr.ansible-mariadb-galera-cluster 
 
 - name: Set wsrep_auto_increment_control in galera-privacyidea.cnf
-  copy:
+  ansible.builtin.copy:
     content: |
       [galera]
       wsrep_auto_increment_control=off
@@ -35,7 +47,7 @@
   register: wsrep_config_changed
 
 - name: Ensure 'wsrep_auto_increment_control' is not set in galera.cnf
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/mysql/conf.d/galera.cnf
     regexp: '^wsrep_auto_increment_control\s*=.*$'
     state: absent
@@ -45,10 +57,16 @@
   service:
     name: mariadb
     state: restarted
+  become: true
   when: wsrep_config_changed.changed or wsrep_remove_changed.changed
 
-- name: Cleanup pacemaker resources
-  command: /usr/sbin/pcs resource cleanup
-  delegate_to: "{{ groups['privacyidea_test'] | first }}"
+- name: Cleanup pacemaker resources after restarting database
+  ansible.builtin.command: /usr/sbin/pcs resource cleanup
+  become: true
   ignore_errors: true
+  delegate_to: "{{ groups['privacyidea_test'] | first }}"
   when: wsrep_config_changed.changed or wsrep_remove_changed.changed
+
+
+
+
