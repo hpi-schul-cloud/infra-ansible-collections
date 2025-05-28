@@ -27,6 +27,7 @@
   /run/snapd.socket wr,
 
   /home/ r,
+  /boot/ r,
   /usr/lib/ r,
   /usr/lib64/ r,
   /usr/local/lib/ r,
@@ -40,6 +41,8 @@
   /etc/shadow r,
   /etc/group r,
   /boot/grub/grub.cfg r,
+  /etc/default/grub r,
+  /etc/default/apport r,
   /etc/motd r,
   /etc/issue r,
   /etc/issue.net r,
@@ -123,5 +126,10 @@
   /usr/bin/ps rUx, 
   /usr/bin/apt rUx, 
   /usr/bin/sudo rUx,
-  
+  /usr/bin/find rUx,
+  /usr/sbin/xtables-nft-multi rUx,
+  /usr/sbin/nft rUx,
+  /usr/sbin/sysctl rUx,
+  /usr/bin/passwd rUx,
+
 }
