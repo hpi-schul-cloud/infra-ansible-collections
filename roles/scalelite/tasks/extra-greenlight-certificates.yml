@@ -10,7 +10,7 @@
   register: privkey
 
 - name: "{{ instance.name }} - Docker-compose up"
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ scalelite_docker_compose_folder }}"
   register: certificates_compose_output
 
