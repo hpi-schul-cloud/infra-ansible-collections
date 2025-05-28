@@ -22,12 +22,7 @@
   /run/systemd/resolve/stub-resolv.conf r,
   /etc/hosts r,
 
-  /var/ossec/etc/ossec.conf r,
-  /var/ossec/etc/shared/agent.conf r,
-  /var/ossec/etc/local_internal_options.conf r,
-  /var/ossec/etc/internal_options.conf r,
-  /var/ossec/etc/shared/merged.mg r,
-  /var/ossec/etc/client.keys r,
+  /var/ossec/etc/** r,
 
   /var/ossec/logs/ossec.log wr,
   /var/ossec/var/run/wazuh-agentd.state.temp wr,
