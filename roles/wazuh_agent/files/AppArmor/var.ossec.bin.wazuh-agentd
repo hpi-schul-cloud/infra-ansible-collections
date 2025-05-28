@@ -22,7 +22,7 @@
   /run/systemd/resolve/stub-resolv.conf r,
   /etc/hosts r,
 
-  /var/ossec/etc/** r,
+  /var/ossec/etc/** rw,  
 
   /var/ossec/logs/ossec.log wr,
   /var/ossec/var/run/wazuh-agentd.state.temp wr,
