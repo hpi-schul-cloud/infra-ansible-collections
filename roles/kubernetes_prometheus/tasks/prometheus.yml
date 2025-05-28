@@ -11,7 +11,7 @@
       kind: PersistentVolumeClaim
       metadata:
         name: "{{ item.name }}-grafana"
-        namespace: monitoring
+        namespace: "{{ item.namespace }}"
       spec:
         accessModes:
           - ReadWriteOnce

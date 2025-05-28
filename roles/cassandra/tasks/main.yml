@@ -21,6 +21,22 @@
       spec:
         itemPath: "vaults/{{ vault }}/items/cassandra"
 
+- name: Create Image pull secret token
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: "{{ image_pull_secrets_name }}"
+        namespace: monitoring
+      data:
+        .dockerconfigjson: "{{ image_pull_token_secret }}"
+
 - name: Create Cassandra PVCs
   kubernetes.core.k8s:
     state: present
