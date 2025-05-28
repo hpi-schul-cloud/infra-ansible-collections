@@ -27,6 +27,7 @@
   /run/snapd.socket wr,
 
   /home/ r,
+  /boot/ r,
   /boot/** r,
   /usr/lib/ r,
   /usr/lib64/ r,
