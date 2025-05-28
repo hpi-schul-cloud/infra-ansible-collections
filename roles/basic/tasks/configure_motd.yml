@@ -1,7 +1,7 @@
 ---
-    - name: set motd
-      copy:
-        src: motd
+    - name: set dynamic motd
+      template:
+        src: motd.j2
         dest: /etc/motd
         owner: root
         group: root
