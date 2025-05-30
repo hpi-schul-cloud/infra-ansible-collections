@@ -9,7 +9,8 @@
   /var/ossec/etc/local_internal_options.conf r,
   /var/ossec/etc/internal_options.conf r,
   /var/ossec/etc/ossec.conf r,
-  /var/ossec/etc/shared/agent.conf r,
+  /var/ossec/etc/shared/** r,
+
   /var/ossec/queue/sockets/com wr,
   /var/ossec/queue/alerts/execq wr,
   /var/ossec/logs/ossec.log wr,

@@ -27,4 +27,6 @@
   capability setuid,
   capability setgid,
 
+/var/ossec/active-response/bin/restart.sh rUx,  
+
 }
