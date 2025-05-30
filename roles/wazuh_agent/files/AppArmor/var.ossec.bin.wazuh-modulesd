@@ -18,10 +18,8 @@
   /var/ossec/queue/syscollector/db/local.db wrk,
   /var/ossec/queue/alerts/cfgaq wr,
 
-  /var/ossec/queue/sockets/.agent_info r,
-  /var/ossec/queue/sockets/wmodules wr,
-  /var/ossec/queue/sockets/control wr,
-  /var/ossec/queue/sockets/upgrade wr,
+  /var/ossec/queue/sockets/** wr,
+
   /var/ossec/queue/syscollector/db/local.db-journal wr,
   /var/lib/dpkg/status r,
   /run/snapd.socket wr,

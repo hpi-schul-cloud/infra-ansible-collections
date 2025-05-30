@@ -40,10 +40,7 @@
   /var/ossec/var/run/wazuh-logcollector.state wr,
   /var/ossec/queue/sockets/logcollector wr,
   /var/ossec/queue/logcollector/file_status.json wr,
-  /var/ossec/queue/sockets/control wr,
-  /var/ossec/queue/sockets/queue wr,
-  /var/ossec/queue/sockets/.agent_info r,
-
+  /var/ossec/queue/sockets/** wr,
 
   /etc/nsswitch.conf r,
   /etc/passwd r,
