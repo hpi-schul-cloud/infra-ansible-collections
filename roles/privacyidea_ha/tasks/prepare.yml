@@ -1,5 +1,4 @@
 ---
-
 - name: Cleanup pacemaker resources
   command:
     cmd: /usr/sbin/pcs resource cleanup
@@ -17,7 +16,7 @@
 
 - name: Get Encfile from vault
   ansible.builtin.copy:
-    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea', field='enckey', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
+    content: "{{ enckey }}"
     dest: /etc/privacyidea/enckey
     mode: 0600
     group: www-data

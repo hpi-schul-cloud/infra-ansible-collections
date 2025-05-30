@@ -85,3 +85,4 @@ privacyidea_mariadb_root_password: ""
 
 exporter_username: "exporter"
 exporter_password: ""
+privacyidea_enckey_file: ""

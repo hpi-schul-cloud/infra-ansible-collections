@@ -11,5 +11,5 @@ privacyidea_mariadb_name: ""
 privacyidea_db_user_password: ""
 
 private_network_cidr: 24
-privacyidea_inventory_host: ""
+privacyidea_inventory_hostname: ""
 
