@@ -55,3 +55,18 @@
     state: restarted
   become: true
   when: wsrep_config_changed.changed or wsrep_remove_changed.changed
+
+- name: Check if /usr/sbin/pcs exists
+  ansible.builtin.stat:
+    path: /usr/sbin/pcs
+  register: pcs_stat
+  ignore_errors: true
+
+- name: Cleanup pacemaker resources after restarting database
+  ansible.builtin.command: /usr/sbin/pcs resource cleanup
+  become: true
+  ignore_errors: true
+  when:
+    - pcs_stat.stat.exists
+    - wsrep_config_changed.changed or wsrep_remove_changed.changed
+  delegate_to: "{{ groups[privacyidea_inventory_hostname] | first }}"
