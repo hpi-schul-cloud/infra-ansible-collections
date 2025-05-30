@@ -60,6 +60,7 @@
   ansible.builtin.stat:
     path: /usr/sbin/pcs
   register: pcs_stat
+  delegate_to: "{{ groups[privacyidea_inventory_hostname] | first }}"
   ignore_errors: true
 
 - name: Cleanup pacemaker resources after restarting database
