@@ -55,10 +55,3 @@
     state: restarted
   become: true
   when: wsrep_config_changed.changed or wsrep_remove_changed.changed
-
-# - name: Cleanup pacemaker resources after restarting database
-#   ansible.builtin.command: /usr/sbin/pcs resource cleanup
-#   become: true
-#   ignore_errors: true
-#   delegate_to: "{{ groups['privacyidea_inventory_hostname'] | first }}"
-#   when: wsrep_config_changed.changed or wsrep_remove_changed.changed
