@@ -8,13 +8,8 @@
   #include <abstractions/base>
 
   /var/ossec/bin/wazuh-agentd mr,
-  /var/ossec/queue/sockets/queue wr,
-  /var/ossec/queue/sockets/modules r,
-  /var/ossec/queue/sockets/wmodules wr,
-  /var/ossec/queue/sockets/.agent_info wr,
-  /var/ossec/queue/sockets/.wait wr,
-  /var/ossec/queue/sockets/syscheck wr,
-
+  /var/ossec/queue/** wr,
+  
   /etc/host.conf r,
   /etc/nsswitch.conf r,
   /etc/passwd r,
@@ -22,16 +17,13 @@
   /run/systemd/resolve/stub-resolv.conf r,
   /etc/hosts r,
 
-  /var/ossec/etc/** rw,  
+  /var/ossec/etc/** wr,
 
   /var/ossec/logs/ossec.log wr,
   /var/ossec/var/run/wazuh-agentd.state.temp wr,
   /var/ossec/var/run/wazuh-agentd.state wr,
-  /var/ossec/queue/alerts/execq wr,
-
-  /var/ossec/queue/rids/* wr,
-  /var/ossec/queue/rids/sender_counter wr,
-
+  /var/ossec/etc/shared/* r,
+  
   /var/ossec/var/run/wazuh-agentd-@{pid}.pid wr,
 
   /var/ossec/lib/lib*so* mr,
