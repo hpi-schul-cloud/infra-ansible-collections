@@ -16,7 +16,7 @@
 
 - name: Get Encfile from vault
   ansible.builtin.copy:
-    content: "{{ enckey }}"
+    content: "{{ privacyidea_enckey_file }}"
     dest: /etc/privacyidea/enckey
     mode: 0600
     group: www-data
