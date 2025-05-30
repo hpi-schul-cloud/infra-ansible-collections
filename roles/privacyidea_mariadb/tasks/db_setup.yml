@@ -31,5 +31,5 @@
     priv: '{{ privacyidea_mariadb_name }}.*:ALL' 
     state: present
     host: "{{ hostvars[item].ansible_all_ipv4_addresses | select('match', '10\\..*') | first }}"
-  with_inventory_hostnames: "{{ privacyidea_inventory_host }}:&{{ stage }}:&{{ project }} {% if project != 'spshinfra' %}:!infra{% endif %}"                                                   
+  with_inventory_hostnames: "{{ privacyidea_inventory_hostname }}:&{{ stage }}:&{{ project }} {% if project != 'spshinfra' %}:!infra{% endif %}"                                                   
   when: is_main_node
