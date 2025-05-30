@@ -35,6 +35,30 @@
     name: wazuh-agent
     selection: "{{ 'hold' if wazuh_agent_hold_package else 'install' }}"
 
+- name: Copy AppArmor profiles for Wazuh
+  ansible.builtin.copy:
+    src: "AppArmor/{{ item }}"
+    dest: "/etc/apparmor.d/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  loop: 
+    - var.ossec.bin.wazuh-agentd  
+    - var.ossec.bin.wazuh-logcollector  
+    - var.ossec.bin.wazuh-syscheckd
+    - var.ossec.bin.wazuh-execd   
+    - var.ossec.bin.wazuh-modulesd
+  register: apparmor_update
+  when: wazuh_agent_apparmor_active
+
+- name: Reread Apparmor Profile
+  command: /usr/sbin/apparmor_parser -r {{ item.dest }}
+  with_items: "{{ apparmor_update.results | select('changed') | list }}"
+  loop_control:
+    label: "{{ item.item }}"
+  notify: Restart wazuh
+  when:  not ansible_check_mode and wazuh_agent_apparmor_active
+
 - name: Enable and start wazuh service
   service:
     name: wazuh-agent
