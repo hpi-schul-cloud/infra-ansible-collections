@@ -1,9 +1,9 @@
 ---
-# - name: Cleanup pacemaker resources
-#   command:
-#     cmd: /usr/sbin/pcs resource cleanup
-#   become: true
-#   ignore_errors: true
+- name: Cleanup pacemaker resources
+  command:
+    cmd: /usr/sbin/pcs resource cleanup
+  become: true
+  ignore_errors: true
 
 - name: Create directory /etc/privacyidea if it does not exist
   ansible.builtin.file:
