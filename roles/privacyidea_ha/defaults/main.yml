@@ -83,6 +83,4 @@ ha_cluster_exporter_version: 1.3.3
 subscription_auth_public_key: ""
 privacyidea_mariadb_root_password: ""
 
-exporter_username: "exporter"
-exporter_password: ""
-privacyidea_enckey_file: ""
+privacyidea_galera_mysql_node_exporter: ""

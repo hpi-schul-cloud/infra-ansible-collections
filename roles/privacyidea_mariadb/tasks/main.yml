@@ -3,4 +3,6 @@
 - include_tasks: security.yml
 - include_tasks: system.yml
 - include_tasks: db_setup.yml
+- import_tasks: node-exporter.yml
+- import_tasks: mysql-exporter.yml
 - include_tasks: privacyidea-backup-restore.yml

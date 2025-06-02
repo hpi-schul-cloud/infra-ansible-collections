@@ -1,7 +1,7 @@
 ---
 galera_cluster_name: ""
 galera_cluster_nodes_group: ""
-project: ""
+project: "spsh"
 stage: ""
 privacyidea_variant: ""
 
@@ -12,3 +12,6 @@ privacyidea_db_user_password: ""
 
 private_network_cidr: 24
 privacyidea_inventory_hostname: ""
+
+privacyidea_galera_mysql_node_exporter: ""
+mariadb_password: ""

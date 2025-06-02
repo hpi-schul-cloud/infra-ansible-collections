@@ -19,7 +19,7 @@
 - name: Check number of Nodes 
   ansible.builtin.assert:
     that:
-      - groups[galera_cluster_nodes_group] | length >= 2
+      - groups[galera_cluster_nodes_group] | length == 2
     fail_msg: "Cluster Must use at least 3 nodes"
 
 - name: Secure and setup Galera Cluster
