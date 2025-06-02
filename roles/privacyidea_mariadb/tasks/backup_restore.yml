@@ -1,4 +1,0 @@
----
-- name: Create PrivacyIDEA Backup/Restore
-  include_tasks: privacyidea-backup-restore.yml
-  when: is_last_node

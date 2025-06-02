@@ -7,23 +7,27 @@
       - gettext
       - librsync-dev
     update_cache: true
+  when: is_last_node
 
 - name: Install correct Duplicity version
   pip:
     name:
       - duplicity==0.8.23
+  when: is_last_node
 
 - name: Create backup script
   ansible.builtin.template:
     src: PrivacyIdea-backup.sh.j2
     dest: /root/PrivacyIdea-backup.sh
     mode: "0700"
+  when: is_last_node
 
 - name: Create restore script
   ansible.builtin.template:
     src: PrivacyIdea-restore.sh.j2
     dest: /root/PrivacyIdea-restore.sh
     mode: "0700"
+  when: is_last_node
 
 - name: Create backup cronjob
   copy:
@@ -31,13 +35,15 @@
       0 1 * * * root /root/PrivacyIdea-backup.sh > /var/log/backup.log 2>&1 
     dest: /etc/cron.d/privacyidea-backup
     mode: "0600"
-  when: stage == "prod" or stage == "staging"
+  when: stage == "prod" or stage == "staging" and is_last_node
+
 
 - name: Create Duply folder
   file:
     path: /etc/duply/default
     state: directory
     mode: "0700"
+  when: is_last_node
 
 - name: Create GPG public keys
   copy: 
@@ -46,6 +52,7 @@
     mode: "0400"
   loop: "{{ backup_gpg_key_names }}"
   diff: false
+  when: is_last_node
 
 - name: Create GPG private keys
   copy:  
@@ -54,6 +61,7 @@
     mode: "0400"
   loop: "{{ backup_gpg_key_names }}"
   diff: false
+  when: is_last_node  
 
 - name: Create Duply config
   ansible.builtin.template:
@@ -61,6 +69,7 @@
     dest: /etc/duply/default/conf
     mode: "0600"
   diff: false
+  when: is_last_node
 
 - name: Create Duply exclude
   copy:
@@ -70,3 +79,4 @@
     dest: /etc/duply/default/exclude
     mode: "0600"
   diff: false
+  when: is_last_node

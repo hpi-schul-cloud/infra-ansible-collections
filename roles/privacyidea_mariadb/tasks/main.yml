@@ -3,4 +3,4 @@
 - include_tasks: security.yml
 - include_tasks: system.yml
 - include_tasks: db_setup.yml
-- include_tasks: backup_restore.yml
+- include_tasks: privacyidea-backup-restore.yml
