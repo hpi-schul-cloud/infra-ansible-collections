@@ -18,7 +18,7 @@
   mysql_user:
     name: "{{ privacyidea_maria_db_user }}"
     password: "{{ privacyidea_maria_db_user_password }}"
-    login_user: root
+    login_user: "{{ login_username }}"
     login_password: "{{ privacyidea_db_root_password }}"
     login_unix_socket: "/var/run/mysqld/mysqld.sock"
     priv: '{{ privacyidea_maria_db_name }}.*:ALL'

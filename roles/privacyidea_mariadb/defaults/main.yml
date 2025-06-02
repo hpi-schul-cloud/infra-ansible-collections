@@ -15,3 +15,4 @@ privacyidea_inventory_hostname: ""
 
 privacyidea_galera_mysql_node_exporter: ""
 mariadb_password: ""
+login_username: root
