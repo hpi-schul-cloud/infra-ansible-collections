@@ -8,9 +8,9 @@
 
 - name: Configure MariaDB for PrivacyIDEA
   mysql_db:
-    name: "{{ privacyidea_maria_db_name }}"
+    name: "{{ privacyidea_mariadb_name }}"
     login_user: "{{ login_username }}"
-    login_password: "{{ privacyidea_db_root_password }}"
+    login_password: "{{ privacyidea_mariadb_root_password }}"
     login_unix_socket: "/var/run/mysqld/mysqld.sock"
     state: present
   when: is_main_node
