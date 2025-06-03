@@ -56,10 +56,20 @@
       mode: "0700"
       owner: "{{ scalelite_user_id }}"
       group: "{{ scalelite_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/greenlight"
+      mode: "0555"
     - path: "{{ scalelite_nginx_logs_folder }}"
       mode: "0750"
       owner: "{{ scalelite_nginx_user_id }}"
       group: "{{ scalelite_certbot_group_id }}"
+    - path: "{{ scalelite_docker_volumes_folder }}/clamav"
+      mode: "0700"
+      owner: "{{ scalelite_clamav_user_id }}"
+      group: "{{ scalelite_clamav_group_id }}"
+    - path: "{{ scalelite_clamav_log_path }}"
+      mode: "0700"
+      owner: "{{ scalelite_clamav_user_id }}"
+      group: "{{ scalelite_clamav_group_id }}"
 
 - name: Create Postgres DBs and permissions script
   vars:
@@ -122,6 +132,22 @@
   loop_control: 
     label: "{{ item.name }}"
   notify: Restart Redis Instaces
+
+- name: Create ClamAV config for greenlight
+  copy:
+    dest: "{{ scalelite_docker_volumes_folder }}/greenlight/clamd.conf"
+    mode: '0444'
+    content: |
+      TCPSocket 3310
+      TCPAddr clamav
+  when: scalelite_clamav_enabled
+
+- name: Create ClamAV config for ClamAV (reduce memory usage)
+  copy:
+    dest: "{{ scalelite_docker_volumes_folder }}/clamav/clamd.conf"
+    mode: '0444'
+    content: "ConcurrentDatabaseReload no"
+  when: scalelite_clamav_enabled
 
 - name: Certbot
   include_tasks: certbot.yml

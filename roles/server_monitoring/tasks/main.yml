@@ -149,14 +149,6 @@
     state: absent
   when: delete_old_nginx_logrotate
 
-# once executed this task can get deleted
-- name: Change ownership of files in /var/log/nginx
-  file:
-    path: /var/log/nginx
-    recurse: yes
-    owner: systemd-resolve
-    group: ssl-certs
-
 - name: Copy docker-compose.yml
   template:
     src: docker-compose.yml.j2

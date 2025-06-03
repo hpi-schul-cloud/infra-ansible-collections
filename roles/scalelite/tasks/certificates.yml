@@ -16,6 +16,15 @@
     file: initial-certificates.yml
   when: not fullchain.stat.exists or not privkey.stat.exists
 
+- name: Ensure the correct permissions
+  file:
+    state: directory
+    recurse: true
+    path: "{{ scalelite_letsencrypt_folder }}"
+    owner: "{{ scalelite_certbot_user_id }}"
+    group: "{{ scalelite_certbot_group_id }}"
+    mode: "u=rwX,g=rX,o="
+
 - name: Extra Greenlight instances certificates
   include_tasks:
     file: extra-greenlight-certificates.yml
