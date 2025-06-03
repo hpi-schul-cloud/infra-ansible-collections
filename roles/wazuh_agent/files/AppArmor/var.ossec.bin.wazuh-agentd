@@ -19,10 +19,10 @@
 
   /var/ossec/etc/** wr,
 
-  /var/ossec/logs/ossec.log wr,
+  /var/ossec/logs/** wr,
   /var/ossec/var/run/wazuh-agentd.state.temp wr,
   /var/ossec/var/run/wazuh-agentd.state wr,
-  /var/ossec/etc/shared/* r,
+  /var/ossec/etc/** wr,
   
   /var/ossec/var/run/wazuh-agentd-@{pid}.pid wr,
 
