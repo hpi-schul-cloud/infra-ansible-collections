@@ -22,7 +22,7 @@
 
 - name: Grant Global Privileges to mysqld_exporter User
   mysql_query:
-    login_user: root
+    login_user: "{{ login_username }}"
     login_password: "{{ privacyidea_mariadb_root_password }}"
     login_unix_socket: "/var/run/mysqld/mysqld.sock"
     query: "GRANT PROCESS, SUPER, SLAVE MONITOR ON *.* TO 'exporter'@'localhost';"
