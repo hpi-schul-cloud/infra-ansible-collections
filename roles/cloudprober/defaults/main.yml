@@ -3,7 +3,22 @@
 cloudprober_namespace: "monitoring"
 
 # Name of secret used for Cloudprober access tokens and other "secret" stuff
+# Here all secrets required in the environment should be defined.
+# E.g. with the config below we will need:
+# env "loki_secret"   so loki_secret should be contained
+# same for vmagent_secret
 cloudprober_secret: "cloudprobersecrets"
+
+#default is to fetch data from 1Password to access Loki and vmagent
+cloudprober_fetch_from_loki: true
+
+#default credentials for loki used when not fetched from 1Password
+loki_password: "" 
+loki_user: ""
+
+#default credentials for vmagent used when not fetched from 1Password
+vmagent_password: ""
+vmagent_user: ""
 
 # Name of config map where cloudprober will look for configuration content must be valid: See https://cloudprober.org/docs/config/latest/overview/
 cloudprober_configmap: "cloudprober"
@@ -329,3 +344,18 @@ cloudprober_values:
       timeout_msec: 1000   # 1s
     }
     {% endif %}
+    {% if API_Hosts is defined  %}
+    probe {
+      name: "API"
+      type: HTTP
+      targets {
+        host_names: "{{ API_Hosts }}"
+      }
+      http_probe {
+        protocol: HTTPS
+      }
+      interval_msec: 15000  # 15s
+      timeout_msec: 1000   # 1s
+    }
+    {% endif %}
+
