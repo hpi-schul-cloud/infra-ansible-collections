@@ -1,0 +1,37 @@
+# Last Modified: Mon May 26 08:42:
+# 15 2025
+#include <tunables/global>
+
+#/var/ossec/bin/wazuh-agentd flags=(audit){
+#/var/ossec/bin/wazuh-agentd flags=(complain){
+/var/ossec/bin/wazuh-agentd {
+  #include <abstractions/base>
+
+  /var/ossec/bin/wazuh-agentd mr,
+  /var/ossec/queue/** wr,
+  
+  /etc/host.conf r,
+  /etc/nsswitch.conf r,
+  /etc/passwd r,
+  /etc/group r,
+  /run/systemd/resolve/stub-resolv.conf r,
+  /etc/hosts r,
+
+  /var/ossec/etc/** wr,
+
+  /var/ossec/logs/** wr,
+  /var/ossec/var/run/wazuh-agentd.state.temp wr,
+  /var/ossec/var/run/wazuh-agentd.state wr,
+  /var/ossec/etc/** wr,
+  
+  /var/ossec/var/run/wazuh-agentd-@{pid}.pid wr,
+
+  /var/ossec/lib/lib*so* mr,
+
+  network,
+
+  capability dac_read_search,
+  capability setgid,
+  capability setuid,
+
+}

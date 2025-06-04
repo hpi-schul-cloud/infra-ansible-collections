@@ -1,0 +1,134 @@
+# Last Modified: Mon May 26 08:43:38 2025
+#include <tunables/global>
+
+/var/ossec/bin/wazuh-modulesd flags=(attach_disconnected){
+#/var/ossec/bin/wazuh-modulesd flags=(audit) {
+#/var/ossec/bin/wazuh-modulesd flags=(complain){
+  #include <abstractions/base>
+
+  /var/ossec/queue/sockets/queue wr,
+  /var/ossec/etc/local_internal_options.conf r,
+  /var/ossec/etc/internal_options.conf r,
+  /var/ossec/etc/ossec.conf r,
+  /var/ossec/etc/shared/agent.conf r,
+  /var/ossec/queue/syscollector/norm_config.json r,
+  /var/ossec/ruleset/sca/ r,
+  /var/ossec/logs/ossec.log wr,
+  /var/ossec/ruleset/sca/cis_ubuntu2?-04.yml r,
+  /var/ossec/queue/syscollector/db/local.db wrk,
+  /var/ossec/queue/alerts/cfgaq wr,
+
+  /var/ossec/queue/sockets/** wr,
+
+  /var/ossec/queue/syscollector/db/local.db-journal wr,
+  /var/lib/dpkg/status r,
+  /run/snapd.socket wr,
+
+  /home/ r,
+  /boot/ r,
+  /boot/** r,
+  /usr/lib/ r,
+  /usr/lib64/ r,
+  /usr/local/lib/ r,
+  /usr/local/lib/python3.*/ r,
+  /usr/local/lib/python3.*/** r,
+  /usr/local/lib/python2.7/ r,
+  /usr/local/lib/python2.7/** r,
+  
+  /etc/nsswitch.conf r,
+  /etc/passwd r,
+  /etc/shadow r,
+  /etc/group r,
+  /boot/grub/grub.cfg r,
+  /etc/default/grub r,
+  /etc/default/apport r,
+  /etc/motd r,
+  /etc/issue r,
+  /etc/issue.net r,
+  /etc/systemd/ r,
+  /etc/ssh/sshd_config r,
+  /etc/ssh/sshd_config.d/ r,
+  /etc/sudoers r,
+  /etc/sudoers.d/ r,
+  /etc/sudoers.d/* r,
+  /etc/pam.d/su r,
+  /etc/pam.d/common-password r,
+  /etc/pam.d/common-auth r,
+  /etc/pam.d/common-account r,
+  /etc/login.defs r,
+  /etc/shells r,
+  /etc/systemd/journald.conf r,
+  /etc/rsyslog.d/ r,
+  /etc/rsyslog.d/* r,
+  /etc/rsyslog.conf r,
+
+  /etc/audit/ r,
+  /etc/audit/auditd.conf r,
+  /etc/audit/rules.d/ r,
+  /etc/audit/rules.d/audit.rules r,
+
+  /etc/systemd/** r,
+  /etc/ssh/sshd_config.d/** r,
+  
+  /sys/module/ipv6/parameters/disable r,
+
+  /var/ossec/var/run/wazuh-modulesd-@{pid}.pid wr,
+  /var/ossec/bin/wazuh-modulesd mr,
+
+  /sys/devices/** r,
+  /proc/ r,
+  /proc/*/fd/ r,
+  /proc/*/fd/** r,
+  /proc/*/stat r,
+  /proc/*/sched r,
+  /proc/*/statm r,
+  /proc/*/cmdline r,
+  /proc/*/environ r,
+  /proc/*/mountinfo r,
+  /proc/@{pid}/net/** r,
+
+  /proc/sys/kernel/osrelease r,
+  /proc/sys/kernel/ostype r,
+
+  /dev/random r,
+  /dev/null r,  
+  /usr/lib/udev/hwdb.bin r,
+
+  /var/ossec/lib/lib*so* mr,
+
+  network raw,
+
+  capability dac_read_search,
+  capability dac_override,
+  capability chown,
+  capability sys_ptrace,
+  ptrace (r), 
+
+  signal (send) set=(kill, term),
+
+  /usr/bin/findmnt rUx,
+  /usr/bin/dpkg rUx,
+  /usr/bin/systemctl rUx,
+  /usr/bin/stat rUx,
+  /usr/bin/dpkg-query rUx,
+  /usr/sbin/aa-status rUx,
+  /usr/bin/ss rUx,  
+  /usr/sbin/ufw rUx,
+  /usr/sbin/xtables-legacy-multi rUx,
+  /usr/bin/dash rUx,
+  /usr/sbin/sshd rUx,
+  /usr/sbin/useradd rUx,
+  /var/ossec/wodles/docker/DockerListener rUx,
+  /usr/sbin/augenrules rUx,
+  /usr/bin/ls rUx,
+  /usr/sbin/auditctl rUx,
+  /usr/bin/ps rUx, 
+  /usr/bin/apt rUx, 
+  /usr/bin/sudo rUx,
+  /usr/bin/find rUx,
+  /usr/sbin/xtables-nft-multi rUx,
+  /usr/sbin/nft rUx,
+  /usr/sbin/sysctl rUx,
+  /usr/bin/passwd rUx,
+
+}
