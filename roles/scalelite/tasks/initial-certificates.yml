@@ -10,11 +10,21 @@
 - name: Docker-compose up
   community.docker.docker_compose_v2:
     project_src: "{{ scalelite_docker_compose_folder }}"
+    state: restarted
+    services: scalelite-nginx
   register: certificates_compose_output
 
 - name: Make sure certbot is up
   community.docker.docker_container_info:
     name: certbot
+  until: "container_info.container.State.Health.Status == 'healthy'"
+  register: container_info
+  retries: 15
+  delay: 10
+
+- name: "Make sure nginx is up"
+  community.docker.docker_container_info:
+    name: scalelite-nginx
   until: "container_info.container.State.Health.Status == 'healthy'"
   register: container_info
   retries: 15
@@ -33,8 +43,7 @@
     command: certbot certonly --noninteractive --webroot -w /var/www/certbot -d {{ scalelite_host }} --expand --agree-tos --email {{ scalelite_letsencrypt_email }} --manual-public-ip-logging-ok {{ '--dry-run' if ansible_check_mode else '' }} --logs-dir /certbot/logs --work-dir /certbot/work
   # Certbot flag --dry-run is used in check mode
   check_mode: false
-  # This task will fail if docker-compose isn't up
-  when: certificates_compose_output.services["certbot"]["certbot"].state.running | default(false) and scalelite_host != scalelite_basedomain
+  when: scalelite_host != scalelite_basedomain
 
 - name: Extra Greenlight instances certificates
   include_tasks:

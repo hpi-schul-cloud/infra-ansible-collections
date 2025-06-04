@@ -58,6 +58,9 @@
       group: "{{ scalelite_group_id }}"
     - path: "{{ scalelite_docker_volumes_folder }}/greenlight"
       mode: "0555"
+    - path: "{{ scalelite_docker_volumes_folder }}/greenlight/main"
+      owner: "{{ scalelite_greenlight_user_id }}"
+      mode: "0700"
     - path: "{{ scalelite_nginx_logs_folder }}"
       mode: "0750"
       owner: "{{ scalelite_nginx_user_id }}"
@@ -82,6 +85,16 @@
     owner: "{{ scalelite_postgres_user_id }}"
     group: "{{ scalelite_postgres_group_id }}"
     mode: "0500"
+
+- name: Create greenlight storage folder for extra Greenlight instances
+  file:
+    state: directory
+    path: "{{ scalelite_docker_volumes_folder }}/greenlight/{{ item.name }}"
+    mode: "0700"
+    owner: "{{ scalelite_greenlight_user_id }}"
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control: 
+    label: "{{ item.name }}"
 
 - name: Create Redis data folders for extra Greenlight instances
   file:

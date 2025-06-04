@@ -292,8 +292,9 @@ services:
       - SMTP_STARTTLS_AUTO={{ scalelite_greenlight_smtp_auth | lower }}
       - SMTP_SENDER_EMAIL={{ scalelite_greenlight_smtp_sender }}
 {% endif %}
-{% if scalelite_clamav_enabled %}
     volumes:
+      - {{ scalelite_docker_volumes_folder }}/greenlight/main:/usr/src/app/storage:rw
+{% if scalelite_clamav_enabled %}
       - {{ scalelite_docker_volumes_folder }}/greenlight/clamd.conf:/etc/clamav/clamd.conf:r
 {% endif %}
     healthcheck:
@@ -358,8 +359,9 @@ services:
       - SMTP_STARTTLS_AUTO={{ scalelite_greenlight_smtp_starttls_auto | lower }}
       - SMTP_SENDER_EMAIL=greenlight@{{ instance.hostname }}
 {% endif %}
-{% if scalelite_clamav_enabled %}
     volumes:
+      - {{ scalelite_docker_volumes_folder }}/greenlight/{{ instance.name }}:/usr/src/app/storage:rw
+{% if scalelite_clamav_enabled %}
       - {{ scalelite_docker_volumes_folder }}/greenlight/clamd.conf:/etc/clamav/clamd.conf:r
 {% endif %}
     healthcheck:

@@ -1,20 +1,22 @@
 ---
-- name: Check for certificates fullchain
+- name: Check for certificates
+  vars:
+    domains:
+      - "{{ scalelite_basedomain }}"
+      - "{{ scalelite_host }}"
+      - "{{ scalelite_greenlight_extra_instances | map(attribute='hostname') | list }}"
+    files:
+      - fullchain.pem
+      - privkey.pem
   stat:
-    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_basedomain }}/fullchain.pem"
-  register: fullchain
-
-- name: Check for certificates privkey
-  stat:
-    path: "{{ scalelite_letsencrypt_folder }}/live/{{ scalelite_basedomain }}/privkey.pem"
-  register: privkey
-
-# TODO: Ggf. auch noch andere prüfen ?
+    path: "{{ scalelite_letsencrypt_folder }}/live/{{ item }}"
+  loop: "{{ domains | flatten | product(files) | map('join', '/') | list }}"
+  register: cert_files
 
 - name: Create Letsencrypt certificates
   import_tasks:
     file: initial-certificates.yml
-  when: not fullchain.stat.exists or not privkey.stat.exists
+  when: not (cert_files.results | map(attribute='stat.exists') is all)
 
 - name: Ensure the correct permissions
   file:
@@ -24,11 +26,3 @@
     owner: "{{ scalelite_certbot_user_id }}"
     group: "{{ scalelite_certbot_group_id }}"
     mode: "u=rwX,g=rX,o="
-
-- name: Extra Greenlight instances certificates
-  include_tasks:
-    file: extra-greenlight-certificates.yml
-  loop: "{{ scalelite_greenlight_extra_instances }}"
-  loop_control:
-    loop_var: instance
-    label: "{{ instance.name }}"
