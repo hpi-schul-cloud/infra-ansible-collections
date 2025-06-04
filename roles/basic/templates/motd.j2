@@ -2,10 +2,8 @@
   ʕ•ᴥ•ʔ Welcome to your VM!
 
   Hostname: {{ inventory_hostname }}
-  IP (v4): {{ ansible_default_ipv4.address }}
-  {% if ansible_default_ipv6 is defined and ansible_default_ipv6.address is defined %}
-  IP (v6): {{ ansible_default_ipv6.address }}
-  {% endif %}
+   IP (v4): {{ ansible_default_ipv4.address }}
+   IP (v6): {{ ansible_default_ipv6.address | default('not available', true) }}
   
-  Managed by Ansible <3
+  Managed by Ansible
 ╚════════════════════════════════════════════════════════════╝
