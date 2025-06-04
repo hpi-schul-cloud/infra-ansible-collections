@@ -1,9 +1,22 @@
 ---
-    - name: set dynamic motd
-      template:
-        src: motd.j2
-        dest: /etc/motd
-        owner: root
-        group: root
-        mode: 0644
-      notify: Restart sshd
+- name: set motd
+  template:
+    src: motd.j2
+    dest: /etc/motd
+    owner: root
+    group: root
+    mode: '0755'
+  notify: Restart sshd
+
+- name: Ensure pam_motd.so noupdate is present and uncommented in /etc/pam.d/sshd
+  lineinfile:
+    path: /etc/pam.d/sshd
+    regexp: '^#?\s*session\s+optional\s+pam_motd\.so\s+noupdate'
+    line: 'session    optional     pam_motd.so noupdate'
+    state: present
+
+- name: Ensure pam_motd.so motd=/run/motd.dynamic is commented out if present
+  replace:
+    path: /etc/pam.d/sshd
+    regexp: '^(\s*)session\s+optional\s+pam_motd\.so\s+motd=/run/motd\.dynamic'
+    replace: '#\1session    optional     pam_motd.so  motd=/run/motd.dynamic'
