@@ -90,7 +90,7 @@ services:
       - {{ scalelite_docker_volumes_folder }}/certbot/:/certbot
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
     tmpfs:
-      - /tmp:rw,mode=777
+      - /tmp:rw,exec,mode=777
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew --logs-dir /certbot/logs --work-dir /certbot/work; sleep 12h & wait $${!}; done;'"
     environment:
 {% if scalelite_aws_access_key_id is defined %}
@@ -145,9 +145,11 @@ services:
       - /tmp:rw,mode=777
       - /var/cache/nginx:rw,mode=777 
     volumes:
+{% if scalelite_modsec_enabled | bool %}
       - {{ scalelite_docker_volumes_folder }}/owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/opt/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
       - {{ scalelite_docker_volumes_folder }}/owasp/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/opt/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
       - {{ scalelite_modsec_logs_folder }}:/var/log/modsecurity
+{% endif %}
       - {{ scalelite_nginx_logs_folder }}:/var/log/nginx
       - {{ scalelite_letsencrypt_folder }}:/etc/letsencrypt
       - {{ scalelite_docker_volumes_folder }}/webroot:/var/www/certbot
@@ -157,7 +159,6 @@ services:
 {% if scalelite_greenlight_enabled | bool %}
       - {{ scalelite_docker_volumes_folder }}/nginx/scalelite/greenlight.nginx:/etc/nginx/http.d/scalelite/greenlight.nginx
 {% endif %}
-      - {{ scalelite_docker_volumes_folder }}/nginx/scalelite/acme-challenge.nginx:/etc/nginx/http.d/scalelite/acme-challenge.nginx
       - {{ scalelite_docker_volumes_folder }}/nginx/scalelite.conf:/etc/nginx/http.d/scalelite.conf
       - {{ scalelite_docker_volumes_folder }}/nginx/dhparam.pem:/etc/nginx/dhparam.pem
     depends_on:
@@ -204,7 +205,7 @@ services:
       - db
       - redis
     healthcheck:
-      test: curl -sS --connect-to {{ scalelite_hostname }}:80:localhost:3000 http://{{ scalelite_hostname }}/health_check | grep -c success > /dev/null
+      test: curl -sS --connect-to {{ scalelite_host }}:80:localhost:3000 http://{{ scalelite_host }}/health_check | grep -c success > /dev/null
       interval: 30s
       timeout: 10s
       retries: 5
@@ -268,7 +269,7 @@ services:
     container_name: greenlight
     restart: unless-stopped
     environment:
-      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_hostname }}/bigbluebutton
+      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_host }}/bigbluebutton
       - BIGBLUEBUTTON_SECRET=${GREENLIGHT_BBB_API_TOKEN}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - RELATIVE_URL_ROOT=/greenlight
@@ -276,6 +277,8 @@ services:
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
       - DATABASE_URL=postgres://greenlight-v3:${POSTGRES_GREENLIGHT_V3_PASSWORD}@db:5432/greenlight-v3
       - REDIS_URL=redis://${GREENLIGHT_REDIS_USER}:${GREENLIGHT_REDIS_SECRET}@redis-greenlight:6379
+      - CLAMAV_SCANNING={{ scalelite_clamav_enabled }}
+      - CLAMAV_DAEMONIZE=true
 {% if scalelite_greenlight_phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ scalelite_greenlight_phone_number }}
 {% endif %}
@@ -288,6 +291,11 @@ services:
       - SMTP_AUTH={{ scalelite_greenlight_smtp_auth }}
       - SMTP_STARTTLS_AUTO={{ scalelite_greenlight_smtp_auth | lower }}
       - SMTP_SENDER_EMAIL={{ scalelite_greenlight_smtp_sender }}
+{% endif %}
+    volumes:
+      - {{ scalelite_docker_volumes_folder }}/greenlight/main:/usr/src/app/storage:rw
+{% if scalelite_clamav_enabled %}
+      - {{ scalelite_docker_volumes_folder }}/greenlight/clamd.conf:/etc/clamav/clamd.conf:r
 {% endif %}
     healthcheck:
       test: ["CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/3000"]
@@ -328,7 +336,7 @@ services:
     container_name: greenlight-{{ instance.name }}
     restart: unless-stopped
     environment:
-      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_hostname }}/bigbluebutton
+      - BIGBLUEBUTTON_ENDPOINT=https://{{ scalelite_host }}/bigbluebutton
       - BIGBLUEBUTTON_SECRET=${GREENLIGHT_BBB_API_TOKEN}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - RELATIVE_URL_ROOT=/greenlight
@@ -336,6 +344,8 @@ services:
       - LOG_LEVEL={{ scalelite_greenlight_log_level }}
       - DATABASE_URL=postgres://greenlight-{{ instance.name }}-v3:${POSTGRES_GREENLIGHT_{{ instance.name|upper }}_V3_PASSWORD}@db:5432/greenlight-{{ instance.name }}-v3
       - REDIS_URL=redis://${GREENLIGHT_REDIS_{{ instance.name | upper }}_USER}:${GREENLIGHT_REDIS_{{ instance.name | upper }}_SECRET}@redis-{{ instance.name}}:6379
+      - CLAMAV_SCANNING={{ scalelite_clamav_enabled }}
+      - CLAMAV_DAEMONIZE=true
 {% if instance.phone_number is defined %}
       - VOICE_BRIDGE_PHONE_NUMBER={{ instance.phone_number }}
 {% endif %}
@@ -348,6 +358,11 @@ services:
       - SMTP_AUTH={{ scalelite_greenlight_smtp_auth }}
       - SMTP_STARTTLS_AUTO={{ scalelite_greenlight_smtp_starttls_auto | lower }}
       - SMTP_SENDER_EMAIL=greenlight@{{ instance.hostname }}
+{% endif %}
+    volumes:
+      - {{ scalelite_docker_volumes_folder }}/greenlight/{{ instance.name }}:/usr/src/app/storage:rw
+{% if scalelite_clamav_enabled %}
+      - {{ scalelite_docker_volumes_folder }}/greenlight/clamd.conf:/etc/clamav/clamd.conf:r
 {% endif %}
     healthcheck:
       test: ["CMD", "bash", "-c", "echo -n '' > /dev/tcp/127.0.0.1/3000"]
@@ -378,3 +393,22 @@ services:
     deploy:
       resources:
         {{ scalelite_postgres_exporter_resources | to_nice_yaml | indent(8) }}
+
+{% if scalelite_clamav_enabled %}
+  clamav-scan:
+    image: {{ scalelite_clamav_image }}
+    container_name: clamav
+    read_only: true
+    restart: unless-stopped
+    user: {{ scalelite_clamav_user_id }}:{{ scalelite_clamav_group_id }}
+    volumes:
+      - {{ scalelite_clamav_log_path }}:/var/log/clamav:rw
+      - {{ scalelite_docker_volumes_folder }}/clamav:/var/lib/clamav:rw
+      - {{ scalelite_docker_volumes_folder }}/clamav/clamd.conf:/etc/clamav/clamd.conf:r
+    tmpfs:
+      - /tmp:rw,mode=777
+    entrypoint: "/init-unprivileged"
+    deploy:
+      resources:
+        {{ scalelite_clamav_resources | to_nice_yaml | indent(8) }}
+{% endif %}

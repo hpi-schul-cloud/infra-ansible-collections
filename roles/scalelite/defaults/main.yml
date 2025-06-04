@@ -23,10 +23,10 @@ scalelite_certbot_terraform_version: 1.5.4
 scalelite_certbot_resources:
   reservations:
     cpus: '0.1'
-    memory: 10M
+    memory: 50M
   limits:
     cpus: '0.3'
-    memory: 70M
+    memory: 200M
 # scalelite_letsencrypt_email:
 
 
@@ -34,6 +34,7 @@ scalelite_certbot_resources:
 scalelite_greenlight_enabled: false
 scalelite_greenlight_image_repository: greenlight
 scalelite_greenlight_image_tag: v3.1.0.2
+scalelite_greenlight_user_id: 999
 scalelite_greenlight_extra_instances: []
 scalelite_greenlight_default_locale: de
 scalelite_greenlight_log_level: warn
@@ -96,14 +97,17 @@ scalelite_redis_user: "worker"
 scalelite_greenlight_redis_user: "greenlight"
 # scalelite_greenlight_redis_password: "2_SomeSecretPassword_!"  
 
-
-scalelite_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
+scalelite_nginx_image: >-
+  {{
+    'owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103' 
+    if scalelite_modsec_enabled else 
+    'nginxinc/nginx-unprivileged:1.24-alpine3.18' 
+  }}
 scalelite_nginx_user_id: 101
 scalelite_nginx_group_id: "{{ scalelite_certbot_group_id }}"
 scalelite_nginx_logs_folder: /var/log/nginx
 scalelite_nginx_dhparam_size: 4096
 scalelite_nginx_worker_processes: auto
-scalelite_nginx_ssl: true
 scalelite_nginx_resources:
   reservations:
     cpus: '0.1'
@@ -126,6 +130,7 @@ scalelite_nginx_metrics_endpoints:
     private_port: 9187
 
 scalelite_docker_net: "192.168.64.0/24"
+scalelite_modsec_enabled: true
 scalelite_modsec_mode: DetectionOnly  # Either DetectionOnly or '"ON"'
 # Paranoia level for ModSecurity 
 scalelite_modsec_level: 1
@@ -179,7 +184,8 @@ scalelite_api_resources:
     cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
     memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
 
-scalelite_hostname: "{{ inventory_hostname }}"
+scalelite_host: "{{ inventory_hostname }}"
+scalelite_basedomain: "{{ inventory_hostname }}"
 scalelite_letsencrypt_folder: /etc/letsencrypt
 scalelite_terraform_workspace: prod
 scalelite_bbb_dialin_enabled: false
@@ -205,7 +211,7 @@ scalelite_node_exporter_group_id: 65534
 
 scalelite_fail2ban_filter_nginx: |
   [Definition]
-  failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d).+$
+  failregex = ^<HOST> - - \[.*\] ".*" (4\d\d|5\d\d) .+$
   ignoreregex =
 scalelite_fail2ban_filter_path_nginx: /etc/fail2ban/filter.d/nginx-errors.conf
 scalelite_fail2ban_filter_greenlight: |
@@ -238,3 +244,17 @@ scalelite_fail2ban_jail_greenlight: |
   maxretry   = 5
   bantime    = 3600
 scalelite_fail2ban_jail_path_greenlight: /etc/fail2ban/jail.d/greenlight_jail.local
+
+scalelite_clamav_enabled: true
+scalelite_clamav_user_id: 2330
+scalelite_clamav_group_id: 2330
+scalelite_clamav_image: "clamav/clamav"
+scalelite_clamav_log_path: "/var/log/clamav"
+scalelite_clamav_db_path: "/var/lib/clamav"
+scalelite_clamav_resources:
+  limits:
+    cpus: '0.5'
+    memory: '1.5G'
+  reservations:
+    cpus: '0.05'
+    memory: '1G'

@@ -1,12 +1,4 @@
 ---
-- name: Copy Nginx acme-challenge config
-  copy:
-    src: nginx/scalelite/acme-challenge.nginx
-    dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite/acme-challenge.nginx"
-    mode: "0600"
-    owner: "{{ scalelite_nginx_user_id }}"
-    group: "{{ scalelite_nginx_group_id }}"
-
 - name: Copy Nginx config (templates)
   template:
     src: "{{ item }}.j2"
@@ -28,6 +20,7 @@
   loop:
     - owasp/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
     - owasp/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf
+  when: scalelite_modsec_enabled
   notify: Restart OWASP
 
 - name: Creating Nginx DH parameters next, this can take some time
@@ -67,13 +60,8 @@
 
 - name: Install python-passlib
   package:
-    name: python-passlib
+    name: python3-passlib
     state: present
-
-- name: Pip install passlib
-  pip:
-    executable: /usr/bin/pip3
-    name: passlib
 
 - name: Copy basic auth user
   community.general.htpasswd:
@@ -87,7 +75,7 @@
 - name: Create nginx log directory
   file:
     path: "{{ scalelite_nginx_logs_folder }}"
-    mode: "0750"
+    mode: u=rwX,g=rX,o=
     state: directory
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_certbot_group_id }}"
@@ -100,6 +88,7 @@
     mode: "0750"
     owner: "{{ scalelite_nginx_user_id }}"
     group: "{{ scalelite_certbot_group_id }}"
+  when: scalelite_modsec_enabled
  
-- name: Set nginx log file permissions
+- name: Ensure nginx log file permissions
   command: find {{ scalelite_nginx_logs_folder }} -type f -exec chmod 0640 {} \;
