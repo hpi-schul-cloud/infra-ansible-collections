@@ -1,0 +1,6 @@
+---
+- name: Restart wazuh
+  ansible.builtin.service:
+    name: wazuh-agent
+    state: restarted    
+  ignore_errors: "{{ ansible_check_mode }}"
