@@ -1,0 +1,61 @@
+---
+owasp_docker_volumes_folder: /var/docker_volumes
+owasp_docker_compose_folder: /etc/owasp
+owasp_docker_compose_owner: root
+owasp_docker_compose_group: root
+
+owasp_nginx_image: owasp/modsecurity-crs:4.12.0-nginx-alpine-202503230103
+# Image requires 101 or /etc/nginx must be remounted
+owasp_nginx_user_id: 101
+# Group must have read access to certs
+owasp_nginx_group_id: 1800
+# Owner and group of the auto-generated self-signed certificates
+owasp_certificates_user: 0
+owasp_certificates_group: "{{ owasp_group_id }}"
+owasp_nginx_logs_folder: /var/log/nginx
+owasp_nginx_dhparam_size: 4096
+owasp_nginx_worker_processes: auto
+owasp_nginx_ssl: true
+owasp_nginx_resources:
+  reservations:
+    cpus: '0.1'
+    memory: 15M
+  limits:
+    cpus: "{{ ansible_facts['processor_vcpus'] / 2 }}"
+    memory: "{{ ansible_facts['memory_mb']['real']['total'] / 2 }}M"
+# Our local endpoints should be different from our proxied endpoints
+owasp_nginx_metrics_endpoints:
+  - name: node-exporter
+    public_port: 9101
+    private_port: 9099
+  - name: cadvisor
+    public_port: 9301
+    private_port: 9299
+
+owasp_docker_net: "192.168.64.0/24"
+owasp_modsec_mode: DetectionOnly  # Either DetectionOnly or '"ON"'
+# Paranoia level for ModSecurity 
+owasp_modsec_level: 1
+# Debug Level for logging
+owasp_modsec_debuglevel: 1 
+owasp_modsec_reportlevel: 1
+owasp_modsec_logs_folder: /var/log/modsec
+owasp_modsec_outbound_anomaly: 4
+owasp_modsec_inbound_anomaly: 5
+owasp_modsec_before: |
+  # Dummy comment
+
+owasp_modsec_after: |
+  SecAction "id:980145,phase:5,pass,t:none,log,noauditlog, msg:'Incoming and Outgoing Score: %{TX.ANOMALY_SCORE} %{TX.OUTBOUND_ANOMALY_SCORE}'"
+  SecRuleRemoveById 980130
+
+owasp_hostname: "{{ inventory_hostname }}"
+owasp_letsencrypt_folder: /etc/letsencrypt
+owasp_metrics_basic_auth_username: metrics-user
+# owasp_metrics_basic_auth_password:
+owasp_security_txt: |
+  # Security.txt content
+
+owasp_node_exporter_textfile_directory: /node-exporter-textfiles/
+owasp_node_exporter_user_id: 65534
+owasp_node_exporter_group_id: 65534

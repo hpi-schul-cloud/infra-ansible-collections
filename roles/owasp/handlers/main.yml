@@ -1,0 +1,12 @@
+---
+- name: Restart Fail2ban
+  systemd:
+    name: fail2ban
+    state: restarted
+
+- name: Restart OWASP
+  community.docker.docker_compose_v2:
+    project_src: "{{ owasp_docker_compose_folder }}"
+    services: 
+      - "owasp-nginx"
+    state: restarted
