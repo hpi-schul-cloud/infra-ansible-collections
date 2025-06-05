@@ -1,6 +1,6 @@
 
 ---
-- name: Copy privacyidea config file 'pi.cfg'
+- name: Copy privacyidea config file 'pi.cfg' 223
   template:
     src: pi.cfg.j2
     dest: /etc/privacyidea/pi.cfg
@@ -8,18 +8,27 @@
 
 # Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, 
 # ensuring that the audit log entries are tamper-proof and can be verified.
+
+#- name: Get Encfile from vault
+#  ansible.builtin.copy:
+#    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea', field='enckey', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
+#    dest: /etc/privacyidea/enckey
+#    mode: 0600
+#    group: www-data
+#    owner: www-data
+        
 - name: Get private audit key from vault
   ansible.builtin.copy:
-    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea_audit_priv_key', field='private.pem', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
-    dest: /etc/privacyidea/
+    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea_audit, field='privatekey', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
+    dest: /etc/privacyidea/private.pem
     mode: 0600
     group: www-data
     owner: www-data
 
 - name: Get public audit key from vault
   ansible.builtin.copy:
-    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea_audit_public_key', field='public.pem', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
-    dest: /etc/privacyidea/
+    content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea_audit', field='publickey', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
+    dest: /etc/privacyidea/public.pem
     mode: 0600
     group: www-data
     owner: www-data
