@@ -1,0 +1,17 @@
+╔════════════════════════════════════════════════════════════╗
+  ʕ•ᴥ•ʔ Welcome to your VM!
+
+  Hostname: {{ inventory_hostname }}
+{% if ansible_default_ipv4.address is defined %}
+  IP (v4): {{ ansible_default_ipv4.address }}
+{% else %}
+   No default-IPv4 address found.
+{% endif %}
+{% if ansible_default_ipv6.address is defined %}
+  IP (v6): {{ ansible_default_ipv6.address }}
+{% else %}
+  IP (v6): no default-IPv6 address found
+{% endif %}
+
+  Managed by Ansible
+╚════════════════════════════════════════════════════════════╝
