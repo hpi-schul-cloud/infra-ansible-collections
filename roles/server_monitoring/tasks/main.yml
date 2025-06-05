@@ -18,18 +18,6 @@
 - ansible.builtin.set_fact:
      docker_group_id: "{{ getent_group['docker'][1] }}"    
 
-- name: Install python3-pip
-  apt:
-    name: python3-pip
-  when: server_monitoring_install_docker
-
-- name: Install Python Docker SDK
-  pip:
-    name:
-      - docker=={{ server_monitoring_docker_python_sdk_version }}
-      - docker-compose=={{ server_monitoring_docker_compose_version }}
-  when: server_monitoring_install_docker
-
 - name: Create monitoring folder
   file:
     state: directory
@@ -153,9 +141,10 @@
 - name: Change ownership of files in /var/log/nginx
   file:
     path: /var/log/nginx
-    recurse: yes
-    owner: systemd-resolve
-    group: ssl-certs
+    recurse: true
+    owner: "{{ server_monitoring_nginx_user_id }}"
+    group: "{{ server_monitoring_nginx_group_id }}"
+  when: server_monitoring_nginx_enabled
 
 - name: Copy docker-compose.yml
   template:
@@ -166,7 +155,7 @@
     group: "{{ server_monitoring_folder_group }}"
 
 - name: Docker-compose up
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ server_monitoring_folder }}"
     remove_orphans: true
 
