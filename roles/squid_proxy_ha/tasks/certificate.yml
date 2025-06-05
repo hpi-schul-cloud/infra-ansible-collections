@@ -7,7 +7,7 @@
     path: /certificate_sync_key
   when: is_main_node
 
-- name: Get public key 
+- name: Get public key
   ansible.builtin.fetch:
     src: /certificate_sync_key.pub
     dest: "/tmp/certificate_sync_key_{{ unique_ha_group }}.pub"
@@ -24,7 +24,7 @@
     user: "{{ certificate_sync_user }}"
     key: "{{ lookup('file', '/tmp/certificate_sync_key_' ~ unique_ha_group ~ '.pub') }}"
     comment: "{{ certificate_sync_user }}"
-    exclusive: False
+    exclusive: false
   when: not is_main_node
 
 - name: Create directory for synced certificates
@@ -38,10 +38,10 @@
 - name: Ensure nodes are present in known_hosts file
   known_hosts:
     name: "{{ hostvars[item]['ansible_hostname'] }}"
-    key: "{{ lookup('pipe', 'ssh-keyscan ' ~ hostvars[item]['inventory_hostname']) }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan ' ~ hostvars[item]['inventory_hostname']) | string }}"
     hash_host: true
   when: is_main_node
-  loop: "{{ groups[unique_ha_group] }}" 
+  loop: "{{ groups[unique_ha_group] | map('string') }}"
 
 - name: Temporarily allow port 80 for letsencrypt
   ufw:
@@ -52,13 +52,13 @@
 - name: Get main and node specific certificate from Let's Encrypt
   tags: certbot
   vars:
-    certbot_create_if_missing: True
+    certbot_create_if_missing: true
     certbot_create_method: standalone
     certbot_admin_email: "{{ lets_encrypt_email }}"
     certbot_auto_renew_hour: "4"
     certbot_auto_renew_user: "root"
-    certbot_create_standalone_stop_services: False
-    certbot_certs: 
+    certbot_create_standalone_stop_services: false
+    certbot_certs:
       - domains: ["{{ main_domain }}"]
       - domains: ["{{ inventory_hostname }}"]
   import_role:
@@ -68,13 +68,13 @@
 - name: Get node specific certificate from Let's Encrypt
   tags: certbot
   vars:
-    certbot_create_if_missing: True
+    certbot_create_if_missing: true
     certbot_create_method: standalone
     certbot_admin_email: "{{ lets_encrypt_email }}"
     certbot_auto_renew_hour: "4"
     certbot_auto_renew_user: "root"
-    certbot_create_standalone_stop_services: False
-    certbot_certs: 
+    certbot_create_standalone_stop_services: false
+    certbot_certs:
       - domains: ["{{ inventory_hostname }}"]
   import_role:
     name: geerlingguy.certbot
@@ -83,7 +83,7 @@
 - name: Create pre hook to open the port before certificate renewal
   copy:
     dest: /etc/letsencrypt/renewal-hooks/pre/open_port
-    mode: 0700
+    mode: "0700"
     content: |
       #!/bin/bash
       ufw allow 80/tcp
@@ -91,7 +91,7 @@
 - name: Create post hook to close the port and sync them
   copy:
     dest: /etc/letsencrypt/renewal-hooks/post/close_port_sync_certificates
-    mode: 0700
+    mode: "0700"
     content: |
       #!/bin/bash
       ufw deny 80/tcp
@@ -107,7 +107,7 @@
 - name: Create post hook to reload the certificates
   copy:
     dest: /etc/letsencrypt/renewal-hooks/post/reload_certificates
-    mode: 0700
+    mode: "0700"
     content: |
       #!/bin/bash
       service ha-cluster-exporter reload
