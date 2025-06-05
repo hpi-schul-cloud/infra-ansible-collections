@@ -8,7 +8,6 @@
 
 # Audit Keys (private.pem and public.pem) are used to sign and verify the audit logs, 
 # ensuring that the audit log entries are tamper-proof and can be verified.
-
 - name: Get private audit key from vault
   ansible.builtin.copy:
     content: "{{ lookup('dbildungscloud.onepwd.onepwd', secret_name='privacyidea_audit_priv_key', field='private.pem', vault=vault, session_shorthand='ansible-run', credentials=op_credentials) | b64decode }}"
