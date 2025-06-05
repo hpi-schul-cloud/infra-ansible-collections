@@ -10,7 +10,7 @@
 {% if ansible_default_ipv6.address is defined %}
   IP (v6): {{ ansible_default_ipv6.address }}
 {% else %}
-   No default-IPv6 address found.
+  IP (v6): no default-IPv6 address found
 {% endif %}
 
   Managed by Ansible
