@@ -1,0 +1,17 @@
+---
+- name: Deactivate postfix (not used on this host)
+  service:
+    name: postfix
+    enabled: false
+    state: stopped
+  ignore_errors: true
+
+# Automatic security updates are handled by unattended-upgrades. Sometimes a restart is necessary.
+# In the night to Sunday
+- name: Reboot weekly if necessary
+  cron:
+    name: "Weekly reboot for updates"
+    weekday: "{{ inventory_hostname_short[-1] }}"
+    hour: "0"
+    minute: "21"  
+    job: "[ -f /var/run/reboot-required ] && /usr/sbin/reboot"

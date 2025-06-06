@@ -1,0 +1,29 @@
+---
+- name: Determine if the host is a main node (first in group)
+  vars:
+    galera_node_group: "{{ galera_cluster_name }}_{{ project }}_{{ stage }}_{{ privacyidea_variant }}"
+  set_fact:
+    is_main_node: "{{ (groups[galera_node_group] | sort | first) == inventory_hostname }}"
+    is_last_node: "{{ (groups[galera_node_group] | sort | last) == inventory_hostname }}"
+
+- name: Configure MariaDB for PrivacyIDEA
+  mysql_db:
+    name: "{{ privacyidea_mariadb_name }}"
+    login_user: "{{ login_username }}"
+    login_password: "{{ privacyidea_mariadb_root_password }}"
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    state: present
+  when: is_main_node
+
+- name: Create PrivacyIDEA User in MariaDB
+  mysql_user:
+    name: "{{ privacyidea_mariadb_user }}"
+    password: "{{ privacyidea_db_user_password }}"
+    login_user: "{{ login_username }}"
+    login_password: "{{ privacyidea_mariadb_root_password }}"
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    priv: '{{ privacyidea_mariadb_name }}.*:ALL' 
+    state: present
+    host: "{{ hostvars[item].ansible_all_ipv4_addresses | select('match', '10\\..*') | first }}"
+  with_inventory_hostnames: "{{ privacyidea_inventory_hostname }}:&{{ stage }}:&{{ project }} {% if project != 'spshinfra' %}:!infra{% endif %}"                                                   
+  when: is_main_node
