@@ -9,6 +9,22 @@
     name: monitoring
     kind: Namespace
 
+- name: Create Image pull secret token
+  kubernetes.core.k8s:
+    state: present
+    kubeconfig: "{{ kubeconfig }}"
+    proxy: "{{ proxy_url | default(omit, true) }}"
+    proxy_headers: "{{ proxy_headers | default(omit, true) }}"
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: "{{ image_pull_secrets_name }}"
+        namespace: monitoring
+      data:
+        .dockerconfigjson: "{{ image_pull_token_secret }}"
+
 - name: Add metrics-server chart repo
   kubernetes.core.helm_repository:
     name: metrics-server

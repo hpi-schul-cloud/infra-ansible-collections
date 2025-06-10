@@ -1,0 +1,67 @@
+# Last Modified: Mon May 26 08:43:55 2025
+#include <tunables/global>
+
+/var/ossec/bin/wazuh-logcollector {
+#/var/ossec/bin/wazuh-logcollector flags=(audit) {
+#/var/ossec/bin/wazuh-logcollector flags=(complain) {
+  #include <abstractions/base>
+
+  /var/ossec/etc/local_internal_options.conf r,
+  /var/ossec/etc/internal_options.conf r,
+  /var/ossec/etc/ossec.conf r,
+  /var/ossec/etc/shared/agent.conf r,
+
+  /var/log/dpkg.log r,
+  /run/log/journal/ r, 
+  /var/log/journal/ r, 
+  /var/log/journal/** r, 
+  /var/log/nginx/access.log r,
+  /var/log/nginx/error.log r,
+  /var/log/audit/audit.log r,
+  /var/ossec/logs/active-responses.log r,
+  
+  /var/log/wtmp r,
+  /proc/@{pid}/mountinfo r,
+  /proc/@{pid}/mounts r,
+  /proc/@{pid}/net/** r,
+
+  # for last cmd
+  /proc/*/loginuid r,
+  # for netstat cmd
+  /proc/ r,
+  /proc/*/fd/ r,
+  /proc/*/cmdline r,
+  /proc/*/attr/current r,
+  capability sys_ptrace,
+  ptrace (r),
+
+  /var/ossec/logs/ossec.log wr,
+  /var/ossec/var/run/wazuh-logcollector-@{pid}.pid w,
+  /var/ossec/var/run/wazuh-logcollector.state wr,
+  /var/ossec/queue/sockets/logcollector wr,
+  /var/ossec/queue/logcollector/file_status.json wr,
+  /var/ossec/queue/sockets/** wr,
+
+  /etc/nsswitch.conf r,
+  /etc/passwd r,
+  /etc/shadow r,
+  /etc/group r,
+  /etc/machine-id r,
+ 
+
+  /var/ossec/bin/wazuh-logcollector mr,
+  /var/ossec/lib/lib*so* mr,
+
+  capability dac_read_search,
+  capability dac_override,
+  capability setgid,
+  capability setuid,
+
+  /usr/bin/dash rix,
+  /usr/bin/df rix,
+  /usr/bin/netstat rix,
+  /usr/bin/sed rix,
+  /usr/bin/sort rix,
+  /usr/bin/last rix,
+ 
+}
