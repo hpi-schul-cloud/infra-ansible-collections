@@ -2,7 +2,7 @@ GPG_KEYS_ENC='{{ backup_gpg_key_names | join(",") }}'
 GPG_KEY_SIGN='disabled'
 GPG_OPTS='--pinentry-mode loopback --trust-model always'
 GPG='/usr/bin/gpg'
-TARGET="boto3+s3://{{ backup_s3_bucket }}/privacyidea/{% if privacyidea_variant == 'test' %}test/{% endif %}" 
+TARGET="boto3+s3://{{ backup_s3_bucket }}/{{ 'privacyidea-test' if privacyidea_variant == 'test' else 'privacyidea' }}/"
 export AWS_ACCESS_KEY_ID="{{ lookup('dbildungscloud.onepwd.onepwd', secret_name= backup_secret_name, field='AWS_ACCESS_KEY_ID', vault=vault) }}"
 export AWS_SECRET_ACCESS_KEY="{{ lookup('dbildungscloud.onepwd.onepwd', secret_name=  backup_secret_name, field='AWS_SECRET_ACCESS_KEY', vault=vault) }}"
 # base directory to backup
