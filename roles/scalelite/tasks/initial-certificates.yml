@@ -2,7 +2,7 @@
 # We need to run Nginx without SSL at first since we don't have certificates yet
 - name: Copy Nginx Scalelite config without SSL
   vars:
-    scalelite_nginx_ssl: false
+    certbot_only: true
   template:
     src: nginx/scalelite.conf.j2
     dest: "{{ scalelite_docker_volumes_folder }}/nginx/scalelite.conf"
@@ -12,14 +12,31 @@
     project_src: "{{ scalelite_docker_compose_folder }}"
   register: certificates_compose_output
 
-- name: Generate certificates
+- name: Generate base domain certificates
   community.docker.docker_container_exec:
     container: certbot
-    command: certbot certonly --noninteractive --manual --manual-auth-hook /certbot/manual-update.sh --post-hook /certbot/post-hook.sh --preferred-challenges=dns -d *.{{ scalelite_hostname }} -d {{ scalelite_hostname }} --expand --agree-tos --email {{ scalelite_letsencrypt_email }}  {{ '--dry-run' if ansible_check_mode else '' }} --logs-dir /certbot/logs --work-dir /certbot/work
+    command: certbot certonly --noninteractive --manual --manual-auth-hook /certbot/manual-update.sh --post-hook /certbot/post-hook.sh --preferred-challenges=dns -d *.{{ scalelite_basedomain }} -d {{ scalelite_basedomain }} --expand --agree-tos --email {{ scalelite_letsencrypt_email }}  {{ '--dry-run' if ansible_check_mode else '' }} --logs-dir /certbot/logs --work-dir /certbot/work
   # Certbot flag --dry-run is used in check mode
   check_mode: false
   # This task will fail if docker-compose isn't up
   when: certificates_compose_output.services["certbot"]["certbot"].state.running | default(false)
+
+- name: Generate hostname certificate
+  community.docker.docker_container_exec:
+    container: certbot
+    command: certbot certonly --noninteractive --webroot -w /var/www/certbot -d {{ scalelite_host }} --expand --agree-tos --email {{ scalelite_letsencrypt_email }} --manual-public-ip-logging-ok {{ '--dry-run' if ansible_check_mode else '' }} --logs-dir /certbot/logs --work-dir /certbot/work
+  # Certbot flag --dry-run is used in check mode
+  check_mode: false
+  # This task will fail if docker-compose isn't up
+  when: certificates_compose_output.services["certbot"]["certbot"].state.running | default(false) and scalelite_host != scalelite_basedomain
+
+- name: Extra Greenlight instances certificates
+  include_tasks:
+    file: extra-greenlight-certificates.yml
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "{{ instance.name }}"
 
 - name: Copy original Nginx Scalelite config after creating certificates
   template:
