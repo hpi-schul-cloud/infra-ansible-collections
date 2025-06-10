@@ -16,6 +16,11 @@
   group_by:
     key: "{{ galera_cluster_name }}_{{ project }}_{{ stage }}_{{ privacyidea_variant }}"
 
+- name: List all Galera cluster nodes
+  debug:
+    msg: "{{ item }}"
+  loop: "{{ groups[galera_cluster_nodes_group] }}"
+  
 - name: Check number of Nodes 
   ansible.builtin.assert:
     that:
