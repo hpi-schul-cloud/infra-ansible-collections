@@ -1,0 +1,103 @@
+#!/bin/bash
+
+# Node Exporter configuration
+NODE_EXPORTER_DIR="{{ node_exporter_textfile_directory }}"
+METRIC_FILE="${NODE_EXPORTER_DIR}/privacyidea_backup.prom"
+
+# Function to update Node Exporter metrics
+update_node_exporter_metric() {
+local status=$1
+local timestamp=$(date +%s)
+
+mkdir -p "$NODE_EXPORTER_DIR"
+
+cat <<EOF > "$METRIC_FILE"
+# HELP server_cronjob_last_successful_timestamp Timestamp of last successful PrivacyIDEA backup
+# TYPE server_cronjob_last_successful_timestamp gauge
+server_cronjob_last_successful_timestamp{cronjob="PrivacyIdea-backup",schedule="daily"} $timestamp
+# HELP privacyidea_backup_status Status of the last PrivacyIDEA backup (1 = success, 0 = failure)
+# TYPE privacyidea_backup_status gauge
+privacyidea_backup_status $status
+EOF
+    
+chown node-exp:node-exp "$METRIC_FILE"
+chmod 644 "$METRIC_FILE"
+}
+# Function to execute MySQL commands
+mysql_exec() {
+    mysql  -e "$1"
+}
+
+# Function to check if command was successful
+check_success() {
+    if [ $? -ne 0 ]; then
+        mysql_exec " SET GLOBAL net_write_timeout = 60; SET GLOBAL net_read_timeout = 30; SET GLOBAL wsrep_on = ON; SET GLOBAL wsrep_desync = OFF;"
+        echo "Error: $1"
+        exit 1
+    fi
+}
+main_backup_process() {
+rm -rf /backup
+mkdir -p /backup
+cd /backup
+
+export DATE=$( date "+%Y-%m-%d" )
+export DUMPFILE=privacyidea_dump_$DATE
+
+echo "===Desynchronizing the node==="
+
+mysql_exec "SET GLOBAL wsrep_desync = ON;SET GLOBAL wsrep_on = OFF; SET GLOBAL net_read_timeout = 31536000; SET GLOBAL net_write_timeout = 31536000;  "
+
+check_success "Failed to desynchronize the node"
+echo "===Perform the backup==="
+mysqldump --lock-tables=false --max-allowed-packet=1024M --quick --flush-logs {{ privacyidea_mariadb_name }} > $DUMPFILE.sql
+check_success "Failed to create database dump"
+mysql_exec " SET GLOBAL net_write_timeout = 60; SET GLOBAL net_read_timeout = 30; SET GLOBAL wsrep_on = ON; SET GLOBAL wsrep_desync = OFF;"
+check_success "Failed to resynchronize the node"
+gzip $DUMPFILE.sql
+check_success "Failed to compress database dump"
+cd /etc/duply/default
+for cert in *.asc
+do
+    echo "=== Import key $cert ==="
+    gpg --import --batch $cert
+    check_success "Failed to import GPG key $cert"
+done
+for fpr in $(gpg --batch --no-tty --command-fd 0 --list-keys --with-colons | awk -F: '/fpr:/ {print $10}' | sort -u);
+do
+    echo "=== Trusts key $fpr ==="
+    echo -e "5\ny\n" | gpg --batch --no-tty --command-fd 0 --expert --edit-key $fpr trust;
+    check_success "Failed to trust GPG key $fpr"
+done
+
+echo "=== Clean up old backups ==="
+/usr/bin/duply default purge --force
+check_success "Failed to clean up old backups"
+
+echo "=== Execute backup ==="
+/usr/bin/duply default backup
+check_success "Failed to execute backup"
+/usr/bin/duply default status
+check_success "Failed to get backup status"
+
+cd /
+rm -rf /backup
+
+echo "===Resynchronizing the node==="
+
+echo "===The backup was successful==="
+update_node_exporter_metric 1
+}
+
+# Error handling
+handle_error() {
+echo "Error occurred at line $1"
+mysql_exec "SET GLOBAL wsrep_desync = OFF;"
+exit 1
+}
+
+# Set up error handling
+trap 'handle_error $LINENO' ERR
+
+# Run the main backup process
+main_backup_process

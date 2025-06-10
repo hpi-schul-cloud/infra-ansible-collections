@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+cd /etc/duply/default
+for cert in *.asc
+do
+echo "=== Import key $cert ==="
+gpg --import --batch $cert
+done
+for fpr in $(gpg --batch --no-tty --command-fd 0 --list-keys --with-colons  | awk -F: '/fpr:/ {print $10}' | sort -u);
+do
+echo "=== Trusts key $fpr ==="
+echo -e "5\ny\n" |  gpg --batch --no-tty --command-fd 0 --expert --edit-key $fpr trust;
+done
+mkdir /restore
+duply default restore /restore $RESTORE_DATE
+
+cd /restore/backup
+echo -n File 
+zcat /restore/backup/privacyidea_dump_*.gz | mysql {{ privacyidea_mariadb_name }}
+cd /
