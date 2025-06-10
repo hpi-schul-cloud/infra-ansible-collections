@@ -13,6 +13,8 @@
   loop: "{{ domains | flatten | product(files) | map('join', '/') | list }}"
   register: cert_files
 
+# TODO: Ggf. auch noch andere prüfen ?
+
 - name: Create Letsencrypt certificates
   import_tasks:
     file: initial-certificates.yml

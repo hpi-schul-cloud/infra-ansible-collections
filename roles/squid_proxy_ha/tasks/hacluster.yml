@@ -5,14 +5,14 @@
     from: "{{ internal_ip }}/{{ private_network_cidr }}"
 
 - name: Insert other nodes of cluster into /etc/hosts
-  vars: 
-      hostname: "{{ hostvars[item]['ansible_hostname'] }}"
+  vars:
+    hostname: "{{ hostvars[item]['ansible_hostname'] }}"
   blockinfile:
     path: /etc/hosts
     block: |
       {{ hostvars[item]['internal_ip'] }} {{ hostname }}
     marker: "# {mark} ANSIBLE MANAGED BLOCK {{ hostname }}"
-  loop: "{{ groups[unique_ha_group] }}" 
+  loop: "{{ groups[unique_ha_group] | map('string') }}"
 
 - name: Check if cloud-init is present
   stat:
@@ -44,7 +44,7 @@
   pcs_auth:
     node_name: "{{ hostvars[item]['ansible_hostname'] }}"
     password: "{{ cluster_password }}"
-  loop: "{{ groups[unique_ha_group] }}"
+  loop: "{{ groups[unique_ha_group] | map('string') }}"
 
 # After installation there is already a local cluster configured that has to be removed
 - name: Check for initial local cluster
@@ -63,7 +63,7 @@
   pcs_cluster:
     cluster_name: "{{ cluster_name }}"
     state: absent
-  when: cluster_state.detected_node_list_set is defined and 
+  when: cluster_state.detected_node_list_set is defined and
         "127.0.0.1" in cluster_state.detected_node_list_set
 
 - name: Setup cluster
@@ -95,7 +95,7 @@
   pcs_property:
     name: no-quorum-policy
     value: ignore
-  when: is_main_node and 
+  when: is_main_node and
         (groups[unique_ha_group] | length) == 2
 
 - name: Add floating IP resource

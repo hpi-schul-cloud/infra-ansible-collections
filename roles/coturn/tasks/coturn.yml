@@ -63,7 +63,7 @@
     group: "{{ coturn_docker_compose_folder_group }}"
 
 - name: Docker-compose up
-  community.docker.docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ coturn_docker_compose_folder }}"
     remove_orphans: true
 
