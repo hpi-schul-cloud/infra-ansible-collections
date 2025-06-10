@@ -1,10 +1,10 @@
-{% for server in scalelite_nginx_metrics_endpoints %}
+{% for server in owasp_nginx_metrics_endpoints %}
 server {
      server_name {{ server.name }};
      
      listen {{ server.public_port }} ssl;
-     ssl_certificate /etc/letsencrypt/live/{{ scalelite_host }}/fullchain.pem;
-     ssl_certificate_key /etc/letsencrypt/live/{{ scalelite_host }}/privkey.pem;
+     ssl_certificate /etc/letsencrypt/live/{{ owasp_accessed_host_name }}/fullchain.pem;
+     ssl_certificate_key /etc/letsencrypt/live/{{ owasp_accessed_host_name }}/privkey.pem;
      access_log  /var/log/nginx/nodeexporter.access.log;
      location /metrics {
         proxy_set_header X-Real-IP $remote_addr;

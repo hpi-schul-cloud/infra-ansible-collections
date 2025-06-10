@@ -21,6 +21,8 @@ bbb_turn_server_cadvisor_enabled: true
 bbb_freeswitch_server_cadvisor_enabled: true
 # true if cAdvisor is enabled on the Scalelite server on port 9300 /metrics
 scalelite_cadvisor_enabled: false
+# true if cAdvisor is enabled on the owasp server on port 9301 /metrics
+owasp_cadvisor_enabled: false
 # true if postgresexporter is enabled on the Scalelite server on port 9188 /metrics
 scalelite_postgresexporter_enabled: false
 # Name of the Kubernetes secret containing the basic auth credentials for the exporters
