@@ -1,6 +1,6 @@
 
 ---
-- name: Copy privacyidea config file 'pi.cfg' 223
+- name: Copy privacyidea config file 'pi.cfg'
   template:
     src: pi.cfg.j2
     dest: /etc/privacyidea/pi.cfg
