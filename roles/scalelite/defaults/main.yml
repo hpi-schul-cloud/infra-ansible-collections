@@ -34,6 +34,7 @@ scalelite_certbot_resources:
 scalelite_greenlight_enabled: false
 scalelite_greenlight_image_repository: greenlight
 scalelite_greenlight_image_tag: v3.1.0.2
+scalelite_greenlight_user_id: 999
 scalelite_greenlight_extra_instances: []
 scalelite_greenlight_default_locale: de
 scalelite_greenlight_log_level: warn
@@ -243,3 +244,17 @@ scalelite_fail2ban_jail_greenlight: |
   maxretry   = 5
   bantime    = 3600
 scalelite_fail2ban_jail_path_greenlight: /etc/fail2ban/jail.d/greenlight_jail.local
+
+scalelite_clamav_enabled: true
+scalelite_clamav_user_id: 2330
+scalelite_clamav_group_id: 2330
+scalelite_clamav_image: "clamav/clamav"
+scalelite_clamav_log_path: "/var/log/clamav"
+scalelite_clamav_db_path: "/var/lib/clamav"
+scalelite_clamav_resources:
+  limits:
+    cpus: '0.5'
+    memory: '1.5G'
+  reservations:
+    cpus: '0.05'
+    memory: '1G'
