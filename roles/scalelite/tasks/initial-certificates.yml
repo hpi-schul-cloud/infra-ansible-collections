@@ -10,7 +10,25 @@
 - name: Docker-compose up
   community.docker.docker_compose_v2:
     project_src: "{{ scalelite_docker_compose_folder }}"
+    state: restarted
+    services: scalelite-nginx
   register: certificates_compose_output
+
+- name: Make sure certbot is up
+  community.docker.docker_container_info:
+    name: certbot
+  until: "container_info.container.State.Health.Status == 'healthy'"
+  register: container_info
+  retries: 15
+  delay: 10
+
+- name: "Make sure nginx is up"
+  community.docker.docker_container_info:
+    name: scalelite-nginx
+  until: "container_info.container.State.Health.Status == 'healthy'"
+  register: container_info
+  retries: 15
+  delay: 10
 
 - name: Generate base domain certificates
   community.docker.docker_container_exec:
@@ -18,8 +36,22 @@
     command: certbot certonly --noninteractive --manual --manual-auth-hook /certbot/manual-update.sh --post-hook /certbot/post-hook.sh --preferred-challenges=dns -d *.{{ scalelite_basedomain }} -d {{ scalelite_basedomain }} --expand --agree-tos --email {{ scalelite_letsencrypt_email }}  {{ '--dry-run' if ansible_check_mode else '' }} --logs-dir /certbot/logs --work-dir /certbot/work
   # Certbot flag --dry-run is used in check mode
   check_mode: false
-  # This task will fail if docker-compose isn't up
-  when: certificates_compose_output.services["certbot"]["certbot"].state.running | default(false)
+
+- name: Generate hostname certificate
+  community.docker.docker_container_exec:
+    container: certbot
+    command: certbot certonly --noninteractive --webroot -w /var/www/certbot -d {{ scalelite_host }} --expand --agree-tos --email {{ scalelite_letsencrypt_email }} --manual-public-ip-logging-ok {{ '--dry-run' if ansible_check_mode else '' }} --logs-dir /certbot/logs --work-dir /certbot/work
+  # Certbot flag --dry-run is used in check mode
+  check_mode: false
+  when: scalelite_host != scalelite_basedomain
+
+- name: Extra Greenlight instances certificates
+  include_tasks:
+    file: extra-greenlight-certificates.yml
+  loop: "{{ scalelite_greenlight_extra_instances }}"
+  loop_control:
+    loop_var: instance
+    label: "{{ instance.name }}"
 
 - name: Generate hostname certificate
   community.docker.docker_container_exec:

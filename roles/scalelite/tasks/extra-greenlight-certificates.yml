@@ -9,11 +9,6 @@
     path: /etc/letsencrypt/live/{{ instance.hostname }}/privkey.pem
   register: privkey
 
-- name: "{{ instance.name }} - Docker-compose up"
-  community.docker.docker_compose_v2:
-    project_src: "{{ scalelite_docker_compose_folder }}"
-  register: certificates_compose_output
-
 - name: "{{ instance.name }} - Generate certificates"
   community.docker.docker_container_exec:
     container: certbot
@@ -21,5 +16,5 @@
   # Certbot flag --dry-run is used in check mode
   check_mode: false
   # This task will fail if docker-compose isn't up
-  when: certificates_compose_output.services.certbot.certbot.state.running | default(false) and certificates_compose_output.services["scalelite-nginx"]["scalelite-nginx"].state.running and (not fullchain.stat.exists or not privkey.stat.exists)
+  when: not fullchain.stat.exists or not privkey.stat.exists
   notify: Restart scalelite-nginx

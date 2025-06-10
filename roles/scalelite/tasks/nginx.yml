@@ -60,13 +60,8 @@
 
 - name: Install python-passlib
   package:
-    name: python-passlib
+    name: python3-passlib
     state: present
-
-- name: Pip install passlib
-  pip:
-    executable: /usr/bin/pip3
-    name: passlib
 
 - name: Copy basic auth user
   community.general.htpasswd:
