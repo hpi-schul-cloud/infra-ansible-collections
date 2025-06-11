@@ -24,15 +24,12 @@
 
 - name: Set facts
   set_fact:
-    mariadb_mysql_root_password: "{{ privacyidea_mariadb_root_password }}"
     galera_cluster_bind_address: "{{ internal_ip }}"
     galera_cluster_bind_interface: "{{ private_interface }}"
 
 - name: Secure and setup Galera Cluster
   vars:
     mariadb_mysql_root_password:  "{{ privacyidea_mariadb_root_password }}"
-    galera_cluster_bind_address: "{{ internal_ip }}"
-    galera_cluster_bind_interface: "{{ private_interface }}"
     galera_mysql_first_node: "{{ (groups[galera_cluster_nodes_group]|sort)[1]}}"
   include_role:
     name: mrlesmithjr.ansible-mariadb-galera-cluster 
