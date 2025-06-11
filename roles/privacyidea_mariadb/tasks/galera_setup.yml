@@ -9,18 +9,13 @@
   when:
     - hostvars[inventory_hostname]['ansible_' + item].ipv4 is defined
     - hostvars[inventory_hostname]['ansible_' + item]['ipv4']['address'] == hostvars[inventory_hostname].internal_ip
-  with_items: "{{ ansible_interfaces }}"
+  with_items: "{{ interfaces }}"
 
 - name: Create ansible groups for the proxy clusters
   changed_when: false
   group_by:
     key: "{{ galera_cluster_name }}_{{ project }}_{{ stage }}_{{ privacyidea_variant }}"
 
-- name: List all Galera cluster nodes
-  debug:
-    msg: "{{ item }}"
-  loop: "{{ groups[galera_cluster_nodes_group] }}"
-  
 - name: Check number of Nodes 
   ansible.builtin.assert:
     that:
