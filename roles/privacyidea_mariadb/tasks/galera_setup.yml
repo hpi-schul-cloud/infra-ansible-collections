@@ -9,7 +9,8 @@
   when:
     - hostvars[inventory_hostname]['ansible_' + item].ipv4 is defined
     - hostvars[inventory_hostname]['ansible_' + item]['ipv4']['address'] == hostvars[inventory_hostname].internal_ip
-  with_items: "{{ interfaces }}"
+  #with_items: "{{ interfaces }}"
+  with_items: "{{ ansible_interfaces }}"
 
 - name: Create ansible groups for the proxy clusters
   changed_when: false
