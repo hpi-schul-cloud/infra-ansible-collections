@@ -9,7 +9,6 @@
   when:
     - hostvars[inventory_hostname]['ansible_' + item].ipv4 is defined
     - hostvars[inventory_hostname]['ansible_' + item]['ipv4']['address'] == hostvars[inventory_hostname].internal_ip
-  #with_items: "{{ interfaces }}"
   with_items: "{{ ansible_interfaces }}"
 
 - name: Create ansible groups for the proxy clusters
@@ -22,6 +21,12 @@
     that:
       - groups[galera_cluster_nodes_group] | length == 3
     fail_msg: "Cluster Must use at least 3 nodes"
+
+- name: Set facts
+  set_fact:
+    mariadb_mysql_root_password: "{{ privacyidea_mariadb_root_password }}"
+    galera_cluster_bind_address: "{{ internal_ip }}"
+    galera_cluster_bind_interface: "{{ private_interface }}"
 
 - name: Secure and setup Galera Cluster
   vars:
