@@ -1,0 +1,96 @@
+# Last Modified: Mon May 26 08:43:48 2025
+#include <tunables/global>
+
+/var/ossec/bin/wazuh-syscheckd {
+#/var/ossec/bin/wazuh-syscheckd flags=(complain) {
+#/var/ossec/bin/wazuh-syscheckd flags=(audit) {
+  #include <abstractions/base>
+
+  /var/ossec/etc/local_internal_options.conf r,
+  /var/ossec/etc/internal_options.conf r,
+  /var/ossec/etc/ossec.conf r,
+  /var/ossec/etc/shared/** r,
+
+  /var/ossec/queue/sockets/com wr,
+  /var/ossec/queue/alerts/execq wr,
+  /var/ossec/logs/ossec.log wr,
+  /var/ossec/queue/sockets/.agent_info r,
+  /var/ossec/queue/sockets/syscheck rw,
+  /var/ossec/var/run/wazuh-syscheckd-@{pid}.pid wr,
+  /var/ossec/queue/sockets/queue wr,
+  /var/ossec/queue/fim/db/fim.db wrk, 
+  /var/ossec/queue/fim/db/fim.db-journal wr,
+
+  /etc/nsswitch.conf r,
+  /etc/group r,
+  /etc/passwd r,
+  /dev/ r,
+  /dev/** r,
+  /usr/bin/ r,
+  /usr/bin/** r,
+  /usr/sbin/ r,
+  /usr/sbin/** r,
+  /etc/ r,
+  /etc/** r,
+  /root/ r,
+  /root/** r,
+  /var/log/ r,
+  /var/log/** r,
+  /var/mail/ r,
+  /var/lib/ r,
+  /var/lib/** r,
+  /var/www/ r,
+  /var/www/** r,
+  /usr/lib/ r,
+  /usr/lib/** r,
+  /usr/include/ r,
+  /usr/include/** r,
+  /tmp/ r,
+  /tmp/** r,
+  /boot/ r,
+  /boot/** r,
+  /usr/local/ r,
+  /usr/local/** r,
+  /usr/bin/ r,
+  /usr/bin/** r,
+  /usr/sbin/ r,
+  /usr/sbin/** r,
+  /var/tmp/ r,
+  /var/tmp/** r,
+  /sys/ r,
+  /proc/*/ r,
+  /run/systemd/userdb/ r,
+  /proc/sys/kernel/random/boot_id r,
+
+  /run/systemd/userdb/io.systemd.DynamicUser wr,
+
+  /proc/ r,
+  /proc/*/fd/ r,
+  /proc/*/fd/** r,
+  /proc/*/stat r,
+  /proc/*/sched r,
+  /proc/*/statm r,
+  /proc/*/cmdline r,
+  /proc/*/environ r,
+  /proc/*/mountinfo r,
+  /proc/*/task/ r,
+  /proc/@{pid}/net/** r,
+ 
+
+  /var/ossec/bin/wazuh-syscheckd mr,
+  /var/ossec/lib/lib*so* mr,
+
+ 
+  capability dac_read_search,
+  capability dac_override,
+  capability setgid,
+  capability kill, 
+  capability net_bind_service,
+  capability net_admin,
+  capability sys_module,
+
+  network dgram,
+  network stream,
+
+  /usr/bin/dash rUx,
+}

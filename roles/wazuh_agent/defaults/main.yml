@@ -17,3 +17,6 @@ wazuh_agent_registration_key: ""
 # Recommended to prevent accidentally having a higher version than the server
 # (https://documentation.wazuh.com/current/installation-guide/wazuh-agent/wazuh-agent-package-linux.html#deploy-a-wazuh-agent)
 wazuh_agent_hold_package: true
+
+# Wazuh should be guarded by AppArmor
+wazuh_agent_apparmor_active: true

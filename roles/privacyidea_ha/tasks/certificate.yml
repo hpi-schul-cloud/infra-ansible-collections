@@ -44,10 +44,10 @@
 - name: Ensure nodes are present in known_hosts file
   known_hosts:
     name: "{{ hostvars[item]['ansible_hostname'] }}"
-    key: "{{ lookup('pipe', 'ssh-keyscan ' ~ hostvars[item]['inventory_hostname']) }}"
+    key: "{{ lookup('pipe', 'ssh-keyscan ' ~ hostvars[item]['inventory_hostname']) | string }}"
     hash_host: true
   when: is_main_node
-  loop: "{{ groups[unique_ha_group] }}" 
+  loop: "{{ groups[unique_ha_group] }}"
 
 - name: Temporarily allow port 80 for letsencrypt
   ufw:
