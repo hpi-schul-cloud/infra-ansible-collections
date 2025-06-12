@@ -1,0 +1,76 @@
+---
+- name: Determine internal IP
+  set_fact:
+    internal_ip: "{{ ansible_all_ipv4_addresses | select('match', '10\\..*') | first }}"
+
+- name: Figure out network device of private network
+  set_fact:
+    private_interface: "{{ hostvars[inventory_hostname]['ansible_' + item]['device'] }}"
+  when:
+    - hostvars[inventory_hostname]['ansible_' + item].ipv4 is defined
+    - hostvars[inventory_hostname]['ansible_' + item]['ipv4']['address'] == hostvars[inventory_hostname].internal_ip
+  with_items: "{{ ansible_interfaces }}"
+
+- name: Create ansible groups for the proxy clusters
+  changed_when: false
+  group_by:
+    key: "{{ galera_cluster_name }}_{{ project }}_{{ stage }}_{{ privacyidea_variant }}"
+
+- name: Check number of Nodes 
+  ansible.builtin.assert:
+    that:
+      - groups[galera_cluster_nodes_group] | length == 3
+    fail_msg: "Cluster Must use at least 3 nodes"
+
+- name: Set facts
+  set_fact:
+    galera_cluster_bind_address: "{{ internal_ip }}"
+    galera_cluster_bind_interface: "{{ private_interface }}"
+
+- name: Secure and setup Galera Cluster
+  vars:
+    mariadb_mysql_root_password:  "{{ privacyidea_mariadb_root_password }}"
+    galera_mysql_first_node: "{{ (groups[galera_cluster_nodes_group]|sort)[1]}}"
+  include_role:
+    name: mrlesmithjr.ansible-mariadb-galera-cluster 
+
+- name: Set wsrep_auto_increment_control in galera-privacyidea.cnf
+  ansible.builtin.copy:
+    content: |
+      [galera]
+      wsrep_auto_increment_control=off
+    dest: /etc/mysql/conf.d/galera-privacyidea.cnf
+    owner: root
+    group: root
+    mode: 0644
+  register: wsrep_config_changed
+
+- name: Ensure 'wsrep_auto_increment_control' is not set in galera.cnf
+  ansible.builtin.lineinfile:
+    path: /etc/mysql/conf.d/galera.cnf
+    regexp: '^wsrep_auto_increment_control\s*=.*$'
+    state: absent
+  register: wsrep_remove_changed
+
+- name: Restart mariadb service
+  service:
+    name: mariadb
+    state: restarted
+  become: true
+  when: wsrep_config_changed.changed or wsrep_remove_changed.changed
+
+- name: Check if /usr/sbin/pcs exists
+  ansible.builtin.stat:
+    path: /usr/sbin/pcs
+  register: pcs_stat
+  delegate_to: "{{ groups[privacyidea_inventory_hostname] | first }}"
+  ignore_errors: true
+
+- name: Cleanup pacemaker resources after restarting database
+  ansible.builtin.command: /usr/sbin/pcs resource cleanup
+  become: true
+  ignore_errors: true
+  when:
+    - pcs_stat.stat.exists
+    - wsrep_config_changed.changed or wsrep_remove_changed.changed
+  delegate_to: "{{ groups[privacyidea_inventory_hostname] | first }}"

@@ -1,0 +1,29 @@
+---
+- name: Setup mysqld_exporter in Galera Nodes       
+  vars:
+    mysqld_exporter_basic_auth_users:
+        "exporter": "{{ privacyidea_galera_mysql_node_exporter}}"
+    mysqld_exporter_password: "{{ privacyidea_galera_mysql_node_exporter}}"
+    privacyidea_mariadb_root_password: "{{ mariadb_password }}"
+  include_role:
+    name: prometheus.prometheus.mysqld_exporter
+
+- name: Create mysqld_exporter User in MariaDB
+  mysql_user:
+    name: "exporter"
+    password: "{{ mysqld_exporter_password }}"
+    login_user: "{{ login_username }}"
+    login_password: "{{ privacyidea_mariadb_root_password }}"
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    priv: '{{ privacyidea_mariadb_name }}.*:ALL'
+    state: present
+    host: "localhost"
+  when: is_main_node
+
+- name: Grant Global Privileges to mysqld_exporter User
+  mysql_query:
+    login_user: "{{ login_username }}"
+    login_password: "{{ privacyidea_mariadb_root_password }}"
+    login_unix_socket: "/var/run/mysqld/mysqld.sock"
+    query: "GRANT PROCESS, SUPER, SLAVE MONITOR ON *.* TO 'exporter'@'localhost';"
+  when: is_main_node

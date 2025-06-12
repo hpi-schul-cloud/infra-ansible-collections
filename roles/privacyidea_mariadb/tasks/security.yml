@@ -1,0 +1,28 @@
+- name: Add fail2ban and ufw 
+  apt:
+    name: 
+    - ufw
+    - fail2ban
+    state: latest
+
+- name: Enable ufw (deny all)
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: Allow required ports
+  ufw:
+    rule: allow
+    port: '{{ item.port }}'
+    comment: '{{ item.name }}'
+    proto: '{{ item.protocol }}' 
+    from_ip: '{{ item.from | default("any")}}' 
+    to_ip: '{{ item.to | default("any")}}'         
+  loop:
+    - { protocol: tcp, port: 22,   name: "SSH" }
+    - { protocol: tcp, port: 9100, name: "Node exporter"}
+    - { protocol: tcp, port: 9104, name: "MySQL exporter"}
+    - { protocol: tcp, port: 3306, name: "MySQL", from: "{{ internal_ip }}/{{ private_network_cidr }}" }
+    - { protocol: tcp, port: 4567, name: "Galera WSREP", from: "{{ internal_ip }}/{{ private_network_cidr }}" }
+    - { protocol: tcp, port: 4568, name: "Galera IST", from: "{{ internal_ip }}/{{ private_network_cidr }}" }
+    - { protocol: tcp, port: 4444, name: "Galera SST", from: "{{ internal_ip }}/{{ private_network_cidr }}" }
