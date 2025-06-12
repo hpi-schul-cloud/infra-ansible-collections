@@ -1,0 +1,18 @@
+---
+galera_cluster_name: ""
+galera_cluster_nodes_group: ""
+project: "spsh"
+stage: ""
+privacyidea_variant: ""
+
+privacyidea_mariadb_root_password: ""
+privacyidea_mariadb_user: ""
+privacyidea_mariadb_name: ""
+privacyidea_db_user_password: ""
+
+private_network_cidr: 24
+privacyidea_inventory_hostname: ""
+
+privacyidea_galera_mysql_node_exporter: ""
+mariadb_password: ""
+login_username: root
