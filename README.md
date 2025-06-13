@@ -1,3 +1,5 @@
+# DEPRECATED
+**This repository has been moved to [dBildungsplattform/infra-ansible-collections](https://github.com/dBildungsplattform/infra-ansible-collections) and will no longer get updated.**
 
 # These are our Ansible Roles 
 They are used in the infra-schulcloud repo and installed over the Makefile
